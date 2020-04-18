@@ -27,7 +27,7 @@
     `(module
        ,@non-elem-defs
        (table ,scheme-procedures-table-id ,(length elem-func-indices) funcref)
-       (elem ,scheme-procedures-table-id (i32.const 0) ,@elem-func-indices)
+       (elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices)
        (func $main (result i32)
              ,@top-level-code)
        (export "main" (func $main)))))

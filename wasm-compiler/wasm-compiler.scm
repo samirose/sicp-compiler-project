@@ -176,8 +176,29 @@
 
 ;;;lambda expressions
 
-(define (make-scheme-procedure-type-id formals)
-  (make-id 'scm-procedure (length formals)))
+(define (make-scheme-procedure-type-id arity)
+  (make-id 'scm-procedure arity))
+
+(define scheme-procedure-param-type 'i32)
+
+(define (make-scheme-procedure-param-list arity)
+  (letrec ((make-list
+            (lambda (l e n)
+              (if (= n 0)
+                  l
+                  (make-list (cons e l) e (- n 1))))))
+    (if (= 0 arity)
+        '()
+        (cons 'param
+              (make-list '() scheme-procedure-param-type arity)))))
+
+(define (add-scheme-procedure-type-definition module arity)
+  (let* ((type-id (make-scheme-procedure-type-id arity))
+         (type-definition
+          `(type ,type-id (func (,@(make-scheme-procedure-param-list arity)) (result i32)))))
+    (if (not ((module 'definition-index) type-definition))
+        ((module 'add-definition!) type-definition))
+    type-id))
 
 (define scheme-procedures-table-id '$scm-procedures)
 
@@ -185,18 +206,14 @@
   (let* ((func-index
           ; Generate id for the lambda function's type based on number of parameters
           (let* ((formals (lambda-parameters exp))
-                 (params (map (lambda (arg) '(param i32)) formals))
-                 (type-id (make-scheme-procedure-type-id formals))
-                 (type-definition `(type ,type-id (func ,@params (result i32))))
+                 (func-type-id
+                  (add-scheme-procedure-type-definition module (length formals)))
                  (body-code
                    (compile-sequence
                     (lambda-body exp) module (cons formals lexical-env) compile)))
-            ; Add type for the lambda's function unless it is already defined in the module
-            (if (not ((module 'definition-index) type-definition))
-                ((module 'add-definition!) type-definition))
             ; Add function to the module and keep its index in func-index
             ((module 'add-definition!)
-             `(func (type ,type-id) ,@body-code))))
+             `(func (type ,func-type-id) ,@body-code))))
          ; Add table element for the function for indirect calling.
          ; The module post-processing will combine the elem items to a single item and add a
          ; table element of correct size.
@@ -215,7 +232,7 @@
          (map (lambda (operand) (compile operand module lexical-env))
               (operands exp)))
         (func-type-id
-         (make-scheme-procedure-type-id (operands exp))))
+         (add-scheme-procedure-type-definition module (length (operands exp)))))
     (append
      (construct-arglist operand-codes)
      proc-code

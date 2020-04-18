@@ -159,12 +159,11 @@
         (a-code (compile (if-alternative exp) module lexical-env)))
     (append
      p-code
-     (append
-      '(if (result i32))
-      c-code
-       '(else)
-       a-code
-       '(end)))))
+     '(if (result i32))
+     c-code
+     '(else)
+     a-code
+     '(end))))
 
 ;;; sequences
 

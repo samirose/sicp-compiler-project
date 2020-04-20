@@ -1,6 +1,6 @@
 #lang sicp
 (#%require "scheme-syntax.scm")
-(#%require "wasm-module.scm")
+(#%require "wasm-definitions-table.scm")
 (#%require "lists.scm")
 (#%provide compile-to-wasm-module)
 
@@ -14,7 +14,7 @@
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 
 (define (compile-to-wasm-module exp)
-  (let* ((module (make-wasm-module))
+  (let* ((module (make-wasm-definitions-table))
          (top-level-code (compile exp module '()))
          (elem-def? (lambda (def) (eq? (car def) 'elem)))
          (elem-defs

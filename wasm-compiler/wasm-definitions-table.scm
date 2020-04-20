@@ -1,8 +1,8 @@
 #lang sicp
 (#%require "lists.scm")
-(#%provide make-wasm-module)
+(#%provide make-wasm-definitions-table)
 
-(define (make-definition-vector)
+(define (make-definition-list)
   (let*
       ((head '())
        (tail head)
@@ -24,7 +24,7 @@
         ((eq? m 'definitions)
          head)
         (else
-         (error "Unknown message -- definition-vector" m))))))
+         (error "Unknown message -- definition-list:" m))))))
 
 (define (index-of-equal l e)
   (letrec
@@ -35,19 +35,19 @@
                 (else (search (cdr l) (+ i 1)))))))
     (search l 0)))
 
-(define (make-wasm-module)
+(define (make-wasm-definitions-table)
   (let*
       ((definition-keys '(type func table elem))
        (definitions-table
          (map (lambda (key)
-                (cons key (make-definition-vector)))
+                (cons key (make-definition-list)))
               definition-keys))
        (definition-vector
          (lambda (tag)
            (let ((entry (assq tag definitions-table)))
              (if entry
                  (cdr entry)
-                 (error "Unsupported definition type -- wasm-module" tag))))))
+                 (error "Unsupported definition type -- definitions-table:" tag))))))
     (lambda (m)
       (cond
         ((eq? m 'add-definition!)

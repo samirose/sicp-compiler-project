@@ -195,7 +195,7 @@
 (define (add-scheme-procedure-type-definition module arity)
   (let* ((type-id (make-scheme-procedure-type-id arity))
          (type-definition
-          `(type ,type-id (func (,@(make-scheme-procedure-param-list arity)) (result i32)))))
+          `(type ,type-id (func ,(make-scheme-procedure-param-list arity) (result i32)))))
     (if (not ((module 'definition-index) type-definition))
         ((module 'add-definition!) type-definition))
     type-id))

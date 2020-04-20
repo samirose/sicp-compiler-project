@@ -26,15 +26,6 @@
         (else
          (error "Unknown message -- definition-list:" m))))))
 
-(define (index-of-equal l e)
-  (letrec
-      ((search
-        (lambda (l i)
-          (cond ((null? l) #f)
-                ((equal? (car l) e) i)
-                (else (search (cdr l) (+ i 1)))))))
-    (search l 0)))
-
 (define (make-wasm-definitions-table)
   (let*
       ((definition-keys '(type func table elem))

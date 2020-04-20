@@ -182,15 +182,10 @@
 (define scheme-procedure-param-type 'i32)
 
 (define (make-scheme-procedure-param-list arity)
-  (letrec ((make-list
-            (lambda (l e n)
-              (if (= n 0)
-                  l
-                  (make-list (cons e l) e (- n 1))))))
-    (if (= 0 arity)
-        '()
-        (cons 'param
-              (make-list '() scheme-procedure-param-type arity)))))
+  (if (= 0 arity)
+      '()
+      (cons 'param
+            (make-list scheme-procedure-param-type arity))))
 
 (define (add-scheme-procedure-type-definition module arity)
   (let* ((type-id (make-scheme-procedure-type-id arity))

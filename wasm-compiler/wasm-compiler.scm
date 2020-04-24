@@ -1,6 +1,7 @@
 #lang sicp
 (#%require "scheme-syntax.scm")
 (#%require "wasm-definitions-table.scm")
+(#%require "wasm-syntax.scm")
 (#%require "lists.scm")
 (#%provide compile-to-wasm-module)
 
@@ -16,14 +17,10 @@
 (define (compile-to-wasm-module exp)
   (let* ((module (make-wasm-definitions-table))
          (top-level-code (compile exp module '()))
-         (elem-def? (lambda (def) (eq? (car def) 'elem)))
-         (elem-defs
-          (filter elem-def? (module 'definitions)))
-         (non-elem-defs
-          (filter
-           (lambda (def) (not (elem-def? def)))
-           (module 'definitions)))
-         (elem-func-indices (map caddr elem-defs)))
+         (elem-def? (lambda (def) (wasm-definition-type? 'elem def)))
+         (elem-defs (filter elem-def? (module 'definitions)))
+         (non-elem-defs (reject elem-def? (module 'definitions)))
+         (elem-func-indices (map wasm-elem-definition-func-index elem-defs)))
     `(module
        ,@non-elem-defs
        (table ,scheme-procedures-table-id ,(length elem-func-indices) funcref)

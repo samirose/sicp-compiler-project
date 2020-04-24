@@ -9,6 +9,9 @@
                (filter predicate (cdr sequence))))
         (else (filter predicate (cdr sequence)))))
 
+(define (reject predicate sequence)
+  (filter (lambda (elem) (not (predicate elem))) sequence))
+
 (define (index-of-equal l e)
   (letrec
       ((search

@@ -1,11 +1,14 @@
-#lang sicp
-(#%require "scheme-syntax.scm")
-(#%require "wasm-definitions-table.scm")
-(#%require "wasm-syntax.scm")
-(#%require "lists.scm")
-(#%provide compile-to-wasm-module)
+#!r6rs
+(library (wasm-compiler)
+         (export compile-to-wasm-module)
+         (import (rnrs base)
+                 (rnrs lists)
+                 (lists)
+                 (scheme-syntax)
+                 (wasm-definitions-table)
+                 (wasm-syntax))
 
-;;;; SCHEME to WAT (WebAssembly Text format) compiler written in Racket
+;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
 
 ;; Currently supports compilation of:
 ;; * 32-bit integer values
@@ -238,3 +241,4 @@
        (construct-arglist (cdr operand-codes)))))
 
 '(COMPILER LOADED)
+)

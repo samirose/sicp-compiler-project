@@ -8,10 +8,10 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 
 ## Goals
 
-* Implement the compiler in [Scheme](https://en.wikipedia.org/wiki/Scheme_(programming_language)), using [Racket](https://racket-lang.org) as the development platform
+* Implement the compiler in [Scheme](https://en.wikipedia.org/wiki/Scheme_(programming_language)) [R6RS](http://www.r6rs.org), using [Racket](https://racket-lang.org) as the development platform
 * Learn about Scheme and compilation of functional languages in general
-* Get familiar of WebAssembly as an environment and compiler target
-* Stay in the spirit of SICP and the simple Scheme used in the book
+* Get familiar of WebAssembly as an execution environment and compiler target
+* Stay in the spirit of simple Scheme of SICP and use as little of R6RS as possible
 * Implement as much of the required run-time support in Scheme as possible
 * Write the required native run-time support in WAT
 * Use only basic, standardised WASM features initially
@@ -29,14 +29,16 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 
 * Compilation of 32-bit integer values and open-coded application of + - * / = operators
 * Scheme if statement to WASM if statement
+* Compilation of lambda expressions to WASM functions and values that can be applied to arguments
+* Compilation of Scheme to a WASM module with the top-level code in an exported `func` "main"
+* Port the compiler from Racket `#lang sicp` to standard R6RS Scheme (still using Racket as the development platform)
 
 ## Features currently under work
 
-* Draft compilation of lambdas and lambda application
-
 ## Rough backlog
 
-* Implement function values as WASM i32 function indices
+* Implement a simple compiler "driver" that can be given a program from standard input and that emits a WASM module to standard output
+* Add a few automated tests of the compiler using the driver
 * Implement support for top-level definitions. _Scan out_ (see [SICP chapter 4.16](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1.6)) internal definitions.
 * Export top-level definitions from the WASM module
 * Add run-time support for rudimentary heap-based values: vectors, pairs

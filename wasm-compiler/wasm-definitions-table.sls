@@ -1,6 +1,9 @@
-#lang sicp
-(#%require "lists.scm")
-(#%provide make-wasm-definitions-table)
+#!r6rs
+(library (wasm-definitions-table)
+  (export make-wasm-definitions-table)
+  (import (lists)
+          (rnrs)
+          (rnrs mutable-pairs))
 
 (define (make-definition-list)
   (let*
@@ -24,7 +27,7 @@
         ((eq? m 'definitions)
          head)
         (else
-         (error "Unknown message -- definition-list:" m))))))
+         (error "Unknown message -- definition-list" m))))))
 
 (define (make-wasm-definitions-table)
   (let*
@@ -38,7 +41,7 @@
            (let ((entry (assq tag definitions-table)))
              (if entry
                  (cdr entry)
-                 (error "Unsupported definition type -- definitions-table:" tag))))))
+                 (error "Unsupported definition type -- definitions-table" tag))))))
     (lambda (m)
       (cond
         ((eq? m 'add-definition!)
@@ -58,4 +61,5 @@
                        ((cdr entry) 'definitions))
                      definitions-table)))
         (else
-         (error "Unknown message -- wasm-module"))))))
+         (error "Unknown message -- wasm-definitions-table" m))))))
+)

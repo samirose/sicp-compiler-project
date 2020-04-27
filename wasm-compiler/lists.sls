@@ -1,13 +1,8 @@
-#lang sicp
-
-(#%provide (all-defined))
-
-(define (filter predicate sequence)
-  (cond ((null? sequence) nil)
-        ((predicate (car sequence))
-         (cons (car sequence)
-               (filter predicate (cdr sequence))))
-        (else (filter predicate (cdr sequence)))))
+#!r6rs
+(library (lists)
+  (export reject index-of-equal make-list)
+  (import (rnrs base)
+          (rnrs lists))
 
 (define (reject predicate sequence)
   (filter (lambda (elem) (not (predicate elem))) sequence))
@@ -31,3 +26,4 @@
     (if (< n 0)
         (error "Expected positive n -- make-list:" n)
         (loop '() e n))))
+)

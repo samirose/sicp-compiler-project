@@ -1,6 +1,18 @@
-;; Adapted from ch5-syntax.scm for Racket.
-#lang sicp
-(#%provide (all-defined))
+#!r6rs
+;; Adapted from ch5-syntax.scm for R6RS.
+
+(library (scheme-syntax)
+  (export self-evaluating?
+          quoted? text-of-quotation
+          variable?
+          assignment? assignment-variable assignment-value
+          definition? definition-variable definition-value
+          lambda? lambda-parameters lambda-body
+          if? if-predicate if-consequent if-alternative
+          begin? begin-actions last-exp? first-exp rest-exps
+          application? operator operands
+          cond? cond->if)
+  (import (rnrs base))
 
 ;;;;SCHEME SYNTAX FROM SECTION 4.1.2 OF STRUCTURE AND INTERPRETATION OF
 ;;;  COMPUTER PROGRAMS, TO SUPPORT CHAPTER 5
@@ -8,9 +20,9 @@
 ;;;; (for simulation of eceval machine operations)
 
 (define (self-evaluating? exp)
-  (cond ((number? exp) true)
-        ((string? exp) true)
-        (else false)))
+  (cond ((number? exp) #t)
+        ((string? exp) #f)
+        (else #f)))
 
 
 (define (quoted? exp)
@@ -21,7 +33,7 @@
 (define (tagged-list? exp tag)
   (if (pair? exp)
       (eq? (car exp) tag)
-      false))
+      #f))
 
 
 (define (variable? exp) (symbol? exp))
@@ -122,3 +134,4 @@
                      (sequence->exp (cond-actions first))
                      (expand-clauses rest))))))
 ;; end of Cond support
+)

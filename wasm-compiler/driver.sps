@@ -3,5 +3,5 @@
         (rnrs io simple)
         (wasm-compiler))
 
-(display
- (compile-to-wasm-module '((lambda (x) (* x x)) (+ 1 2))))
+(write (compile-to-wasm-module (read)))
+(newline)

@@ -20,7 +20,7 @@ compile : $(COMPILED_COMPILER)
 	$(SCHEME) ++path $(LIBDIR) driver.sps $<
 
 
-TEST_PROGRAMS = $(wildcard test/*.scm)
+TEST_PROGRAMS := $(wildcard test/*.scm)
 TEST_LOGS = $(patsubst test/%.scm,test/log/%.log,$(TEST_PROGRAMS))
 
 .PHONY : test

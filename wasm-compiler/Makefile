@@ -26,11 +26,8 @@ TEST_LOGS = $(patsubst test/%.scm,test/log/%.log,$(TEST_PROGRAMS))
 .PHONY : test
 test : $(TEST_LOGS)
 
-test/build:
-	mkdir -p test/build
-
-test/log :
-	mkdir -p test/log
+test/build test/log:
+	mkdir -p $@
 
 $(TEST_LOGS) : test/log/%.log : test/build/%.json test/log
 	spectest-interp $< | tee $@

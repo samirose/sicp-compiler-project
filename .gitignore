@@ -3,3 +3,5 @@
 \#*\#
 compiled/
 wasm-compiler/lib/
+build/
+log/

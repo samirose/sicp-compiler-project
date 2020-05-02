@@ -19,8 +19,34 @@ lib/wasm-compiler : lib/lists lib/scheme-syntax lib/wasm-syntax lib/wasm-definit
 compile : $(COMPILED_COMPILER)
 	$(SCHEME) ++path $(LIBDIR) driver.sps $<
 
+
+TEST_PROGRAMS = $(wildcard test/*.scm)
+TEST_LOGS = $(patsubst test/%.scm,test/log/%.log,$(TEST_PROGRAMS))
+
+.PHONY : test
+test : $(TEST_LOGS)
+
+test/build:
+	mkdir -p test/build
+
+test/log :
+	mkdir -p test/log
+
+$(TEST_LOGS) : test/log/%.log : test/build/%.json test/log
+	spectest-interp $< | tee $@
+
+test/build/%.json : test/build/%.wast
+	wast2json $< -o $@
+
+test/build/%.wast : test/build/%.wat test/%.wast
+	cat $^ > $@
+
+test/build/%.wat : test/%.scm $(COMPILED_COMPILER) test/build
+	$(SCHEME) ++path $(LIBDIR) driver.sps < $< > $@
+
+
 .PHONY : cleanall
-cleanall : cleanlibs cleancompiler
+cleanall : cleantest cleanlibs cleancompiler
 
 .PHONY : cleancompiler
 cleancompiler :
@@ -29,3 +55,7 @@ cleancompiler :
 .PHONY : cleanlibs
 cleanlibs :
 	-rm -rf $(LIBDIRS)
+
+.PHONY : cleantest
+cleantest :
+	-rm -rf test/build test/log

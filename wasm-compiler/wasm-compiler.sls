@@ -126,7 +126,7 @@
   '((+ (i32.add))
     (- (i32.sub))
     (* (i32.mul))
-    (/ (i32.div))
+    (/ (i32.div_s))
     (= (i32.eq))))
 
 (define (open-coded-primitive-application? exp)

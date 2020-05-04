@@ -23,14 +23,24 @@
          (elem-def? (lambda (def) (wasm-definition-type? 'elem def)))
          (elem-defs (filter elem-def? (module 'definitions)))
          (non-elem-defs (reject elem-def? (module 'definitions)))
-         (elem-func-indices (map wasm-elem-definition-func-index elem-defs)))
-    `(module
-       ,@non-elem-defs
-       (table ,scheme-procedures-table-id ,(length elem-func-indices) funcref)
-       (elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices)
-       (func $main (result i32)
-             ,@top-level-code)
-       (export "main" (func $main)))))
+         (elem-func-indices (map wasm-elem-definition-func-index elem-defs))
+         (table-definition
+          (if (null? elem-func-indices)
+              '()
+              `(table ,scheme-procedures-table-id ,(length elem-func-indices) funcref)))
+         (elem-definition
+          (if (null? elem-func-indices)
+              '()
+              `(elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices))))
+    (remp
+     null?
+     `(module
+        ,@non-elem-defs
+        ,table-definition
+        ,elem-definition
+        (func $main (result i32)
+              ,@top-level-code)
+        (export "main" (func $main))))))
 
 (define (compile exp module lexical-env)
   (cond ((self-evaluating? exp)

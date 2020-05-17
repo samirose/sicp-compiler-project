@@ -1,6 +1,6 @@
 SCHEME := plt-r6rs
 LIBDIR := lib/
-LIBS := lists scheme-syntax wasm-syntax wasm-definitions-table wasm-compiler
+LIBS := lists scheme-syntax lexical-env wasm-syntax wasm-definitions-table wasm-compiler
 LIBDIRS = $(addprefix $(LIBDIR),$(LIBS))
 COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
 

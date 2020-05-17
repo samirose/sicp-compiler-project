@@ -5,6 +5,7 @@
                  (rnrs lists)
                  (lists)
                  (scheme-syntax)
+                 (lexical-env)
                  (wasm-definitions-table)
                  (wasm-syntax))
 
@@ -74,30 +75,6 @@
 
 (define (compile-quoted exp)
   (error "Quote not supported yet" exp))
-
-; From solution exercise 5.39
-(define (make-lexical-address frame-index var-index)
-  (cons frame-index var-index))
-
-(define (frame-index lexical-address)
-  (car lexical-address))
-
-(define (var-index lexical-address)
-  (cdr lexical-address))
-
-; From solution to exercise 5.41
-(define (find-variable var lexical-env)
-  (define (scan env frame frame-index var-index)
-    (if (null? frame)
-        (if (null? (cdr env))
-            'not-found
-            (scan (cdr env) (cadr env) (+ frame-index 1) 0))
-        (if (eq? (car frame) var)
-            (make-lexical-address frame-index var-index)
-            (scan env (cdr frame) frame-index (+ var-index 1)))))
-  (if (null? lexical-env)
-      'not-found
-      (scan lexical-env (car lexical-env) 0 0)))
 
 (define (compile-variable exp lexical-env)
   (let ((lexical-address (find-variable exp lexical-env)))

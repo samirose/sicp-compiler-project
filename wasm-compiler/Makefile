@@ -14,7 +14,7 @@ $(LIBDIR)% : %.sls
 	touch $@
 
 lib/wasm-definitions-table : lib/lists
-lib/wasm-compiler : lib/lists lib/scheme-syntax lib/wasm-syntax lib/wasm-definitions-table
+lib/wasm-compiler : lib/lists lib/lexical-env lib/scheme-syntax lib/wasm-syntax lib/wasm-definitions-table
 
 .PHONY : compile
 compile : $(COMPILED_COMPILER)

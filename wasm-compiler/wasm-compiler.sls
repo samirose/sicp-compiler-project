@@ -50,7 +50,7 @@
                      ,@top-level-code)
                (export "main" (func $main)))))
         (remp null? module-code))
-      (error "Invalid r7rs library" exp)))
+      (error "Invalid R7RS library" exp)))
 
 (define (compile-single-exp-to-wasm-module exp)
   (let ((library

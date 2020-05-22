@@ -11,11 +11,6 @@
                  (wasm-syntax))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
-
-;; Currently supports compilation of:
-;; * 32-bit integer values
-;; * Open-coded compilation of application of + - * / = operators
-
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 

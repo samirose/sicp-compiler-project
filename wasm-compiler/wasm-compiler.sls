@@ -1,6 +1,7 @@
 #!r6rs
 (library (wasm-compiler)
-         (export compile-to-wasm-module)
+         (export compile-r7rs-library-to-wasm-module
+                 compile-single-exp-to-wasm-module)
          (import (rnrs base)
                  (rnrs lists)
                  (lists)
@@ -18,30 +19,45 @@
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 
-(define (compile-to-wasm-module exp)
-  (let* ((module (make-wasm-definitions-table))
-         (top-level-code (compile exp module '()))
-         (elem-def? (lambda (def) (wasm-definition-type? 'elem def)))
-         (elem-defs (filter elem-def? (module 'definitions)))
-         (non-elem-defs (reject elem-def? (module 'definitions)))
-         (elem-func-indices (map wasm-elem-definition-func-index elem-defs))
-         (table-definition
-          (if (null? elem-func-indices)
-              '()
-              `(table ,scheme-procedures-table-id ,(length elem-func-indices) funcref)))
-         (elem-definition
-          (if (null? elem-func-indices)
-              '()
-              `(elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices))))
-    (remp
-     null?
-     `(module
-        ,@non-elem-defs
-        ,table-definition
-        ,elem-definition
-        (func $main (result i32)
-              ,@top-level-code)
-        (export "main" (func $main))))))
+(define (compile-r7rs-library-to-wasm-module exp)
+  (if (and (pair? exp) (eq? (car exp) 'define-library))
+      (let*
+          ((module (make-wasm-definitions-table))
+           (library-decls (filter pair? exp))
+           (exps (assq 'begin library-decls))
+           (top-level-code
+            (if (not (null? exps))
+                (compile exps module '())
+                (error "No begin declaration in library" exp)))
+           (elem-def? (lambda (def) (wasm-definition-type? 'elem def)))
+           (elem-defs (filter elem-def? (module 'definitions)))
+           (non-elem-defs (reject elem-def? (module 'definitions)))
+           (elem-func-indices (map wasm-elem-definition-func-index elem-defs))
+           (table-definition
+            (if (null? elem-func-indices)
+                '()
+                `(table ,scheme-procedures-table-id ,(length elem-func-indices) funcref)))
+           (elem-definition
+            (if (null? elem-func-indices)
+                '()
+                `(elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices)))
+           (module-code
+            `(module
+               ,@non-elem-defs
+               ,table-definition
+               ,elem-definition
+               (func $main (result i32)
+                     ,@top-level-code)
+               (export "main" (func $main)))))
+        (remp null? module-code))
+      (error "Invalid r7rs library" exp)))
+
+(define (compile-single-exp-to-wasm-module exp)
+  (let ((library
+         `(define-library
+            (begin
+              ,exp))))
+    (compile-r7rs-library-to-wasm-module library)))
 
 (define (compile exp module lexical-env)
   (cond ((self-evaluating? exp)

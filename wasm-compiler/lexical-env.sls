@@ -1,8 +1,23 @@
 #!r6rs
 (library
  (lexical-env)
- (export make-lexical-address frame-index var-index find-variable)
+ (export make-empty-lexical-env is-global-lexical-env?
+         extend-current-lexical-frame add-new-lexical-frame
+         make-lexical-address frame-index var-index find-variable)
  (import (rnrs base))
+
+ (define (make-empty-lexical-env)
+   '(()))
+
+ (define (global-lexical-env? lexical-env)
+   (null? (cdr lexical-env)))
+
+ (define (extend-current-lexical-frame var lexical-env)
+   (cons (cons var (car lexical-env))
+         (cdr lexical-env)))
+
+ (define (add-new-lexical-frame frame lexical-env)
+   (cons frame lexical-env))
 
  ; From solution to SICP exercise 5.39
  (define (make-lexical-address frame-index var-index)

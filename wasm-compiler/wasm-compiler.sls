@@ -22,7 +22,7 @@
            (exps (assq 'begin library-decls))
            (top-level-code
             (if exps
-                (compile exps module '())
+                (compile exps module (make-empty-lexical-env))
                 (error "No begin declaration in library" exp)))
            (elem-def? (lambda (def) (wasm-definition-type? 'elem def)))
            (elem-defs (filter elem-def? (module 'definitions)))
@@ -203,7 +203,7 @@
                   (add-scheme-procedure-type-definition module (length formals)))
                  (body-code
                    (compile-sequence
-                    (lambda-body exp) module (cons formals lexical-env) compile)))
+                    (lambda-body exp) module (add-new-lexical-frame formals lexical-env) compile)))
             ; Add function to the module and keep its index in func-index
             ((module 'add-definition!)
              `(func (type ,func-type-id) ,@body-code))))

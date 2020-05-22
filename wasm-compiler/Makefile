@@ -42,7 +42,7 @@ test/build/%.wast : test/build/%.wat test/%.wast
 test/build/%.wat : test/%.scm $(COMPILED_COMPILER) test/build
 	$(SCHEME) ++path $(LIBDIR) driver.sps < $< > $@
 
-.SECONDARY : test/build/%.json test/build/%.wast test/build/%.wat
+.PRECIOUS : test/build/%.json test/build/%.wast test/build/%.wat
 
 .PHONY : cleanall
 cleanall : cleantest cleanlibs cleancompiler

@@ -26,7 +26,7 @@
            (library-decls (filter pair? exp))
            (exps (assq 'begin library-decls))
            (top-level-code
-            (if (not (null? exps))
+            (if exps
                 (compile exps module '())
                 (error "No begin declaration in library" exp)))
            (elem-def? (lambda (def) (wasm-definition-type? 'elem def)))

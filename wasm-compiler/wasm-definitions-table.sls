@@ -31,7 +31,7 @@
 
 (define (make-wasm-definitions-table)
   (let*
-      ((definition-keys '(type func table elem))
+      ((definition-keys '(type func table elem global))
        (definitions-table
          (map (lambda (key)
                 (cons key (make-definition-list)))

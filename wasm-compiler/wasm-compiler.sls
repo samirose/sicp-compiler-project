@@ -4,6 +4,7 @@
                  compile-single-exp-to-wasm-module)
          (import (rnrs base)
                  (rnrs lists)
+                 (rnrs io simple)
                  (lists)
                  (scheme-syntax)
                  (lexical-env)
@@ -19,11 +20,21 @@
       (let*
           ((module (make-wasm-definitions-table))
            (library-decls (filter pair? exp))
-           (exps (assq 'begin library-decls))
-           (top-level-code
-            (if exps
-                (compile exps module (make-empty-lexical-env))
+           (exps
+            (or (assq 'begin library-decls)
                 (error "No begin declaration in library" exp)))
+           (exp-sequence (begin-actions exps))
+           (definitions (filter definition? exp-sequence))
+           (lexical-env
+            (add-new-lexical-frame
+             (map definition-variable definitions)
+             (make-empty-lexical-env)))
+           (non-definitions (reject definition? exp-sequence))
+           (top-level-code
+            (begin
+              (if (not (null? definitions))
+                  (compile-sequence definitions module lexical-env compile))
+              (compile-sequence non-definitions module lexical-env compile)))
            (elem-def? (lambda (def) (wasm-definition-type? 'elem def)))
            (elem-defs (filter elem-def? (module 'definitions)))
            (non-elem-defs (reject elem-def? (module 'definitions)))
@@ -48,10 +59,8 @@
       (error "Invalid R7RS library" exp)))
 
 (define (compile-single-exp-to-wasm-module exp)
-  (let ((library
-         `(define-library
-            (begin
-              ,exp))))
+  (let* ((sequence (if (begin? exp) exp `(begin ,exp)))
+         (library `(define-library ,sequence)))
     (compile-r7rs-library-to-wasm-module library)))
 
 (define (compile exp module lexical-env)
@@ -88,12 +97,17 @@
   (error "Quote not supported yet" exp))
 
 (define (compile-variable exp lexical-env)
-  (let ((lexical-address (find-variable exp lexical-env)))
-    (if (eq? lexical-address 'not-found)
-        (error "Lexically unbound variable" exp)
-        (if (> (frame-index lexical-address) 0)
-            (error "Variables in immediate enclosing frame only supported" exp)
-            `(get_local ,(var-index lexical-address))))))
+  (let*
+      ((lexical-address (find-variable exp lexical-env))
+       (get-instr
+        (if (eq? lexical-address 'not-found)
+            (error "Lexically unbound variable" exp)
+            (cond
+              ((global-address? lexical-address) 'get_global)
+              ((= (frame-index lexical-address) 0) 'get_local)
+              (else
+               (error "Variables in immediate enclosing scope or top-level only supported" exp))))))
+    `(,get-instr ,(var-index lexical-address))))
 
 (define (compile-assignment exp module lexical-env compile)
   (let ((lexical-address (find-variable (assignment-variable exp))))
@@ -106,7 +120,12 @@
              `(set_local ,(var-index lexical-address)))))))
 
 (define (compile-definition exp module lexical-env compile)
-  (error "Definitions not supported yet" exp))
+  (let ((value-code
+         (compile (definition-value exp) module lexical-env)))
+    ((module 'add-definition!)
+     `(global i32 ,@value-code))
+    ; Definition does not generate any value
+    '()))
 
 ;;;open-coded primitives
 

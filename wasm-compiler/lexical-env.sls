@@ -1,35 +1,30 @@
 #!r6rs
 (library
  (lexical-env)
- (export make-empty-lexical-env is-global-lexical-env?
-         extend-current-lexical-frame add-new-lexical-frame
-         make-lexical-address frame-index var-index find-variable)
+ (export make-empty-lexical-env add-new-lexical-frame
+         find-variable frame-index var-index global-address?)
  (import (rnrs base))
 
- (define (make-empty-lexical-env)
-   '(()))
+ (define (make-empty-lexical-env) '())
 
  (define (global-lexical-env? lexical-env)
    (null? (cdr lexical-env)))
 
- (define (extend-current-lexical-frame var lexical-env)
-   (cons (cons var (car lexical-env))
-         (cdr lexical-env)))
-
  (define (add-new-lexical-frame frame lexical-env)
    (cons frame lexical-env))
 
- ; From solution to SICP exercise 5.39
- (define (make-lexical-address frame-index var-index)
-   (cons frame-index var-index))
+ (define (make-lexical-address frame-index var-index lexical-env)
+   (list frame-index var-index lexical-env))
 
  (define (frame-index lexical-address)
    (car lexical-address))
 
  (define (var-index lexical-address)
-   (cdr lexical-address))
+   (cadr lexical-address))
 
- ; From solution to SICP exercise 5.41
+ (define (global-address? lexical-address)
+   (global-lexical-env? (caddr lexical-address)))
+
  (define (find-variable var lexical-env)
    (define (scan env frame frame-index var-index)
      (if (null? frame)
@@ -37,7 +32,7 @@
              'not-found
              (scan (cdr env) (cadr env) (+ frame-index 1) 0))
          (if (eq? (car frame) var)
-             (make-lexical-address frame-index var-index)
+             (make-lexical-address frame-index var-index env)
              (scan env (cdr frame) frame-index (+ var-index 1)))))
    (if (null? lexical-env)
        'not-found

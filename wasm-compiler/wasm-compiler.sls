@@ -179,16 +179,16 @@
 
 (define scheme-procedure-param-type 'i32)
 
-(define (make-scheme-procedure-param-list arity)
-  (if (= 0 arity)
-      '()
-      (cons 'param
-            (make-list scheme-procedure-param-type arity))))
-
 (define (add-scheme-procedure-type-definition module arity)
   (let* ((type-id (make-scheme-procedure-type-id arity))
+         (param-types
+          (if (= 0 arity)
+              '()
+              (list
+               (cons 'param
+                     (make-list scheme-procedure-param-type arity)))))
          (type-definition
-          `(type ,type-id (func ,(make-scheme-procedure-param-list arity) (result i32)))))
+          `(type ,type-id (func ,@param-types (result i32)))))
     (if (not ((module 'definition-index) type-definition))
         ((module 'add-definition!) type-definition))
     type-id))

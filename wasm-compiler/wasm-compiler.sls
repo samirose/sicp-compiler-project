@@ -41,20 +41,18 @@
            (table-definition
             (if (null? elem-func-indices)
                 '()
-                `(table ,scheme-procedures-table-id ,(length elem-func-indices) funcref)))
+                `((table ,scheme-procedures-table-id ,(length elem-func-indices) funcref))))
            (elem-definition
             (if (null? elem-func-indices)
                 '()
-                `(elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices)))
-           (module-code
-            `(module
-               ,@non-elem-defs
-               ,table-definition
-               ,elem-definition
-               (func $main (result i32)
-                     ,@top-level-code)
-               (export "main" (func $main)))))
-        (remp null? module-code))
+                `((elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices)))))
+           `(module
+              ,@non-elem-defs
+              ,@table-definition
+              ,@elem-definition
+              (func $main (result i32)
+                    ,@top-level-code)
+              (export "main" (func $main))))
       (error "Invalid R7RS library" exp)))
 
 (define (compile-single-exp-to-wasm-module exp)

@@ -4,7 +4,6 @@
                  compile-single-exp-to-wasm-module)
          (import (rnrs base)
                  (rnrs lists)
-                 (rnrs io simple)
                  (lists)
                  (scheme-syntax)
                  (lexical-env)

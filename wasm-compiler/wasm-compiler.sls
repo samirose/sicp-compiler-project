@@ -6,6 +6,7 @@
                  (rnrs lists)
                  (lists)
                  (scheme-syntax)
+                 (scheme-r7rs-syntax)
                  (lexical-env)
                  (wasm-definitions-table)
                  (wasm-syntax))
@@ -15,12 +16,11 @@
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 
 (define (compile-r7rs-library-to-wasm-module exp)
-  (if (and (pair? exp) (eq? (car exp) 'define-library))
+  (if (r7rs-library? exp)
       (let*
           ((module (make-wasm-definitions-table))
-           (library-decls (filter pair? exp))
            (exps
-            (or (assq 'begin library-decls)
+            (or (library-decl 'begin exp)
                 (error "No begin declaration in library" exp)))
            (exp-sequence (begin-actions exps))
            (definitions (filter definition? exp-sequence))

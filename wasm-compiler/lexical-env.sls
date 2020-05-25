@@ -1,7 +1,7 @@
 #!r6rs
 (library
  (lexical-env)
- (export make-empty-lexical-env add-new-lexical-frame
+ (export make-empty-lexical-env global-lexical-env? add-new-lexical-frame
          find-variable frame-index var-index global-address?)
  (import (rnrs base))
 

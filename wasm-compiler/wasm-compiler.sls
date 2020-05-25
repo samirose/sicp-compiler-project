@@ -117,12 +117,14 @@
              `(set_local ,(var-index lexical-address)))))))
 
 (define (compile-definition exp module lexical-env compile)
-  (let ((value-code
-         (compile (definition-value exp) module lexical-env)))
-    ((module 'add-definition!)
-     `(global i32 ,@value-code))
-    ; Definition does not generate any value
-    '()))
+  (if (global-lexical-env? lexical-env)
+      (let ((value-code
+             (compile (definition-value exp) module lexical-env)))
+        ((module 'add-definition!)
+         `(global i32 ,@value-code))
+        ; Definition does not generate any value
+        '())
+      (error "Only top-level define is supported" exp)))
 
 ;;;open-coded primitives
 

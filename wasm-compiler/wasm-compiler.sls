@@ -107,7 +107,7 @@
     `(,get-instr ,(var-index lexical-address))))
 
 (define (compile-assignment exp module lexical-env compile)
-  (let ((lexical-address (find-variable (assignment-variable exp))))
+  (let ((lexical-address (find-variable (assignment-variable exp) lexical-env)))
     (if (eq? lexical-address 'not-found)
         (error "Lexically unbound variable" exp)
         (if (> (frame-index lexical-address) 0)

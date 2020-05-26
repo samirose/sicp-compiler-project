@@ -97,31 +97,38 @@
   (let*
       ((lexical-address (find-variable exp lexical-env))
        (get-instr
-        (if (eq? lexical-address 'not-found)
-            (error "Lexically unbound variable" exp)
-            (cond
-              ((global-address? lexical-address) 'get_global)
-              ((= (frame-index lexical-address) 0) 'get_local)
-              (else
-               (error "Variables in immediate enclosing scope or top-level only supported" exp))))))
+        (cond
+          ((eq? lexical-address 'not-found)
+           (error "Lexically unbound variable" exp))
+          ((global-address? lexical-address) 'get_global)
+          ((= (frame-index lexical-address) 0) 'get_local)
+          (else
+           (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
     `(,get-instr ,(var-index lexical-address))))
 
 (define (compile-assignment exp module lexical-env compile)
-  (let ((lexical-address (find-variable (assignment-variable exp) lexical-env)))
-    (if (eq? lexical-address 'not-found)
-        (error "Lexically unbound variable" exp)
-        (if (> (frame-index lexical-address) 0)
-            (error "Variables in immediate enclosing frame only supported" exp)
-            (append
-             (compile (assignment-value exp) module lexical-env)
-             `(set_local ,(var-index lexical-address)))))))
+  (let*
+      ((lexical-address (find-variable (assignment-variable exp) lexical-env))
+       (value-code
+        (compile (assignment-value exp) module lexical-env))
+       (set-instr
+        (cond
+          ((eq? lexical-address 'not-found)
+           (error "Lexically unbound variable" exp))
+          ((global-address? lexical-address) 'set_global)
+          ((= (frame-index lexical-address) 0) 'set_local)
+          (else
+           (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+    (append
+     value-code
+     `(,set-instr ,(var-index lexical-address)))))
 
 (define (compile-definition exp module lexical-env compile)
   (if (global-lexical-env? lexical-env)
       (let ((value-code
              (compile (definition-value exp) module lexical-env)))
         ((module 'add-definition!)
-         `(global i32 ,@value-code))
+         `(global (mut i32) ,value-code))
         ; Definition does not generate any value
         '())
       (error "Only top-level define is supported" exp)))

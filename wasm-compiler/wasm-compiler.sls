@@ -50,7 +50,7 @@
             (if (null? global-init-defs)
                 '()
                 `((func $global-init
-                       ,@(flatten-1 (flatten-1 global-init-defs)))
+                        ,@(flatten-n 2 global-init-defs))
                   (start $global-init)))))
         `(module
            ,@((module 'definitions-of-type) 'type)

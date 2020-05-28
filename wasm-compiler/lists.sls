@@ -1,7 +1,7 @@
 #!r6rs
 (library
  (lists)
- (export reject index-of-equal make-list flatten-1)
+ (export reject index-of-equal make-list flatten-n)
  (import (rnrs base)
          (rnrs lists))
 
@@ -28,12 +28,15 @@
          (error "Expected positive n -- make-list:" n)
          (loop '() e n))))
 
- (define (flatten-1 x)
+ (define (tolist x)
+   (if (pair? x) x (list x)))
+
+ (define (flatten-n n x)
    (cond ((null? x) '())
+         ((= n 0) x)
          ((pair? x)
-          (let ((first (car x)))
-            (append
-             (if (pair? first) first (list first))
-             (flatten-1 (cdr x)))))
+          (append
+           (flatten-n (- n 1) (tolist (car x)))
+           (flatten-n n (cdr x))))
          (else x)))
  )

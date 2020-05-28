@@ -4,6 +4,7 @@
                  compile-single-exp-to-wasm-module)
          (import (rnrs base)
                  (rnrs lists)
+                 (rnrs io simple)
                  (lists)
                  (scheme-syntax)
                  (scheme-r7rs-syntax)
@@ -34,9 +35,7 @@
               (if (not (null? definitions))
                   (compile-sequence definitions module lexical-env compile))
               (compile-sequence non-definitions module lexical-env compile)))
-           (elem-def? (lambda (def) (wasm-definition-type? 'elem def)))
-           (elem-defs (filter elem-def? (module 'definitions)))
-           (non-elem-defs (reject elem-def? (module 'definitions)))
+           (elem-defs ((module 'definitions-of-type) 'elem))
            (elem-func-indices (map wasm-elem-definition-func-index elem-defs))
            (table-definition
             (if (null? elem-func-indices)
@@ -45,14 +44,24 @@
            (elem-definition
             (if (null? elem-func-indices)
                 '()
-                `((elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices)))))
-           `(module
-              ,@non-elem-defs
-              ,@table-definition
-              ,@elem-definition
-              (func $main (result i32)
-                    ,@top-level-code)
-              (export "main" (func $main))))
+                `((elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices))))
+           (global-init-defs (map cdr ((module 'definitions-of-type) 'global-init)))
+           (global-init-func
+            (if (null? global-init-defs)
+                '()
+                `((func $global-init
+                       ,@(flatten-1 (flatten-1 global-init-defs)))
+                  (start $global-init)))))
+        `(module
+           ,@((module 'definitions-of-type) 'type)
+           ,@((module 'definitions-of-type) 'func)
+           (func $main (result i32)
+                 ,@top-level-code)
+           ,@table-definition
+           ,@((module 'definitions-of-type) 'global)
+           ,@global-init-func
+           (export "main" (func $main))
+           ,@elem-definition))
       (error "Invalid R7RS library" exp)))
 
 (define (compile-single-exp-to-wasm-module exp)
@@ -123,12 +132,26 @@
      value-code
      `(,set-instr ,(var-index lexical-address)))))
 
+; Uninitialized value should be distinguishable from valid values.
+; Use zero for now until typing of primitive values is implemented.
+(define uninitialized-value '(i32.const 0))
+
 (define (compile-definition exp module lexical-env compile)
   (if (global-lexical-env? lexical-env)
-      (let ((value-code
-             (compile (definition-value exp) module lexical-env)))
-        ((module 'add-definition!)
-         `(global (mut i32) ,value-code))
+      (let* ((value-code
+              (compile (definition-value exp) module lexical-env))
+             (const-value?
+              (and (= (length value-code) 2)
+                       (eq? (car value-code) 'i32.const)))
+             (init-expr
+              (if const-value? value-code uninitialized-value))
+             (global-index
+              ((module 'add-definition!)
+               `(global (mut i32) ,init-expr))))
+        (if (not const-value?)
+            ((module 'add-definition!)
+             `(global-init
+               (,@value-code (set_global ,global-index)))))
         ; Definition does not generate any value
         '())
       (error "Only top-level define is supported" exp)))

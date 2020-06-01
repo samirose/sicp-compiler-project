@@ -1,3 +1,5 @@
+SHELL = /bin/bash
+.SHELLFLAGS = -o pipefail -c
 SCHEME := plt-r6rs
 LIBDIR := lib/
 LIBS := lists scheme-syntax scheme-r7rs-syntax lexical-env wasm-syntax wasm-definitions-table wasm-compiler

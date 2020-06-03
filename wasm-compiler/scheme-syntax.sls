@@ -21,7 +21,8 @@
 
 (define (self-evaluating? exp)
   (cond ((number? exp) #t)
-        ((string? exp) #f)
+        ((boolean? exp) #t)
+        ((string? exp) #f)  ; Strings are not supported yet
         (else #f)))
 
 

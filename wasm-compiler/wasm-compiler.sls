@@ -96,6 +96,8 @@
 (define (compile-self-evaluating exp)
   (cond ((integer? exp)
          `(i32.const ,exp))
+        ((boolean? exp)
+         `(i32.const ,(if exp 1 0)))
         (else
          (error "Unsupported value" exp))))
 

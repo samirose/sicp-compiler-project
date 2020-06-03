@@ -204,13 +204,12 @@
   (let ((p-code (compile (if-predicate exp) module lexical-env))
         (c-code (compile (if-consequent exp) module lexical-env))
         (a-code (compile (if-alternative exp) module lexical-env)))
-    (append
-     p-code
-     '(if (result i32))
-     c-code
-     '(else)
-     a-code
-     '(end))))
+    `(,@p-code
+      if (result i32)
+      ,@c-code
+      else
+      ,@a-code
+      end)))
 
 ;;; sequences
 

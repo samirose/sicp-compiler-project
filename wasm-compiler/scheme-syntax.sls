@@ -78,7 +78,7 @@
 (define (if-alternative exp)
   (if (not (null? (cdddr exp)))
       (cadddr exp)
-      'false))
+      '#f))
 
 
 (define (begin? exp) (tagged-list? exp 'begin))
@@ -123,7 +123,7 @@
 
 (define (expand-clauses clauses)
   (if (null? clauses)
-      'false                          ; no else clause
+      '#f                          ; no else clause
       (let ((first (car clauses))
             (rest (cdr clauses)))
         (if (cond-else-clause? first)

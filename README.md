@@ -44,7 +44,6 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 ## Known issues
 * Open coding of numerical comparison operators produces incorrect results when the operator is applied to more than two parameters
 * The Scheme values are not type checked in the compiled programs: a number can be used as a procedure reference and vice-versa. Using of uninitialized values is not detected.
-* if-form without alternative expression is not supported and if is missing dedicated tests.
 
 ## Features currently under work
 

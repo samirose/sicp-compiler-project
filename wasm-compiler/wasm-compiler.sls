@@ -170,7 +170,8 @@
     (* (i32.mul))
     (/ (i32.div_s))
     (= (i32.eq))
-    (< (i32.lt_s))))
+    (< (i32.lt_s))
+    (> (i32.gt_s))))
 
 (define (open-coded-primitive-application? exp)
   (and (application? exp)

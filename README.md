@@ -12,9 +12,10 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 * Learn about Scheme and compilation of functional languages in general
 * Get familiar with WebAssembly as an execution environment and compiler target
 * Stay in the spirit of simple Scheme and target initially supporting a subset of [R7RS-small Scheme](https://r7rs.org)
+* Compile Scheme forms directly to as idiomatic WASM as feasible
+* Use only basic, standardised [WASM core](https://www.w3.org/TR/wasm-core-1/) features initially
 * Implement as much of the required run-time support in Scheme as possible
 * Write the required native run-time support in WAT
-* Use only basic, standardised [WASM core](https://www.w3.org/TR/wasm-core-1/) features initially
 * Compile a Scheme interpreter to WASM using the compiler (see also [SICP exercise 5.52](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-35.html#%_thm_5.52))
 * If the interpreter works, host it on a web page with minimal JavaScript-driven [REPL](https://en.wikipedia.org/wiki/Read–eval–print_loop)
 * _Maybe_ try to [bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(compilers)) the compiler at some point as an interesting exercise

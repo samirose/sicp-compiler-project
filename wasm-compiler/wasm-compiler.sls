@@ -91,6 +91,15 @@
         (else
          (error "Unknown expression type -- COMPILE" exp))))
 
+;;;special values
+
+; Uninitialized value should be distinguishable from valid values.
+; Use zero for now until typing of primitive values is implemented.
+(define uninitialized-value '(i32.const 0))
+
+; Result of expressions for which Scheme defines an unspecified result
+(define unspecified-value '(i32.const 0))
+
 ;;;simple expressions
 
 (define (compile-self-evaluating exp)
@@ -130,13 +139,9 @@
           ((= (frame-index lexical-address) 0) 'set_local)
           (else
            (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
-    (append
-     value-code
-     `(,set-instr ,(var-index lexical-address)))))
-
-; Uninitialized value should be distinguishable from valid values.
-; Use zero for now until typing of primitive values is implemented.
-(define uninitialized-value '(i32.const 0))
+     `(,@value-code
+       ,set-instr ,(var-index lexical-address)
+       ,@unspecified-value)))
 
 (define (compile-definition exp module lexical-env compile)
   (if (global-lexical-env? lexical-env)
@@ -154,8 +159,7 @@
             ((module 'add-definition!)
              `(global-init
                (,@value-code (set_global ,global-index)))))
-        ; Definition does not generate any value
-        '())
+        unspecified-value)
       (error "Only top-level define is supported" exp)))
 
 ;;;open-coded primitives
@@ -218,9 +222,9 @@
 (define (compile-sequence seq module lexical-env compile)
   (if (last-exp? seq)
       (compile (first-exp seq) module lexical-env)
-      (append
-       (compile (first-exp seq) module lexical-env)
-       (compile-sequence (rest-exps seq) module lexical-env compile))))
+      `(,@(compile (first-exp seq) module lexical-env)
+        drop ; Drop the results of the intermediate expressions
+        ,@(compile-sequence (rest-exps seq) module lexical-env compile))))
 
 ;;;lambda expressions
 

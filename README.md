@@ -50,12 +50,14 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 ## Rough backlog
 
 * Come up with a name for this project
-* Add compilation of `and` and `or` expressions. They can probably be implemented with WASM block structure and conditional branch instructions.
-* Restrict numerical comparison operators to two parameters (see [Known issues](#known-issues)) and add support for the currently missing operators
-* Optional: Implement support for numerical comparison operators with more than two parameters by compiling them as an `and` expression
-* Add support for exported top-level definitions with R7RS libary syntax. The exports can be used for writing more comprehensive tests with mulitple calls to the exported procedures and asserting the return values.
+* Add support for exported top-level definitions with R7RS libary syntax. The exports can be used for writing more comprehensive tests with multiple calls to the exported procedures and asserting the return values.
 * Implement local bindings (`let` forms), with WASM locals instead of `lambda`, if possible.
 * _Scan out_ (see [SICP chapter 4.16](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1.6)) internal definitions and implement the bindings with `letrec*`
+* Add support for allocating local temporary variables. They will be needed in the implementation of `and` and `or` expressions for retaining the expression's value. See also [#1102 dup instruction](https://github.com/WebAssembly/design/issues/1102).
+* Add compilation of `and` and `or` expressions. They can be implemented with WASM block structure and conditional branch instructions.
+* Restrict numerical comparison operators to two parameters (see [Known issues](#known-issues)) and add support for the currently missing operators
+* Optional: Implement support for numerical comparison operators with more than two parameters by compiling them as an `and` expression
+* Compile `cond` as WASM block structure and conditional branch instructions instead of the current nested if expressions.
 * Add high-level design document of the compiler
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))
 * Add support for read-only symbols and strings

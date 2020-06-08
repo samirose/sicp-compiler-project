@@ -46,8 +46,21 @@ $(TEST_COMPILER_DIR)/build/%.wat : $(TEST_COMPILER_DIR)/%.scm $(COMPILED_COMPILE
 
 .PRECIOUS : $(TEST_COMPILER_DIR)/build/%.json $(TEST_COMPILER_DIR)/build/%.wast $(TEST_COMPILER_DIR)/build/%.wat
 
+TEST_UNIT_DIR := test-unit
+UNIT_TEST_PROGRAMS = $(wildcard $(TEST_UNIT_DIR)/*.sps)
+UNIT_TEST_LOGS = $(patsubst $(TEST_UNIT_DIR)/%.sps,$(TEST_UNIT_DIR)/log/%.log,$(UNIT_TEST_PROGRAMS))
+
+.PHONY : test-unit
+test-unit : $(UNIT_TEST_LOGS)
+
+$(TEST_UNIT_DIR)/log:
+	mkdir -p $@
+
+$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)/log/%.log : $(TEST_UNIT_DIR)/%.sps $(TEST_UNIT_DIR)/log $(LIBDIRS)
+	$(SCHEME) ++path $(LIBDIR) $< > $@
+
 .PHONY : test
-test : test-compiler
+test : test-unit test-compiler
 
 .PHONY : cleanall
 cleanall : cleantest cleanlibs cleancompiler
@@ -62,4 +75,4 @@ cleanlibs :
 
 .PHONY : cleantest
 cleantest :
-	-rm -rf $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log
+	-rm -rf $(TEST_UNIT_DIR)/log $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log

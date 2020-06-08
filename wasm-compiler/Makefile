@@ -22,29 +22,32 @@ lib/wasm-compiler : lib/lists lib/lexical-env lib/scheme-syntax lib/scheme-r7rs-
 compile : $(COMPILED_COMPILER)
 	$(SCHEME) ++path $(LIBDIR) driver.sps $<
 
+TEST_COMPILER_DIR := test-compiler
+COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)/*.scm)
+COMPILER_TEST_LOGS = $(patsubst $(TEST_COMPILER_DIR)/%.scm,$(TEST_COMPILER_DIR)/log/%.log,$(COMPILER_TEST_PROGRAMS))
 
-TEST_PROGRAMS := $(wildcard test/*.scm)
-TEST_LOGS = $(patsubst test/%.scm,test/log/%.log,$(TEST_PROGRAMS))
+.PHONY : test-compiler
+test-compiler : $(COMPILER_TEST_LOGS)
 
-.PHONY : test
-test : $(TEST_LOGS)
-
-test/build test/log:
+$(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log:
 	mkdir -p $@
 
-$(TEST_LOGS) : test/log/%.log : test/build/%.json test/log
+$(COMPILER_TEST_LOGS) : $(TEST_COMPILER_DIR)/log/%.log : $(TEST_COMPILER_DIR)/build/%.json $(TEST_COMPILER_DIR)/log
 	spectest-interp $< | tee $@
 
-test/build/%.json : test/build/%.wast
+$(TEST_COMPILER_DIR)/build/%.json : $(TEST_COMPILER_DIR)/build/%.wast
 	wast2json $< -o $@
 
-test/build/%.wast : test/build/%.wat test/%.wast
+$(TEST_COMPILER_DIR)/build/%.wast : $(TEST_COMPILER_DIR)/build/%.wat $(TEST_COMPILER_DIR)/%.wast
 	cat $^ > $@
 
-test/build/%.wat : test/%.scm $(COMPILED_COMPILER) test/build
+$(TEST_COMPILER_DIR)/build/%.wat : $(TEST_COMPILER_DIR)/%.scm $(COMPILED_COMPILER) $(TEST_COMPILER_DIR)/build
 	$(SCHEME) ++path $(LIBDIR) driver.sps < $< > $@
 
-.PRECIOUS : test/build/%.json test/build/%.wast test/build/%.wat
+.PRECIOUS : $(TEST_COMPILER_DIR)/build/%.json $(TEST_COMPILER_DIR)/build/%.wast $(TEST_COMPILER_DIR)/build/%.wat
+
+.PHONY : test
+test : test-compiler
 
 .PHONY : cleanall
 cleanall : cleantest cleanlibs cleancompiler
@@ -59,4 +62,4 @@ cleanlibs :
 
 .PHONY : cleantest
 cleantest :
-	-rm -rf test/build test/log
+	-rm -rf $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log

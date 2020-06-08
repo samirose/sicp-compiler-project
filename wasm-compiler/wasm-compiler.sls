@@ -210,7 +210,10 @@
 (define (compile-if exp module lexical-env compile)
   (let ((p-code (compile (if-predicate exp) module lexical-env))
         (c-code (compile (if-consequent exp) module lexical-env))
-        (a-code (compile (if-alternative exp) module lexical-env)))
+        (a-code
+         (if (if-alternative exp)
+             (compile (if-alternative exp) module lexical-env)
+             unspecified-value)))
     `(,@p-code
       if (result i32)
       ,@c-code

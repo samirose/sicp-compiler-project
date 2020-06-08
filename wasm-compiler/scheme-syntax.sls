@@ -78,7 +78,7 @@
 (define (if-alternative exp)
   (if (not (null? (cdddr exp)))
       (cadddr exp)
-      '#f))
+      #f))
 
 
 (define (begin? exp) (tagged-list? exp 'begin))

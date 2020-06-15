@@ -1,7 +1,8 @@
 #!r6rs
 (library
  (lists)
- (export reject index-of-equal make-list flatten-n)
+ (export reject index-of-equal make-list flatten-n
+         make-counted-set counted-set-add counted-set-count)
  (import (rnrs base)
          (rnrs lists))
 
@@ -39,4 +40,19 @@
            (flatten-n (- n 1) (tolist (car x)))
            (flatten-n n (cdr x))))
          (else x)))
+
+ (define (make-counted-set) '())
+
+ (define (counted-set-add s x)
+   (let* ((existing (assq x s))
+          (count (if existing
+                     (+ (cdr existing) 1)
+                     1))
+          (new-head (cons x count))
+          (rest (reject (lambda (entry) (eq? x entry)) s)))
+     (cons new-head rest)))
+
+ (define (counted-set-count s x)
+   (let ((existing (assq x s)))
+         (if existing (cdr existing) 0)))
  )

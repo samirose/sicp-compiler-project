@@ -91,3 +91,47 @@
  '(1 2 3 4)
  (flatten-n 2 '(1 ((2 3) 4)))
  "flatten-n of a 2-nested list with n=2 results in a flat list")
+
+(assert-equal
+ 0
+ (let ((s (make-counted-set)))
+   (counted-set-count s 'x))
+ "counted-set-count results to 0 with an empty set")
+
+(assert-equal
+ 0
+ (let ((s (make-counted-set)))
+   (let ((s (counted-set-add s 'x)))
+     (counted-set-count s 'y)))
+ "counted-set-count results to 0 when the key has not been added")
+
+(assert-equal
+ 1
+ (let ((s (make-counted-set)))
+   (let ((s (counted-set-add s 'x)))
+     (counted-set-count s 'x)))
+ "counted-set-count results to 1 when the key has been added")
+
+(assert-equal
+ 2
+ (let ((s (make-counted-set)))
+   (let ((s (counted-set-add s 'x)))
+     (let ((s (counted-set-add s 'x)))
+       (counted-set-count s 'x))))
+ "counted-set-count results to 2 when the key has been added twice")
+
+(assert-equal
+ 1
+ (let ((s (make-counted-set)))
+   (let ((s (counted-set-add s 'x)))
+     (let ((s (counted-set-add s 'y)))
+       (counted-set-count s 'x))))
+ "counted-set-count results to 1 when the queried key has been added once")
+
+(assert-equal
+ 1
+ (let ((s (make-counted-set)))
+   (let ((s (counted-set-add s 'x)))
+     (let ((s (counted-set-add s 'y)))
+       (counted-set-count s 'y))))
+ "counted-set-count results to 1 when the queried key has been added once")

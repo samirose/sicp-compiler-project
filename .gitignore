@@ -2,6 +2,6 @@
 *~
 \#*\#
 compiled/
-wasm-compiler/lib/
+lib/
 build/
 log/

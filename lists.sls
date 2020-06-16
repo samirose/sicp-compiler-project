@@ -29,16 +29,16 @@
          (error "Expected positive n -- make-list:" n)
          (loop '() e n))))
 
- (define (tolist x)
-   (if (pair? x) x (list x)))
-
  (define (flatten-n n x)
    (cond ((null? x) '())
          ((= n 0) x)
          ((pair? x)
-          (append
-           (flatten-n (- n 1) (tolist (car x)))
-           (flatten-n n (cdr x))))
+          (let ((head (car x)))
+            (if (pair? head)
+                (append
+                 (flatten-n (- n 1) head)
+                 (flatten-n n (cdr x)))
+                (cons head (flatten-n n (cdr x))))))
          (else x)))
 
  (define (make-counted-set) '())

@@ -135,3 +135,11 @@
      (let ((s (counted-set-add s 'y)))
        (counted-set-count s 'y))))
  "counted-set-count results to 1 when the queried key has been added once")
+
+(assert-equal
+ 1
+ (let ((s (make-counted-set)))
+   (let ((s (counted-set-add s 'x)))
+     (let ((s (counted-set-add s 'x)))
+       (counted-set-unique-keys s))))
+ "counted-set-count should have 1 unique key when the same key has been added twice")

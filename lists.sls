@@ -2,7 +2,7 @@
 (library
  (lists)
  (export reject index-of-equal make-list flatten-n
-         make-counted-set counted-set-add counted-set-count)
+         make-counted-set counted-set-add counted-set-count counted-set-unique-keys)
  (import (rnrs base)
          (rnrs lists))
 
@@ -43,16 +43,19 @@
 
  (define (make-counted-set) '())
 
- (define (counted-set-add s x)
-   (let* ((existing (assq x s))
+ (define (counted-set-add s key)
+   (let* ((existing (assq key s))
           (count (if existing
                      (+ (cdr existing) 1)
                      1))
-          (new-head (cons x count))
-          (rest (reject (lambda (entry) (eq? x entry)) s)))
+          (new-head (cons key count))
+          (rest (reject (lambda (entry) (eq? key (car entry))) s)))
      (cons new-head rest)))
 
- (define (counted-set-count s x)
-   (let ((existing (assq x s)))
+ (define (counted-set-count s key)
+   (let ((existing (assq key s)))
          (if existing (cdr existing) 0)))
+
+ (define (counted-set-unique-keys s)
+   (length s))
  )

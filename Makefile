@@ -90,4 +90,4 @@ cleanlibs :
 
 .PHONY : cleantest
 cleantest :
-	-rm -rf $(TEST_UNIT_DIR)/log $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log
+	-rm -rf $(TEST_UNIT_DIR)/log $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log $(UNIT_TEST_LIBS)

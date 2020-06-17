@@ -2,7 +2,14 @@ SHELL = /bin/bash
 .SHELLFLAGS = -o pipefail -c
 SCHEME := plt-r6rs
 LIBDIR := lib/
-LIBS := lists scheme-syntax scheme-r7rs-syntax lexical-env wasm-syntax wasm-definitions-table wasm-compiler
+LIBS := lists \
+        scheme-syntax \
+		scheme-r7rs-syntax \
+		lexical-env \
+		wasm-syntax \
+		wasm-definitions-table \
+		wasm-module-definitions \
+		wasm-compiler
 LIBDIRS = $(addprefix $(LIBDIR),$(LIBS))
 COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
 
@@ -16,7 +23,14 @@ $(LIBDIR)% : %.sls
 	touch $@
 
 lib/wasm-definitions-table : lib/lists
-lib/wasm-compiler : lib/lists lib/lexical-env lib/scheme-syntax lib/scheme-r7rs-syntax lib/wasm-syntax lib/wasm-definitions-table
+lib/wasm-module-definitions : lib/lists
+lib/wasm-compiler : lib/lists \
+                    lib/lexical-env \
+					lib/scheme-syntax \
+					lib/scheme-r7rs-syntax \
+					lib/wasm-syntax \
+					lib/wasm-definitions-table \
+					lib/wasm-module-definitions
 
 .PHONY : compile
 compile : $(COMPILED_COMPILER)

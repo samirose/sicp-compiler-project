@@ -1,11 +1,8 @@
 #!r6rs
 (import
  (rnrs base)
- (lists))
-
-(define (assert-equal expected actual text)
-  (if (not (equal? expected actual))
-      (error text (list expected actual))))
+ (lists)
+ (assert))
 
 (assert-equal
  '()

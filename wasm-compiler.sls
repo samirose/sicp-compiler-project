@@ -9,7 +9,8 @@
                  (scheme-syntax)
                  (scheme-r7rs-syntax)
                  (lexical-env)
-                 (wasm-definitions-table)
+                 (compiled-program)
+                 (wasm-module-definitions)
                  (wasm-syntax))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
@@ -19,24 +20,37 @@
 (define (compile-r7rs-library-to-wasm-module exp)
   (if (r7rs-library? exp)
       (let*
-          ((module (make-wasm-definitions-table))
-           (exps
+          ((exps
             (or (library-decl 'begin exp)
                 (error "No begin declaration in library" exp)))
-           (exp-sequence (begin-actions exps))
-           (definitions (filter definition? exp-sequence))
+           (exp-sequence
+            (begin-actions exps))
+           (definitions
+             (filter definition? exp-sequence))
+           (non-definitions
+            (reject definition? exp-sequence))
            (lexical-env
             (add-new-lexical-frame
              (map definition-variable definitions)
              (make-empty-lexical-env)))
-           (non-definitions (reject definition? exp-sequence))
-           (top-level-code
-            (begin
-              (if (not (null? definitions))
-                  (compile-sequence definitions module lexical-env compile))
-              (compile-sequence non-definitions module lexical-env compile)))
-           (elem-defs ((module 'definitions-of-type) 'elem))
-           (elem-func-indices (map wasm-elem-definition-func-index elem-defs))
+           (definitions-program
+             (if (not (null? definitions))
+                 (compile-sequence definitions
+                                   (make-empty-compiled-program)
+                                   lexical-env
+                                   compile)
+                 (make-empty-compiled-program)))
+           (program
+            (compile-sequence non-definitions definitions-program lexical-env compile))
+           (module-definitions
+            (compiled-program-module-definitions program))
+           (get-module-definitions
+            (lambda (type)
+              (wasm-module-get-definitions module-definitions 'elem)))
+           (elem-defs
+            (get-module-definitions 'elem))
+           (elem-func-indices
+            (map wasm-elem-definition-func-index elem-defs))
            (table-definition
             (if (null? elem-func-indices)
                 '()
@@ -45,20 +59,23 @@
             (if (null? elem-func-indices)
                 '()
                 `((elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices))))
-           (global-init-defs (map cdr ((module 'definitions-of-type) 'global-init)))
+           (global-init-defs
+            (map cdr (get-module-definitions 'global-init)))
            (global-init-func
             (if (null? global-init-defs)
                 '()
                 `((func $global-init
                         ,@(flatten-n 2 global-init-defs))
-                  (start $global-init)))))
+                  (start $global-init))))
+           (top-level-code
+            (compiled-program-value-code program)))
         `(module
-           ,@((module 'definitions-of-type) 'type)
-           ,@((module 'definitions-of-type) 'func)
+           ,@(get-module-definitions 'type)
+           ,@(get-module-definitions 'func)
            (func $main (result i32)
                  ,@top-level-code)
            ,@table-definition
-           ,@((module 'definitions-of-type) 'global)
+           ,@(get-module-definitions 'global)
            ,@global-init-func
            (export "main" (func $main))
            ,@elem-definition))
@@ -69,25 +86,29 @@
          (library `(define-library ,sequence)))
     (compile-r7rs-library-to-wasm-module library)))
 
-(define (compile exp module lexical-env)
+(define (compile exp program lexical-env)
   (cond ((self-evaluating? exp)
-         (compile-self-evaluating exp))
-        ((quoted? exp) (compile-quoted exp))
+         (compile-self-evaluating exp program))
+        ((quoted? exp)
+         (compile-quoted exp program))
         ((variable? exp)
-         (compile-variable exp lexical-env))
+         (compile-variable exp program lexical-env))
         ((assignment? exp)
-         (compile-assignment exp module lexical-env compile))
+         (compile-assignment exp program lexical-env compile))
         ((definition? exp)
-         (compile-definition exp module lexical-env compile))
-        ((if? exp) (compile-if exp module lexical-env compile))
-        ((lambda? exp) (compile-lambda exp module lexical-env compile))
+         (compile-definition exp program lexical-env compile))
+        ((if? exp)
+         (compile-if exp program lexical-env compile))
+        ((lambda? exp)
+         (compile-lambda exp program lexical-env compile))
         ((begin? exp)
-         (compile-sequence (begin-actions exp) module lexical-env compile))
-        ((cond? exp) (compile (cond->if exp) lexical-env))
+         (compile-sequence (begin-actions exp) program lexical-env compile))
+        ((cond? exp)
+         (compile (cond->if exp) lexical-env))
         ((open-coded-primitive-application? exp)
-         (compile-open-coded-primitive exp module lexical-env compile))
+         (compile-open-coded-primitive exp program lexical-env compile))
         ((application? exp)
-         (compile-application exp module lexical-env compile))
+         (compile-application exp program lexical-env compile))
         (else
          (error "Unknown expression type -- COMPILE" exp))))
 
@@ -102,64 +123,78 @@
 
 ;;;simple expressions
 
-(define (compile-self-evaluating exp)
-  (cond ((integer? exp)
-         `(i32.const ,exp))
-        ((boolean? exp)
-         `(i32.const ,(if exp 1 0)))
-        (else
-         (error "Unsupported value" exp))))
+(define (compile-self-evaluating exp program)
+  (compiled-program-with-value-code
+   program
+   (cond ((integer? exp)
+          `(i32.const ,exp))
+         ((boolean? exp)
+          `(i32.const ,(if exp 1 0)))
+         (else
+          (error "Unsupported value" exp)))))
 
-(define (compile-quoted exp)
+(define (compile-quoted exp program)
   (error "Quote not supported yet" exp))
 
-(define (compile-variable exp lexical-env)
-  (let*
-      ((lexical-address (find-variable exp lexical-env))
-       (get-instr
-        (cond
-          ((eq? lexical-address 'not-found)
-           (error "Lexically unbound variable" exp))
-          ((global-address? lexical-address) 'get_global)
-          ((= (frame-index lexical-address) 0) 'get_local)
-          (else
-           (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
-    `(,get-instr ,(var-index lexical-address))))
+(define (compile-variable exp program lexical-env)
+  (let* ((lexical-address
+          (find-variable exp lexical-env))
+         (get-instr
+          (cond ((eq? lexical-address 'not-found)
+                 (error "Lexically unbound variable" exp))
+                ((global-address? lexical-address) 'get_global)
+                ((= (frame-index lexical-address) 0) 'get_local)
+                (else
+                 (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+    (compiled-program-with-value-code
+     program
+     `(,get-instr ,(var-index lexical-address)))))
 
-(define (compile-assignment exp module lexical-env compile)
-  (let*
-      ((lexical-address (find-variable (assignment-variable exp) lexical-env))
-       (value-code
-        (compile (assignment-value exp) module lexical-env))
-       (set-instr
-        (cond
-          ((eq? lexical-address 'not-found)
-           (error "Lexically unbound variable" exp))
-          ((global-address? lexical-address) 'set_global)
-          ((= (frame-index lexical-address) 0) 'set_local)
-          (else
-           (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
-     `(,@value-code
-       ,set-instr ,(var-index lexical-address)
-       ,@unspecified-value)))
+(define (compile-assignment exp program lexical-env compile)
+  (let* ((lexical-address
+          (find-variable (assignment-variable exp) lexical-env))
+         (program-with-value-computing-code
+          (compile (assignment-value exp) program lexical-env))
+         (set-instr
+          (cond
+            ((eq? lexical-address 'not-found)
+             (error "Lexically unbound variable" exp))
+            ((global-address? lexical-address) 'set_global)
+            ((= (frame-index lexical-address) 0) 'set_local)
+            (else
+             (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+    (compiled-program-append-value-code
+     program-with-value-computing-code
+     `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
-(define (compile-definition exp module lexical-env compile)
+(define (compile-definition exp program lexical-env compile)
   (if (global-lexical-env? lexical-env)
-      (let* ((value-code
-              (compile (definition-value exp) module lexical-env))
+      (let* ((program-with-value-computing-code
+              (compile (definition-value exp) program lexical-env))
+             (value-code
+              (compiled-program-value-code program-with-value-computing-code))
              (const-value?
               (and (= (length value-code) 2)
-                       (eq? (car value-code) 'i32.const)))
+                   (eq? (car value-code) 'i32.const)))
              (init-expr
               (if const-value? value-code uninitialized-value))
              (global-index
-              ((module 'add-definition!)
-               `(global (mut i32) ,init-expr))))
-        (if (not const-value?)
-            ((module 'add-definition!)
-             `(global-init
-               (,@value-code (set_global ,global-index)))))
-        unspecified-value)
+              (wasm-module-definitions-count
+               (compiled-program-module-definitions program-with-value-computing-code)
+               'global))
+             (global-definition
+              `((global (mut i32) ,init-expr)))
+             (definitions
+              (if const-value?
+                  global-definition
+                  (append
+                   global-definition
+                   `((global-init
+                      (,@value-code (set_global ,global-index))))))))
+        (compiled-program-with-definitions-and-value-code
+         program-with-value-computing-code
+         definitions
+         unspecified-value))
       (error "Only top-level define is supported" exp)))
 
 ;;;open-coded primitives
@@ -177,20 +212,25 @@
   (and (application? exp)
        (assoc (operator exp) open-coded-primitives-to-machine-ops)))
 
-(define (compile-open-coded-primitive exp module lexical-env compile)
+(define (compile-open-coded-primitive exp program lexical-env compile)
   (let ((op (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops))))
-    (define (compile-rest-arguments operands)
-      (let ((code-to-compute-next-operand-to-stack
-             (compile (car operands) module lexical-env)))
-        (append
-         code-to-compute-next-operand-to-stack
+    (define (compile-rest-arguments program operands)
+      (let ((program-with-next-value-computing-code
+             (compiled-program-append-value-code
+              (compile (car operands) program lexical-env) op)))
          (if (null? (cdr operands))
-             op
-             (append op (compile-rest-arguments (cdr operands)))))))
-    (let ((operands (operands exp)))
-      (append
-       (compile (car operands) module lexical-env)
-       (compile-rest-arguments (cdr operands))))))
+             program-with-next-value-computing-code
+             (compiled-program-append-value-code
+              program-with-next-value-computing-code
+              (compiled-program-value-code
+               (compile-rest-arguments program-with-next-value-computing-code (cdr operands)))))))
+    (let* ((operands (operands exp))
+           (program-with-next-value-computing-code
+            (compile (car operands) program lexical-env)))
+      (compiled-program-append-value-code
+       program-with-next-value-computing-code
+       (compiled-program-value-code
+        (compile-rest-arguments program-with-next-value-computing-code (cdr operands)))))))
 
 ;;;ids
 

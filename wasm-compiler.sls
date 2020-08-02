@@ -40,13 +40,15 @@
                                    lexical-env
                                    compile)
                  (make-empty-compiled-program)))
+           (debug1 (begin (write definitions-program) (newline)))
            (program
             (compile-sequence non-definitions definitions-program lexical-env compile))
+           (debug2 (begin (write program) (newline)))
            (module-definitions
             (compiled-program-module-definitions program))
            (get-module-definitions
             (lambda (type)
-              (wasm-module-get-definitions module-definitions 'elem)))
+              (wasm-module-get-definitions module-definitions type)))
            (elem-defs
             (get-module-definitions 'elem))
            (elem-func-indices
@@ -247,28 +249,34 @@
 
 ;;;conditional expressions
 
-(define (compile-if exp module lexical-env compile)
-  (let ((p-code (compile (if-predicate exp) module lexical-env))
-        (c-code (compile (if-consequent exp) module lexical-env))
-        (a-code
-         (if (if-alternative exp)
-             (compile (if-alternative exp) module lexical-env)
-             unspecified-value)))
-    `(,@p-code
-      if (result i32)
-      ,@c-code
-      else
-      ,@a-code
-      end)))
+(define (compile-if exp program lexical-env compile)
+  (let* ((p-prog (compile (if-predicate exp) program lexical-env))
+         (c-prog (compile (if-consequent exp) p-prog lexical-env))
+         (a-prog
+          (if (if-alternative exp)
+              (compile (if-alternative exp) c-prog lexical-env)
+              (compiled-program-with-value-code c-prog unspecified-value))))
+    (compiled-program-with-value-code
+     a-prog
+     `(,@(compiled-program-value-code p-prog)
+       if (result i32)
+       ,@(compiled-program-value-code c-prog)
+       else
+       ,@(compiled-program-value-code a-prog)
+       end))))
 
 ;;; sequences
 
-(define (compile-sequence seq module lexical-env compile)
+(define (compile-sequence seq program lexical-env compile)
   (if (last-exp? seq)
-      (compile (first-exp seq) module lexical-env)
-      `(,@(compile (first-exp seq) module lexical-env)
-        drop ; Drop the results of the intermediate expressions
-        ,@(compile-sequence (rest-exps seq) module lexical-env compile))))
+      (compile (first-exp seq) program lexical-env)
+      (let ((progam-with-first-exp
+             (compiled-program-append-value-code
+              (compile (first-exp seq) program lexical-env)
+              '(drop)))) ; Drop the results of the intermediate expressions
+        (compiled-program-append-value-code
+         progam-with-first-exp
+         (compile-sequence (rest-exps seq) progam-with-first-exp lexical-env compile)))))
 
 ;;;lambda expressions
 

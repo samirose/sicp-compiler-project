@@ -40,10 +40,10 @@
                                    lexical-env
                                    compile)
                  (make-empty-compiled-program)))
-           (debug1 (begin (write definitions-program) (newline)))
            (program
-            (compile-sequence non-definitions definitions-program lexical-env compile))
-           (debug2 (begin (write program) (newline)))
+            (if (null? non-definitions)
+                definitions-program
+                (compile-sequence non-definitions definitions-program lexical-env compile)))
            (module-definitions
             (compiled-program-module-definitions program))
            (get-module-definitions
@@ -192,7 +192,7 @@
                   (append
                    global-definition
                    `((global-init
-                      (,@value-code (set_global ,global-index))))))))
+                      (,@value-code set_global ,global-index)))))))
         (compiled-program-with-definitions-and-value-code
          program-with-value-computing-code
          definitions
@@ -219,20 +219,19 @@
     (define (compile-rest-arguments program operands)
       (let ((program-with-next-value-computing-code
              (compiled-program-append-value-code
-              (compile (car operands) program lexical-env) op)))
+              (compile (car operands) program lexical-env)
+              op)))
          (if (null? (cdr operands))
              program-with-next-value-computing-code
-             (compiled-program-append-value-code
-              program-with-next-value-computing-code
-              (compiled-program-value-code
-               (compile-rest-arguments program-with-next-value-computing-code (cdr operands)))))))
+             (compiled-program-prepend-value-code
+              (compile-rest-arguments program-with-next-value-computing-code (cdr operands))
+              (compiled-program-value-code program-with-next-value-computing-code)))))
     (let* ((operands (operands exp))
            (program-with-next-value-computing-code
             (compile (car operands) program lexical-env)))
-      (compiled-program-append-value-code
-       program-with-next-value-computing-code
-       (compiled-program-value-code
-        (compile-rest-arguments program-with-next-value-computing-code (cdr operands)))))))
+      (compiled-program-prepend-value-code
+       (compile-rest-arguments program-with-next-value-computing-code (cdr operands))
+       (compiled-program-value-code program-with-next-value-computing-code)))))
 
 ;;;ids
 
@@ -268,15 +267,15 @@
 ;;; sequences
 
 (define (compile-sequence seq program lexical-env compile)
-  (if (last-exp? seq)
-      (compile (first-exp seq) program lexical-env)
-      (let ((progam-with-first-exp
-             (compiled-program-append-value-code
-              (compile (first-exp seq) program lexical-env)
-              '(drop)))) ; Drop the results of the intermediate expressions
-        (compiled-program-append-value-code
-         progam-with-first-exp
-         (compile-sequence (rest-exps seq) progam-with-first-exp lexical-env compile)))))
+  (let ((progam-with-next-exp
+         (compile (first-exp seq) program lexical-env)))
+    (if (last-exp? seq)
+        progam-with-next-exp
+        (compiled-program-prepend-value-code
+         (compile-sequence (rest-exps seq) progam-with-next-exp lexical-env compile)
+         `(,@(compiled-program-value-code progam-with-next-exp)
+            ; Drop the results of the intermediate expressions
+            drop)))))
 
 ;;;lambda expressions
 

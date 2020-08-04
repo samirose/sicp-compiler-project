@@ -6,6 +6,7 @@
          compiled-program-value-code
          compiled-program-with-value-code
          compiled-program-append-value-code
+         compiled-program-prepend-value-code
          compiled-program-with-definition-and-value-code
          compiled-program-with-definitions-and-value-code)
  (import (rnrs base)
@@ -36,6 +37,11 @@
     (compiled-program-module-definitions cp)
     (append (compiled-program-value-code cp)
             code)))
+
+  (define (compiled-program-prepend-value-code cp code)
+   (make-compiled-program
+    (compiled-program-module-definitions cp)
+    (append code (compiled-program-value-code cp))))
 
  (define (compiled-program-with-definition-and-value-code cp definition code)
    (make-compiled-program

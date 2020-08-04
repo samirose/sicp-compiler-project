@@ -5,6 +5,7 @@
  (export make-empty-wasm-module-definitions
          wasm-module-definitions-count
          wasm-module-add-definition
+         wasm-module-append
          wasm-module-get-definitions)
 
  (import (rnrs)
@@ -33,6 +34,16 @@
    (make-wasm-module-definitions
     (cons def (definitions defs))
     (counted-set-add (definition-counts defs) (car def))))
+
+ (define (wasm-module-add-definitions defs ds)
+   (if (null? ds)
+       defs
+       (wasm-module-add-definitions
+        (wasm-module-add-definition defs (car ds))
+        (cdr ds))))
+
+ (define (wasm-module-append defs1 defs2)
+   (wasm-module-add-definitions defs1 (definitions defs2)))
 
  (define (wasm-module-get-definitions defs type)
    (let collect ((ds (definitions defs))

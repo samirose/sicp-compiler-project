@@ -171,28 +171,29 @@
 
 (define (compile-definition exp program lexical-env compile)
   (if (global-lexical-env? lexical-env)
-      (let* ((program-with-value-computing-code
-              (compile (definition-value exp) program lexical-env))
-             (value-code
-              (compiled-program-value-code program-with-value-computing-code))
-             (const-value?
-              (and (= (length value-code) 2)
-                   (eq? (car value-code) 'i32.const)))
-             (init-expr
-              (if const-value? value-code uninitialized-value))
-             (global-index
-              (wasm-module-definitions-count
-               (compiled-program-module-definitions program-with-value-computing-code)
-               'global))
-             (global-definition
-              `((global (mut i32) ,init-expr)))
-             (definitions
-              (if const-value?
+      (let*
+          ((program-with-value-computing-code
+            (compile (definition-value exp) program lexical-env))
+           (value-code
+            (compiled-program-value-code program-with-value-computing-code))
+           (const-value?
+            (and (= (length value-code) 2)
+                 (eq? (car value-code) 'i32.const)))
+           (init-expr
+            (if const-value? value-code uninitialized-value))
+           (global-index
+            (wasm-module-definitions-count
+             (compiled-program-module-definitions program-with-value-computing-code)
+             'global))
+           (global-definition
+            `((global (mut i32) ,init-expr)))
+           (definitions
+             (if const-value?
+                 global-definition
+                 (append
                   global-definition
-                  (append
-                   global-definition
-                   `((global-init
-                      (,@value-code set_global ,global-index)))))))
+                  `((global-init
+                     (,@value-code set_global ,global-index)))))))
         (compiled-program-with-definitions-and-value-code
          program-with-value-computing-code
          definitions
@@ -233,19 +234,6 @@
        (compile-rest-arguments program-with-next-value-computing-code (cdr operands))
        (compiled-program-value-code program-with-next-value-computing-code)))))
 
-;;;ids
-
-(define id-counter 0)
-
-(define (new-id-number)
-  (set! id-counter (+ 1 id-counter))
-  id-counter)
-
-(define (make-id name number)
-  (string->symbol
-    (string-append "$" (symbol->string name)
-                   (number->string number))))
-
 ;;;conditional expressions
 
 (define (compile-if exp program lexical-env compile)
@@ -279,69 +267,93 @@
 
 ;;;lambda expressions
 
-(define (make-scheme-procedure-type-id arity)
-  (make-id 'scm-procedure arity))
-
 (define scheme-procedure-param-type 'i32)
 
-(define (add-scheme-procedure-type-definition module arity)
-  (let* ((type-id (make-scheme-procedure-type-id arity))
-         (param-types
-          (if (= 0 arity)
-              '()
-              (list
-               (cons 'param
-                     (make-list scheme-procedure-param-type arity)))))
-         (type-definition
-          `(type ,type-id (func ,@param-types (result i32)))))
-    (if (not ((module 'definition-index) type-definition))
-        ((module 'add-definition!) type-definition))
-    type-id))
+(define (scheme-procedure-type-definition arity)
+  (let ((param-types
+         (if (= 0 arity)
+             '()
+             (list
+              (cons 'param
+                    (make-list scheme-procedure-param-type arity))))))
+    `(type (func ,@param-types (result i32)))))
 
 (define scheme-procedures-table-id '$scm-procedures)
 
-(define (compile-lambda exp module lexical-env compile)
-  (let* ((func-index
-          ; Generate id for the lambda function's type based on number of parameters
-          (let* ((formals (lambda-parameters exp))
-                 (func-type-id
-                  (add-scheme-procedure-type-definition module (length formals)))
-                 (body-code
-                   (compile-sequence
-                    (lambda-body exp) module (add-new-lexical-frame formals lexical-env) compile)))
-            ; Add function to the module and keep its index in func-index
-            ((module 'add-definition!)
-             `(func (type ,func-type-id) ,@body-code))))
-         ; Add table element for the function for indirect calling.
-         ; The module post-processing will combine the elem items to a single item and add a
-         ; table element of correct size.
-         (elem-index
-          ((module 'add-definition!)
-           `(elem ,scheme-procedures-table-id ,func-index))))
-         ; Lambda expression's value is the function's index in the table
-         `(i32.const ,elem-index)))
+(define (compile-lambda exp program lexical-env compile)
+  (let*
+      ; Generate lambda function's type based on number of parameters
+      ((formals (lambda-parameters exp))
+       ; Compile the lambda procedure body
+       (body-program
+        (compile-sequence
+         (lambda-body exp) program (add-new-lexical-frame formals lexical-env) compile))
+       ; Add function type, if needed and look up its index
+       (func-type (scheme-procedure-type-definition (length formals)))
+       (type-program
+        (if (compiled-program-contains-definition body-program func-type)
+            body-program
+            (compiled-program-add-definition body-program func-type)))
+       (type-index
+        (compiled-program-definition-index type-program func-type))
+       ; Add function to the module and look up its index
+       (func-definition
+        `(func (type ,type-index)
+               ,@(compiled-program-value-code body-program)))
+       (func-program
+        (if (compiled-program-contains-definition type-program func-definition)
+            type-program
+            (compiled-program-add-definition type-program func-definition)))
+       (func-index
+        (compiled-program-definition-index func-program func-definition))
+       ; Add table element for the function for indirect calling.
+       ; The module compilation procedure compile-r7rs-library-to-wasm-module will combine the elem
+       ; items to a single item and add a table element of correct size.
+       (elem-definition
+        `(elem ,scheme-procedures-table-id ,func-index))
+       (elem-program
+        (if (compiled-program-contains-definition func-program elem-definition)
+            func-program
+            (compiled-program-add-definition func-program elem-definition)))
+       (elem-index
+        (compiled-program-definition-index elem-program elem-definition)))
+       ; Lambda expression's value is the function's index in the table
+    (compiled-program-with-value-code
+     elem-program
+     `(i32.const ,elem-index))))
 
 ;;;combinations
 
-(define (compile-application exp module lexical-env compile)
-  (let ((proc-code
-         (compile (operator exp) module lexical-env))
-        (operand-codes
-         (map (lambda (operand) (compile operand module lexical-env))
-              (operands exp)))
-        (func-type-id
-         (add-scheme-procedure-type-definition module (length (operands exp)))))
-    (append
-     (construct-arglist operand-codes)
-     proc-code
-     `(call_indirect (type ,func-type-id)))))
-
-(define (construct-arglist operand-codes)
-  (if (null? operand-codes)
-      '()
-      (append
-       (car operand-codes)
-       (construct-arglist (cdr operand-codes)))))
+(define (compile-application exp program lexical-env compile)
+  (let*
+      ((operands (operands exp))
+       (func-type (scheme-procedure-type-definition (length operands)))
+       (type-program
+        (if (compiled-program-contains-definition program func-type)
+            program
+            (compiled-program-add-definition program func-type)))
+       (type-index
+        (compiled-program-definition-index type-program func-type))
+       (operands-program
+        (if (null? operands)
+            (compiled-program-with-value-code type-program '())
+            (let ((first-operand-program
+                   (compile (car operands) type-program lexical-env)))
+              (fold-left
+               (lambda (program operand)
+                 (compiled-program-prepend-value-code
+                  (compile operand program lexical-env)
+                  (compiled-program-value-code program)))
+               first-operand-program
+               (cdr operands)))))
+       (operands-and-operator-program
+        (compiled-program-prepend-value-code
+         (compile (operator exp) operands-program lexical-env)
+         (compiled-program-value-code operands-program)))
+       )
+    (compiled-program-append-value-code
+     operands-and-operator-program
+     `(call_indirect (type ,type-index)))))
 
 '(COMPILER LOADED)
 )

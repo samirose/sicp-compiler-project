@@ -1,17 +1,18 @@
 #!r6rs
-(library (wasm-compiler)
-         (export compile-r7rs-library-to-wasm-module
-                 compile-single-exp-to-wasm-module)
-         (import (rnrs base)
-                 (rnrs lists)
-                 (rnrs io simple)
-                 (lists)
-                 (scheme-syntax)
-                 (scheme-r7rs-syntax)
-                 (lexical-env)
-                 (compiled-program)
-                 (wasm-module-definitions)
-                 (wasm-syntax))
+(library
+ (wasm-compiler)
+ (export compile-r7rs-library-to-wasm-module
+         compile-single-exp-to-wasm-module)
+ (import (rnrs base)
+         (rnrs lists)
+         (rnrs io simple)
+         (lists)
+         (scheme-syntax)
+         (scheme-r7rs-syntax)
+         (lexical-env)
+         (compiled-program)
+         (wasm-module-definitions)
+         (wasm-syntax))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF

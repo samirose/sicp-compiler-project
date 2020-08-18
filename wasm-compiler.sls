@@ -21,35 +21,42 @@
 (define (compile-r7rs-library-to-wasm-module exp)
   (if (r7rs-library? exp)
       (let*
-          ((exps
-            (or (library-decl 'begin exp)
-                (error "No begin declaration in library" exp)))
-           (exp-sequence
-            (begin-actions exps))
-           (definitions
-             (filter definition? exp-sequence))
-           (non-definitions
-            (reject definition? exp-sequence))
-           (lexical-env
-            (add-new-lexical-frame
-             (map definition-variable definitions)
-             (make-empty-lexical-env)))
-           (definitions-program
-             (if (not (null? definitions))
-                 (compile-sequence definitions
-                                   (make-empty-compiled-program)
-                                   lexical-env
-                                   compile)
-                 (make-empty-compiled-program)))
-           (program
-            (if (null? non-definitions)
-                definitions-program
-                (compile-sequence non-definitions definitions-program lexical-env compile)))
-           (module-definitions
-            (compiled-program-module-definitions program))
+          ((program
+            (let*
+                ((exps
+                  (or (library-decl 'begin exp)
+                      (error "No begin declaration in library" exp)))
+                 (exp-sequence
+                  (begin-actions exps))
+                 (definitions
+                   (filter definition? exp-sequence))
+                 (non-definitions
+                  (reject definition? exp-sequence))
+                 (lexical-env
+                  (add-new-lexical-frame
+                   (map definition-variable definitions)
+                   (make-empty-lexical-env)))
+                 (definitions-program
+                   (if (null? definitions)
+                       (make-empty-compiled-program)
+                       (compile-sequence
+                        definitions
+                        (make-empty-compiled-program)
+                        lexical-env
+                        compile))))
+              (if (null? non-definitions)
+                  definitions-program
+                  (compile-sequence
+                   non-definitions
+                   definitions-program
+                   lexical-env compile))))
            (get-module-definitions
-            (lambda (type)
-              (wasm-module-get-definitions module-definitions type)))
+            (let ((module-definitions
+                   (compiled-program-module-definitions program)))
+              (lambda (type)
+                (wasm-module-get-definitions
+                 module-definitions
+                 type))))
            (elem-defs
             (get-module-definitions 'elem))
            (elem-func-indices

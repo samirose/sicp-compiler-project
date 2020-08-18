@@ -267,11 +267,14 @@
          (compile (first-exp seq) program lexical-env)))
     (if (last-exp? seq)
         progam-with-next-exp
-        (compiled-program-prepend-value-code
-         (compile-sequence (rest-exps seq) progam-with-next-exp lexical-env compile)
-         `(,@(compiled-program-value-code progam-with-next-exp)
-            ; Drop the results of the intermediate expressions
-            drop)))))
+        (let ((program-with-rest-exps
+               (compile-sequence (rest-exps seq) progam-with-next-exp lexical-env compile)))
+          (compiled-program-with-value-code
+           program-with-rest-exps
+           `(,@(compiled-program-value-code progam-with-next-exp)
+             ; Drop the results of the intermediate expressions
+             drop
+             ,@(compiled-program-value-code program-with-rest-exps)))))))
 
 ;;;lambda expressions
 

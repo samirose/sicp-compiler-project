@@ -263,18 +263,16 @@
 ;;; sequences
 
 (define (compile-sequence seq program lexical-env compile)
-  (let ((progam-with-next-exp
+  (let ((program-with-next-exp
          (compile (first-exp seq) program lexical-env)))
     (if (last-exp? seq)
-        progam-with-next-exp
-        (let ((program-with-rest-exps
-               (compile-sequence (rest-exps seq) progam-with-next-exp lexical-env compile)))
-          (compiled-program-with-value-code
-           program-with-rest-exps
-           `(,@(compiled-program-value-code progam-with-next-exp)
-             ; Drop the results of the intermediate expressions
-             drop
-             ,@(compiled-program-value-code program-with-rest-exps)))))))
+        program-with-next-exp
+        (compiled-program-append-value-codes
+         (compiled-program-append-value-code
+          program-with-next-exp
+          ; Drop the results of the intermediate expressions
+          '(drop))
+         (compile-sequence (rest-exps seq) program-with-next-exp lexical-env compile)))))
 
 ;;;lambda expressions
 

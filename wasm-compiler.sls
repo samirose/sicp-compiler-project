@@ -267,12 +267,17 @@
          (compile (first-exp seq) program lexical-env)))
     (if (last-exp? seq)
         program-with-next-exp
-        (compiled-program-append-value-codes
-         (compiled-program-append-value-code
-          program-with-next-exp
-          ; Drop the results of the intermediate expressions
-          '(drop))
-         (compile-sequence (rest-exps seq) program-with-next-exp lexical-env compile)))))
+        (let ((program-with-next-exp-result-discarded
+               (compiled-program-append-value-code
+                program-with-next-exp
+                '(drop))))
+          (compiled-program-append-value-codes
+           program-with-next-exp-result-discarded
+           (compile-sequence
+            (rest-exps seq)
+            program-with-next-exp-result-discarded
+            lexical-env
+            compile))))))
 
 ;;;lambda expressions
 

@@ -7,7 +7,6 @@ LIBS := lists \
 		scheme-r7rs-syntax \
 		lexical-env \
 		wasm-syntax \
-		wasm-definitions-table \
 		wasm-module-definitions \
 		compiled-program \
 		wasm-compiler
@@ -23,7 +22,6 @@ $(LIBDIR)% : %.sls
 	$(SCHEME) --install --collections $(LIBDIR) $<
 	touch $@
 
-lib/wasm-definitions-table : lib/lists
 lib/wasm-module-definitions : lib/lists
 lib/compiled-program : lib/wasm-module-definitions
 lib/wasm-compiler : lib/lists \
@@ -31,7 +29,6 @@ lib/wasm-compiler : lib/lists \
 					lib/scheme-syntax \
 					lib/scheme-r7rs-syntax \
 					lib/wasm-syntax \
-					lib/wasm-definitions-table \
 					lib/compiled-program \
 					lib/wasm-module-definitions
 

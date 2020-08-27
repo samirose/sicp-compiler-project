@@ -7,7 +7,6 @@
          compiled-program-with-value-code
          compiled-program-append-value-code
          compiled-program-append-value-codes
-         compiled-program-prepend-value-code
          compiled-program-contains-definition
          compiled-program-definition-index
          compiled-program-add-definition
@@ -47,11 +46,6 @@
     (compiled-program-module-definitions cp2)
     (append (compiled-program-value-code cp1)
             (compiled-program-value-code cp2))))
-
-  (define (compiled-program-prepend-value-code cp code)
-   (make-compiled-program
-    (compiled-program-module-definitions cp)
-    (append code (compiled-program-value-code cp))))
 
   (define (compiled-program-contains-definition cp definition)
     (wasm-module-contains-definition

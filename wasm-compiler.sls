@@ -232,15 +232,15 @@
               op)))
          (if (null? (cdr operands))
              program-with-next-value-computing-code
-             (compiled-program-prepend-value-code
-              (compile-rest-arguments program-with-next-value-computing-code (cdr operands))
-              (compiled-program-value-code program-with-next-value-computing-code)))))
+             (compiled-program-append-value-codes
+              program-with-next-value-computing-code
+              (compile-rest-arguments program-with-next-value-computing-code (cdr operands))))))
     (let* ((operands (operands exp))
            (program-with-next-value-computing-code
             (compile (car operands) program lexical-env)))
-      (compiled-program-prepend-value-code
-       (compile-rest-arguments program-with-next-value-computing-code (cdr operands))
-       (compiled-program-value-code program-with-next-value-computing-code)))))
+      (compiled-program-append-value-codes
+       program-with-next-value-computing-code
+       (compile-rest-arguments program-with-next-value-computing-code (cdr operands))))))
 
 ;;;conditional expressions
 
@@ -355,16 +355,15 @@
                    (compile (car operands) type-program lexical-env)))
               (fold-left
                (lambda (program operand)
-                 (compiled-program-prepend-value-code
-                  (compile operand program lexical-env)
-                  (compiled-program-value-code program)))
+                 (compiled-program-append-value-codes
+                  program
+                  (compile operand program lexical-env)))
                first-operand-program
                (cdr operands)))))
        (operands-and-operator-program
-        (compiled-program-prepend-value-code
-         (compile (operator exp) operands-program lexical-env)
-         (compiled-program-value-code operands-program)))
-       )
+        (compiled-program-append-value-codes
+         operands-program
+         (compile (operator exp) operands-program lexical-env))))
     (compiled-program-append-value-code
      operands-and-operator-program
      `(call_indirect (type ,type-index)))))

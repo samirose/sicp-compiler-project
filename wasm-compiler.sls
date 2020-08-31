@@ -224,12 +224,12 @@
        (assoc (operator exp) open-coded-primitives-to-machine-ops)))
 
 (define (compile-open-coded-primitive exp program lexical-env compile)
-  (let ((op (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops))))
+  (let ((op-code (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops))))
     (define (compile-rest-arguments program operands)
       (let ((program-with-next-value-computing-code
              (compiled-program-append-value-code
               (compile (car operands) program lexical-env)
-              op)))
+              op-code)))
          (if (null? (cdr operands))
              program-with-next-value-computing-code
              (compiled-program-append-value-codes

@@ -190,8 +190,8 @@
            (init-expr
             (if const-value? value-code uninitialized-value))
            (global-index
-            (wasm-module-definitions-count
-             (compiled-program-module-definitions program-with-value-computing-code)
+            (compiled-program-definitions-count
+             program-with-value-computing-code
              'global))
            (global-definition
             `(global (mut i32) ,init-expr))

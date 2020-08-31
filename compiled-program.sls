@@ -10,6 +10,7 @@
          compiled-program-add-definition
          compiled-program-contains-definition
          compiled-program-definition-index
+         compiled-program-definitions-count
          compiled-program-with-definition-and-value-code
          compiled-program-with-definitions-and-value-code)
  (import (rnrs base)
@@ -63,6 +64,11 @@
     (wasm-module-definition-index
      (compiled-program-module-definitions cp)
      definition))
+
+  (define (compiled-program-definitions-count cp type)
+    (wasm-module-definitions-count
+     (compiled-program-module-definitions cp)
+     type))
 
   (define (compiled-program-with-definition-and-value-code cp definition code)
     (make-compiled-program

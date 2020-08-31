@@ -7,9 +7,9 @@
          compiled-program-with-value-code
          compiled-program-append-value-code
          compiled-program-append-value-codes
+         compiled-program-add-definition
          compiled-program-contains-definition
          compiled-program-definition-index
-         compiled-program-add-definition
          compiled-program-with-definition-and-value-code
          compiled-program-with-definitions-and-value-code)
  (import (rnrs base)
@@ -47,6 +47,13 @@
     (append (compiled-program-value-code cp1)
             (compiled-program-value-code cp2))))
 
+  (define (compiled-program-add-definition cp definition)
+    (make-compiled-program
+     (wasm-module-add-definition
+      (compiled-program-module-definitions cp)
+      definition)
+     (compiled-program-value-code cp)))
+
   (define (compiled-program-contains-definition cp definition)
     (wasm-module-contains-definition
      (compiled-program-module-definitions cp)
@@ -56,13 +63,6 @@
     (wasm-module-definition-index
      (compiled-program-module-definitions cp)
      definition))
-
-  (define (compiled-program-add-definition cp definition)
-    (make-compiled-program
-     (wasm-module-add-definition
-      (compiled-program-module-definitions cp)
-      definition)
-     (compiled-program-value-code cp)))
 
   (define (compiled-program-with-definition-and-value-code cp definition code)
     (make-compiled-program

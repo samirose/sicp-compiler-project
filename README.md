@@ -11,7 +11,7 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 * Implement the compiler in [Scheme](https://en.wikipedia.org/wiki/Scheme_(programming_language)) [R6RS](http://www.r6rs.org), using [Racket](https://racket-lang.org) as the development platform
 * Learn about Scheme and compilation of functional languages in general
 * Get familiar with WebAssembly as an execution environment and compiler target
-* Stay in the spirit of simple Scheme and target initially supporting a subset of [R7RS-small Scheme](https://r7rs.org)
+* Stay in the spirit of simple Scheme and target initially to support a subset of [R7RS-small Scheme](https://r7rs.org)
 * Compile Scheme forms directly to as idiomatic WASM as feasible
 * Use only basic, standardised [WASM core](https://www.w3.org/TR/wasm-core-1/) features initially
 * Implement as much of the required run-time support in Scheme as possible
@@ -37,14 +37,16 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 * Add regression tests for the implemented features
   * Tests are specified in WAST and executed with [WABT](https://github.com/WebAssembly/wabt)'s [spectest-interp](https://webassembly.github.io/wabt/doc/spectest-interp.1.html) tool
   * The tests invoke the compiler with a Scheme expression, compile it and check the executed WebAssembly's result with WAST assertions
-  * See [wasm-compiler/test] for the tests
+  * See [test-compiler](test-compiler) for the tests. They also give an overall idea of what works has been implemented in the compiler.
 * Compilation of Scheme R7RS library to a WASM module with the top-level code in an exported `func` "main"
 * Top-level `define` of values and procedures
 * `set!` top-level and in-scope binding values
 
 ## Known issues
 * Open coding of numerical comparison operators produces incorrect results when the operator is applied to more than two parameters
+* Numerical operator special cases `(+)`, `(*)`, `(+ x)`, `(* x)`, `(- x)`, `(/ x)` are not supported
 * The Scheme values are not type checked in the compiled programs: a number can be used as a procedure reference and vice-versa. Using of uninitialized values is not detected.
+* Compiling `(begin)` results in no value
 
 ## Features currently under work
 

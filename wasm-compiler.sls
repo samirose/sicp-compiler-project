@@ -1,16 +1,18 @@
 #!r6rs
-(library (wasm-compiler)
-         (export compile-r7rs-library-to-wasm-module
-                 compile-single-exp-to-wasm-module)
-         (import (rnrs base)
-                 (rnrs lists)
-                 (rnrs io simple)
-                 (lists)
-                 (scheme-syntax)
-                 (scheme-r7rs-syntax)
-                 (lexical-env)
-                 (wasm-definitions-table)
-                 (wasm-syntax))
+(library
+ (wasm-compiler)
+ (export compile-r7rs-library-to-wasm-module
+         compile-single-exp-to-wasm-module)
+ (import (rnrs base)
+         (rnrs lists)
+         (rnrs io simple)
+         (lists)
+         (scheme-syntax)
+         (scheme-r7rs-syntax)
+         (lexical-env)
+         (compiled-program)
+         (wasm-module-definitions)
+         (wasm-syntax))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
@@ -19,24 +21,46 @@
 (define (compile-r7rs-library-to-wasm-module exp)
   (if (r7rs-library? exp)
       (let*
-          ((module (make-wasm-definitions-table))
-           (exps
-            (or (library-decl 'begin exp)
-                (error "No begin declaration in library" exp)))
-           (exp-sequence (begin-actions exps))
-           (definitions (filter definition? exp-sequence))
-           (lexical-env
-            (add-new-lexical-frame
-             (map definition-variable definitions)
-             (make-empty-lexical-env)))
-           (non-definitions (reject definition? exp-sequence))
-           (top-level-code
-            (begin
-              (if (not (null? definitions))
-                  (compile-sequence definitions module lexical-env compile))
-              (compile-sequence non-definitions module lexical-env compile)))
-           (elem-defs ((module 'definitions-of-type) 'elem))
-           (elem-func-indices (map wasm-elem-definition-func-index elem-defs))
+          ((program
+            (let*
+                ((exps
+                  (or (library-decl 'begin exp)
+                      (error "No begin declaration in library" exp)))
+                 (exp-sequence
+                  (begin-actions exps))
+                 (definitions
+                   (filter definition? exp-sequence))
+                 (non-definitions
+                  (reject definition? exp-sequence))
+                 (lexical-env
+                  (add-new-lexical-frame
+                   (map definition-variable definitions)
+                   (make-empty-lexical-env)))
+                 (definitions-program
+                   (if (null? definitions)
+                       (make-empty-compiled-program)
+                       (compile-sequence
+                        definitions
+                        (make-empty-compiled-program)
+                        lexical-env
+                        compile))))
+              (if (null? non-definitions)
+                  definitions-program
+                  (compile-sequence
+                   non-definitions
+                   definitions-program
+                   lexical-env compile))))
+           (get-module-definitions
+            (let ((module-definitions
+                   (compiled-program-module-definitions program)))
+              (lambda (type)
+                (wasm-module-get-definitions
+                 module-definitions
+                 type))))
+           (elem-defs
+            (get-module-definitions 'elem))
+           (elem-func-indices
+            (map wasm-elem-definition-func-index elem-defs))
            (table-definition
             (if (null? elem-func-indices)
                 '()
@@ -45,20 +69,23 @@
             (if (null? elem-func-indices)
                 '()
                 `((elem ,scheme-procedures-table-id (i32.const 0) func ,@elem-func-indices))))
-           (global-init-defs (map cdr ((module 'definitions-of-type) 'global-init)))
+           (global-init-defs
+            (map cdr (get-module-definitions 'global-init)))
            (global-init-func
             (if (null? global-init-defs)
                 '()
                 `((func $global-init
                         ,@(flatten-n 2 global-init-defs))
-                  (start $global-init)))))
+                  (start $global-init))))
+           (top-level-code
+            (compiled-program-value-code program)))
         `(module
-           ,@((module 'definitions-of-type) 'type)
-           ,@((module 'definitions-of-type) 'func)
+           ,@(get-module-definitions 'type)
+           ,@(get-module-definitions 'func)
            (func $main (result i32)
                  ,@top-level-code)
            ,@table-definition
-           ,@((module 'definitions-of-type) 'global)
+           ,@(get-module-definitions 'global)
            ,@global-init-func
            (export "main" (func $main))
            ,@elem-definition))
@@ -69,25 +96,29 @@
          (library `(define-library ,sequence)))
     (compile-r7rs-library-to-wasm-module library)))
 
-(define (compile exp module lexical-env)
+(define (compile exp program lexical-env)
   (cond ((self-evaluating? exp)
-         (compile-self-evaluating exp))
-        ((quoted? exp) (compile-quoted exp))
+         (compile-self-evaluating exp program))
+        ((quoted? exp)
+         (compile-quoted exp program))
         ((variable? exp)
-         (compile-variable exp lexical-env))
+         (compile-variable exp program lexical-env))
         ((assignment? exp)
-         (compile-assignment exp module lexical-env compile))
+         (compile-assignment exp program lexical-env compile))
         ((definition? exp)
-         (compile-definition exp module lexical-env compile))
-        ((if? exp) (compile-if exp module lexical-env compile))
-        ((lambda? exp) (compile-lambda exp module lexical-env compile))
+         (compile-definition exp program lexical-env compile))
+        ((if? exp)
+         (compile-if exp program lexical-env compile))
+        ((lambda? exp)
+         (compile-lambda exp program lexical-env compile))
         ((begin? exp)
-         (compile-sequence (begin-actions exp) module lexical-env compile))
-        ((cond? exp) (compile (cond->if exp) lexical-env))
+         (compile-sequence (begin-actions exp) program lexical-env compile))
+        ((cond? exp)
+         (compile (cond->if exp) lexical-env))
         ((open-coded-primitive-application? exp)
-         (compile-open-coded-primitive exp module lexical-env compile))
+         (compile-open-coded-primitive exp program lexical-env compile))
         ((application? exp)
-         (compile-application exp module lexical-env compile))
+         (compile-application exp program lexical-env compile))
         (else
          (error "Unknown expression type -- COMPILE" exp))))
 
@@ -102,64 +133,79 @@
 
 ;;;simple expressions
 
-(define (compile-self-evaluating exp)
-  (cond ((integer? exp)
-         `(i32.const ,exp))
-        ((boolean? exp)
-         `(i32.const ,(if exp 1 0)))
-        (else
-         (error "Unsupported value" exp))))
+(define (compile-self-evaluating exp program)
+  (compiled-program-with-value-code
+   program
+   (cond ((integer? exp)
+          `(i32.const ,exp))
+         ((boolean? exp)
+          `(i32.const ,(if exp 1 0)))
+         (else
+          (error "Unsupported value" exp)))))
 
-(define (compile-quoted exp)
+(define (compile-quoted exp program)
   (error "Quote not supported yet" exp))
 
-(define (compile-variable exp lexical-env)
-  (let*
-      ((lexical-address (find-variable exp lexical-env))
-       (get-instr
-        (cond
-          ((eq? lexical-address 'not-found)
-           (error "Lexically unbound variable" exp))
-          ((global-address? lexical-address) 'get_global)
-          ((= (frame-index lexical-address) 0) 'get_local)
-          (else
-           (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
-    `(,get-instr ,(var-index lexical-address))))
+(define (compile-variable exp program lexical-env)
+  (let* ((lexical-address
+          (find-variable exp lexical-env))
+         (get-instr
+          (cond ((eq? lexical-address 'not-found)
+                 (error "Lexically unbound variable" exp))
+                ((global-address? lexical-address) 'get_global)
+                ((= (frame-index lexical-address) 0) 'get_local)
+                (else
+                 (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+    (compiled-program-with-value-code
+     program
+     `(,get-instr ,(var-index lexical-address)))))
 
-(define (compile-assignment exp module lexical-env compile)
-  (let*
-      ((lexical-address (find-variable (assignment-variable exp) lexical-env))
-       (value-code
-        (compile (assignment-value exp) module lexical-env))
-       (set-instr
-        (cond
-          ((eq? lexical-address 'not-found)
-           (error "Lexically unbound variable" exp))
-          ((global-address? lexical-address) 'set_global)
-          ((= (frame-index lexical-address) 0) 'set_local)
-          (else
-           (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
-     `(,@value-code
-       ,set-instr ,(var-index lexical-address)
-       ,@unspecified-value)))
+(define (compile-assignment exp program lexical-env compile)
+  (let* ((lexical-address
+          (find-variable (assignment-variable exp) lexical-env))
+         (program-with-value-computing-code
+          (compile (assignment-value exp) program lexical-env))
+         (set-instr
+          (cond
+            ((eq? lexical-address 'not-found)
+             (error "Lexically unbound variable" exp))
+            ((global-address? lexical-address) 'set_global)
+            ((= (frame-index lexical-address) 0) 'set_local)
+            (else
+             (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+    (compiled-program-append-value-code
+     program-with-value-computing-code
+     `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
-(define (compile-definition exp module lexical-env compile)
+(define (compile-definition exp program lexical-env compile)
   (if (global-lexical-env? lexical-env)
-      (let* ((value-code
-              (compile (definition-value exp) module lexical-env))
-             (const-value?
-              (and (= (length value-code) 2)
-                       (eq? (car value-code) 'i32.const)))
-             (init-expr
-              (if const-value? value-code uninitialized-value))
-             (global-index
-              ((module 'add-definition!)
-               `(global (mut i32) ,init-expr))))
-        (if (not const-value?)
-            ((module 'add-definition!)
-             `(global-init
-               (,@value-code (set_global ,global-index)))))
-        unspecified-value)
+      (let*
+          ((program-with-value-computing-code
+            (compile (definition-value exp) program lexical-env))
+           (value-code
+            (compiled-program-value-code program-with-value-computing-code))
+           (const-value?
+            (and (= (length value-code) 2)
+                 (eq? (car value-code) 'i32.const)))
+           (init-expr
+            (if const-value? value-code uninitialized-value))
+           (global-index
+            (compiled-program-definitions-count
+             program-with-value-computing-code
+             'global))
+           (global-definition
+            `(global (mut i32) ,init-expr))
+           (global-init
+            (if const-value?
+                '()
+                `((global-init
+                   (,@value-code set_global ,global-index)))))
+           (definitions
+             (cons global-definition global-init)))
+        (compiled-program-with-definitions-and-value-code
+         program-with-value-computing-code
+         definitions
+         unspecified-value))
       (error "Only top-level define is supported" exp)))
 
 ;;;open-coded primitives
@@ -177,124 +223,150 @@
   (and (application? exp)
        (assoc (operator exp) open-coded-primitives-to-machine-ops)))
 
-(define (compile-open-coded-primitive exp module lexical-env compile)
-  (let ((op (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops))))
-    (define (compile-rest-arguments operands)
-      (let ((code-to-compute-next-operand-to-stack
-             (compile (car operands) module lexical-env)))
-        (append
-         code-to-compute-next-operand-to-stack
+(define (compile-open-coded-primitive exp program lexical-env compile)
+  (let ((op-code (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops))))
+    (define (compile-rest-arguments program operands)
+      (let ((program-with-next-value-computing-code
+             (compiled-program-append-value-code
+              (compile (car operands) program lexical-env)
+              op-code)))
          (if (null? (cdr operands))
-             op
-             (append op (compile-rest-arguments (cdr operands)))))))
-    (let ((operands (operands exp)))
-      (append
-       (compile (car operands) module lexical-env)
-       (compile-rest-arguments (cdr operands))))))
-
-;;;ids
-
-(define id-counter 0)
-
-(define (new-id-number)
-  (set! id-counter (+ 1 id-counter))
-  id-counter)
-
-(define (make-id name number)
-  (string->symbol
-    (string-append "$" (symbol->string name)
-                   (number->string number))))
+             program-with-next-value-computing-code
+             (compiled-program-append-value-codes
+              program-with-next-value-computing-code
+              (compile-rest-arguments program-with-next-value-computing-code (cdr operands))))))
+    (let* ((operands (operands exp))
+           (program-with-next-value-computing-code
+            (compile (car operands) program lexical-env)))
+      (compiled-program-append-value-codes
+       program-with-next-value-computing-code
+       (compile-rest-arguments program-with-next-value-computing-code (cdr operands))))))
 
 ;;;conditional expressions
 
-(define (compile-if exp module lexical-env compile)
-  (let ((p-code (compile (if-predicate exp) module lexical-env))
-        (c-code (compile (if-consequent exp) module lexical-env))
-        (a-code
-         (if (if-alternative exp)
-             (compile (if-alternative exp) module lexical-env)
-             unspecified-value)))
-    `(,@p-code
-      if (result i32)
-      ,@c-code
-      else
-      ,@a-code
-      end)))
+(define (compile-if exp program lexical-env compile)
+  (let* ((p-prog (compile (if-predicate exp) program lexical-env))
+         (c-prog (compile (if-consequent exp) p-prog lexical-env))
+         (a-prog
+          (if (if-alternative exp)
+              (compile (if-alternative exp) c-prog lexical-env)
+              (compiled-program-with-value-code c-prog unspecified-value))))
+    (compiled-program-with-value-code
+     a-prog
+     `(,@(compiled-program-value-code p-prog)
+       if (result i32)
+       ,@(compiled-program-value-code c-prog)
+       else
+       ,@(compiled-program-value-code a-prog)
+       end))))
 
 ;;; sequences
 
-(define (compile-sequence seq module lexical-env compile)
-  (if (last-exp? seq)
-      (compile (first-exp seq) module lexical-env)
-      `(,@(compile (first-exp seq) module lexical-env)
-        drop ; Drop the results of the intermediate expressions
-        ,@(compile-sequence (rest-exps seq) module lexical-env compile))))
+(define (compile-sequence seq program lexical-env compile)
+  (let ((program-with-next-exp
+         (compile (first-exp seq) program lexical-env)))
+    (if (last-exp? seq)
+        program-with-next-exp
+        (let ((program-with-next-exp-result-discarded
+               (compiled-program-append-value-code
+                program-with-next-exp
+                '(drop))))
+          (compiled-program-append-value-codes
+           program-with-next-exp-result-discarded
+           (compile-sequence
+            (rest-exps seq)
+            program-with-next-exp-result-discarded
+            lexical-env
+            compile))))))
 
 ;;;lambda expressions
 
-(define (make-scheme-procedure-type-id arity)
-  (make-id 'scm-procedure arity))
-
 (define scheme-procedure-param-type 'i32)
 
-(define (add-scheme-procedure-type-definition module arity)
-  (let* ((type-id (make-scheme-procedure-type-id arity))
-         (param-types
-          (if (= 0 arity)
-              '()
-              (list
-               (cons 'param
-                     (make-list scheme-procedure-param-type arity)))))
-         (type-definition
-          `(type ,type-id (func ,@param-types (result i32)))))
-    (if (not ((module 'definition-index) type-definition))
-        ((module 'add-definition!) type-definition))
-    type-id))
+(define (scheme-procedure-type-definition arity)
+  (let ((param-types
+         (if (= 0 arity)
+             '()
+             (list
+              (cons 'param
+                    (make-list scheme-procedure-param-type arity))))))
+    `(type (func ,@param-types (result i32)))))
 
 (define scheme-procedures-table-id '$scm-procedures)
 
-(define (compile-lambda exp module lexical-env compile)
-  (let* ((func-index
-          ; Generate id for the lambda function's type based on number of parameters
-          (let* ((formals (lambda-parameters exp))
-                 (func-type-id
-                  (add-scheme-procedure-type-definition module (length formals)))
-                 (body-code
-                   (compile-sequence
-                    (lambda-body exp) module (add-new-lexical-frame formals lexical-env) compile)))
-            ; Add function to the module and keep its index in func-index
-            ((module 'add-definition!)
-             `(func (type ,func-type-id) ,@body-code))))
-         ; Add table element for the function for indirect calling.
-         ; The module post-processing will combine the elem items to a single item and add a
-         ; table element of correct size.
-         (elem-index
-          ((module 'add-definition!)
-           `(elem ,scheme-procedures-table-id ,func-index))))
-         ; Lambda expression's value is the function's index in the table
-         `(i32.const ,elem-index)))
+(define (compile-lambda exp program lexical-env compile)
+  (let*
+      ; Generate lambda function's type based on number of parameters
+      ((formals (lambda-parameters exp))
+       ; Compile the lambda procedure body
+       (body-program
+        (compile-sequence
+         (lambda-body exp) program (add-new-lexical-frame formals lexical-env) compile))
+       ; Add function type, if needed and look up its index
+       (func-type (scheme-procedure-type-definition (length formals)))
+       (type-program
+        (if (compiled-program-contains-definition body-program func-type)
+            body-program
+            (compiled-program-add-definition body-program func-type)))
+       (type-index
+        (compiled-program-definition-index type-program func-type))
+       ; Add function to the module and look up its index
+       (func-definition
+        `(func (type ,type-index)
+               ,@(compiled-program-value-code body-program)))
+       (func-program
+        (if (compiled-program-contains-definition type-program func-definition)
+            type-program
+            (compiled-program-add-definition type-program func-definition)))
+       (func-index
+        (compiled-program-definition-index func-program func-definition))
+       ; Add table element for the function for indirect calling.
+       ; The module compilation procedure compile-r7rs-library-to-wasm-module will combine the elem
+       ; items to a single item and add a table element of correct size.
+       (elem-definition
+        `(elem ,scheme-procedures-table-id ,func-index))
+       (elem-program
+        (if (compiled-program-contains-definition func-program elem-definition)
+            func-program
+            (compiled-program-add-definition func-program elem-definition)))
+       (elem-index
+        (compiled-program-definition-index elem-program elem-definition)))
+       ; Lambda expression's value is the function's index in the table
+    (compiled-program-with-value-code
+     elem-program
+     `(i32.const ,elem-index))))
 
 ;;;combinations
 
-(define (compile-application exp module lexical-env compile)
-  (let ((proc-code
-         (compile (operator exp) module lexical-env))
-        (operand-codes
-         (map (lambda (operand) (compile operand module lexical-env))
-              (operands exp)))
-        (func-type-id
-         (add-scheme-procedure-type-definition module (length (operands exp)))))
-    (append
-     (construct-arglist operand-codes)
-     proc-code
-     `(call_indirect (type ,func-type-id)))))
-
-(define (construct-arglist operand-codes)
-  (if (null? operand-codes)
-      '()
-      (append
-       (car operand-codes)
-       (construct-arglist (cdr operand-codes)))))
+(define (compile-application exp program lexical-env compile)
+  (let*
+      ((operands (operands exp))
+       (func-type (scheme-procedure-type-definition (length operands)))
+       (type-program
+        (if (compiled-program-contains-definition program func-type)
+            program
+            (compiled-program-add-definition program func-type)))
+       (type-index
+        (compiled-program-definition-index type-program func-type))
+       (operands-program
+        (if (null? operands)
+            (compiled-program-with-value-code type-program '())
+            (let ((first-operand-program
+                   (compile (car operands) type-program lexical-env)))
+              (fold-left
+               (lambda (program operand)
+                 (compiled-program-append-value-codes
+                  program
+                  (compile operand program lexical-env)))
+               first-operand-program
+               (cdr operands)))))
+       (operands-and-operator-program
+        (compiled-program-append-value-codes
+         operands-program
+         (compile (operator exp) operands-program lexical-env))))
+    (compiled-program-append-value-code
+     operands-and-operator-program
+     `(call_indirect (type ,type-index)))))
 
 '(COMPILER LOADED)
 )

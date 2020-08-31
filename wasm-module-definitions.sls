@@ -44,9 +44,10 @@
      (let loop ((ds (definitions defs))
                 (index (wasm-module-definitions-count defs definition-type)))
        (cond ((null? ds) #f)
-             ((equal? (car ds) def) (- index 1))
              ((wasm-definition-type? definition-type (car ds))
-              (loop (cdr ds) (- index 1)))
+              (if (equal? (car ds) def)
+                  (- index 1)
+                  (loop (cdr ds) (- index 1))))
              (else
               (loop (cdr ds) index))))))
 

@@ -194,14 +194,14 @@
              (compiled-program-module-definitions program-with-value-computing-code)
              'global))
            (global-definition
-            `((global (mut i32) ,init-expr)))
+            `(global (mut i32) ,init-expr))
+           (global-init
+            (if const-value?
+                '()
+                `((global-init
+                   (,@value-code set_global ,global-index)))))
            (definitions
-             (if const-value?
-                 global-definition
-                 (append
-                  global-definition
-                  `((global-init
-                     (,@value-code set_global ,global-index)))))))
+             (cons global-definition global-init)))
         (compiled-program-with-definitions-and-value-code
          program-with-value-computing-code
          definitions

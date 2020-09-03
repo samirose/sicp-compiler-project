@@ -26,6 +26,23 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 * Good interoperability with JavaScript is not critical, except where it helps in testing the compiler or hosting an interpreter or the compiler on the Web
 * Do not aim to replace JavaScript on the Web
 
+## Running
+
+Required tools:
+* GNU Make
+* [Racket](https://racket-lang.org) with [R6RS support](https://docs.racket-lang.org/r6rs/index.html) (Other R6RS supporting Schemes may work too, but the Makefile at least will need modification)
+* [WABT](https://github.com/WebAssembly/wabt) for running the compiler tests as defined in the Makefile. Compiler's output can be tested with any WASM tooling that provides a WAT to WASM assembler and a WASM runtime.
+
+On macOS the built-in `make` is sufficient. Racket and WABT can be installed with [Homebrew](https://brew.sh).
+
+* Run `make` to compile the compiler. Requires Racket to be installed and in PATH.
+* `make test-unit` to run unit tests defined in [test-unit](./test-unit) of the compiler support libraries
+* `make test-compiler` to run tests defined in [test-compiler](./test-compiler) for the full compiler. This requires WABT to be installed and in PATH.
+* `make test` to run both unit and compiler tests
+* `cat test.scm | make compile` to compile the Scheme file `test.scm` to a WAT module to standard output.
+
+Test runs can be a bit slow, but can be executed faster in parallel using GNU make's concurrent exeuction. For example, `make -j4 -O test` compiles the compiler and runs all tests with 4-way concurrency. Requires recent-enough GNU make. The option `-O` keeps the output ordered despite the parallel execution.
+
 ## Implemented features
 
 * Compilation of 32-bit integer values and open-coded application of + - * / = operators
@@ -37,7 +54,7 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 * Add regression tests for the implemented features
   * Tests are specified in WAST and executed with [WABT](https://github.com/WebAssembly/wabt)'s [spectest-interp](https://webassembly.github.io/wabt/doc/spectest-interp.1.html) tool
   * The tests invoke the compiler with a Scheme expression, compile it and check the executed WebAssembly's result with WAST assertions
-  * See [test-compiler](test-compiler) for the tests. They also give an overall idea of what works has been implemented in the compiler.
+  * See [test-compiler](./test-compiler) for the tests. They also give an overall idea of what works and has been implemented in the compiler.
 * Compilation of Scheme R7RS library to a WASM module with the top-level code in an exported `func` "main"
 * Top-level `define` of values and procedures
 * `set!` top-level and in-scope binding values
@@ -47,11 +64,13 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 * Numerical operator special cases `(+)`, `(*)`, `(+ x)`, `(* x)`, `(- x)`, `(/ x)` are not supported
 * The Scheme values are not type checked in the compiled programs: a number can be used as a procedure reference and vice-versa. Using of uninitialized values is not detected.
 * Compiling `(begin)` results in no value
+* The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Features currently under work
 
 ## Rough backlog
 
+* Add a references section to README.md
 * Come up with a name for this project
 * Add support for exported top-level definitions with R7RS libary syntax. The exports can be used for writing more comprehensive tests with multiple calls to the exported procedures and asserting the return values.
 * Implement local bindings (`let` forms), with WASM locals instead of `lambda`, if possible.
@@ -61,7 +80,7 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 * Restrict numerical comparison operators to two parameters (see [Known issues](#known-issues)) and add support for the currently missing operators
 * Optional: Implement support for numerical comparison operators with more than two parameters by compiling them as an `and` expression
 * Compile `cond` as WASM block structure and conditional branch instructions instead of the current nested if expressions.
-* Add high-level design document of the compiler
+* Add high-level design documentation with guide to the source code of the compiler
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))
 * Add support for read-only symbols and strings
 * Add run-time support for rudimentary heap-based values: vectors, pairs

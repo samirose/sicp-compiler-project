@@ -15,12 +15,12 @@ COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
 
 $(COMPILED_COMPILER) &: $(LIBDIRS) driver.sps
 	$(SCHEME) ++path $(LIBDIR) --compile driver.sps
-	touch $(COMPILED_COMPILER)
 
 $(LIBDIR)% : %.sls
 	rm -rf $@
 	$(SCHEME) --install --collections $(LIBDIR) $<
-	touch $@
+
+RUN_DRIVER = $(SCHEME) ++path $(LIBDIR) driver.sps
 
 lib/wasm-module-definitions : lib/lists
 lib/compiled-program : lib/wasm-module-definitions
@@ -34,7 +34,7 @@ lib/wasm-compiler : lib/lists \
 
 .PHONY : compile
 compile : $(COMPILED_COMPILER)
-	$(SCHEME) ++path $(LIBDIR) driver.sps $<
+	$(RUN_DRIVER) $<
 
 TEST_COMPILER_DIR := test-compiler
 COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)/*.scm)
@@ -56,7 +56,7 @@ $(TEST_COMPILER_DIR)/build/%.wast : $(TEST_COMPILER_DIR)/build/%.wat $(TEST_COMP
 	cat $^ > $@
 
 $(TEST_COMPILER_DIR)/build/%.wat : $(TEST_COMPILER_DIR)/%.scm $(COMPILED_COMPILER) $(TEST_COMPILER_DIR)/build
-	$(SCHEME) ++path $(LIBDIR) driver.sps < $< > $@
+	$(RUN_DRIVER) < $< > $@
 
 .PRECIOUS : $(TEST_COMPILER_DIR)/build/%.json $(TEST_COMPILER_DIR)/build/%.wast $(TEST_COMPILER_DIR)/build/%.wat
 

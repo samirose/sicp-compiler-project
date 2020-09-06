@@ -9,7 +9,8 @@ LIBS := lists \
 		wasm-syntax \
 		wasm-module-definitions \
 		compiled-program \
-		wasm-compiler
+		expression-compiler \
+		module-compiler
 LIBDIRS = $(addprefix $(LIBDIR),$(LIBS))
 COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
 
@@ -24,13 +25,21 @@ RUN_DRIVER = $(SCHEME) ++path $(LIBDIR) driver.sps
 
 lib/wasm-module-definitions : lib/lists
 lib/compiled-program : lib/wasm-module-definitions
-lib/wasm-compiler : lib/lists \
-                    lib/lexical-env \
-					lib/scheme-syntax \
-					lib/scheme-r7rs-syntax \
-					lib/wasm-syntax \
-					lib/compiled-program \
-					lib/wasm-module-definitions
+lib/expression-compiler : \
+	lib/lists \
+	lib/scheme-syntax \
+	lib/lexical-env \
+	lib/compiled-program \
+	lib/wasm-module-definitions
+lib/module-compiler : \
+	lib/lists \
+	lib/lexical-env \
+	lib/scheme-syntax \
+	lib/scheme-r7rs-syntax \
+	lib/wasm-syntax \
+	lib/compiled-program \
+	lib/wasm-module-definitions \
+	lib/expression-compiler
 
 .PHONY : compile
 compile : $(COMPILED_COMPILER)

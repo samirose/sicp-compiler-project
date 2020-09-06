@@ -12,5 +12,5 @@
    (eq? (wasm-definition-type wasm-definition) type))
 
  (define (wasm-elem-definition-func-index elem-definition)
-   (caddr elem-definition))
+   (cadr elem-definition))
  )

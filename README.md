@@ -70,7 +70,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 
 ## Backlog
 
-* Add a references section to README.md
 * Come up with a name for this project
 * Add support for exported top-level definitions with R7RS libary syntax. The exports can be used for writing more comprehensive tests with multiple calls to the exported procedures and asserting the return values.
 * Implement local bindings (`let` forms), with Wasm locals instead of `lambda`, if possible.
@@ -87,3 +86,25 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Implement simple garbage collection using [SICP section 5.3](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-33.html#%_sec_5.3) as a guideline in WAT
 * Implement lexical [closures](https://en.wikipedia.org/wiki/Closure_(computer_programming)) with function activation records as vector lists on the heap
 * More R7RS-small features, prioritisation TBD.
+
+## References
+
+### Essential
+* [Structure and Interpretation of Computer Programs (SICP) Web Site](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
+* [WebAssembly home page](https://webassembly.org)
+* [WebAssembly specification](https://webassembly.github.io/spec/core/)
+* [WebAssembly text format (WAT)](https://webassembly.github.io/spec/core/text/index.html)
+
+### Supporting
+* [WebAssembly on MDN](https://developer.mozilla.org/en-US/docs/WebAssembly)
+* [Bringing the Web up to Speed with WebAssembly (research paper)](https://dl.acm.org/doi/10.1145/3140587.3062363)
+* [Bringing the Web Up to Speed with WebAssembly (article in ACM Communications)](https://cacm.acm.org/magazines/2018/12/232881-bringing-the-web-up-to-speed-with-webassembly/fulltext)
+* [CHICKEN internals: data representation](https://www.more-magic.net/posts/internals-data-representation.html)
+
+### Scheme classics
+* [SCHEME: An Interpreter for Extended Lambda Calculus](https://dspace.mit.edu/handle/1721.1/5794)
+* [RABBIT: A Compiler for SCHEME](https://dspace.mit.edu/handle/1721.1/6913)
+
+### Similar projects
+* [Schism – an experimental compiler from Scheme to WebAssembly](https://github.com/google/schism)
+* [WAForth: Forth Interpreter+Compiler for WebAssembly](https://el-tramo.be/blog/waforth/)

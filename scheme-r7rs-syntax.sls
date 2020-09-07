@@ -2,7 +2,9 @@
 
 (library
  (scheme-r7rs-syntax)
- (export r7rs-library? library-decl)
+ (export r7rs-library?
+         check-library-declarations
+         library-declaration)
  (import (rnrs base)
          (rnrs lists))
 
@@ -12,11 +14,15 @@
  (define library-decltypes
    '(begin))
 
- (define (library-decl type library-def)
+ (define (check-library-declarations library-def)
    (for-each
     (lambda (decl)
       (or (and (pair? decl) (memq (car decl) library-decltypes))
           (error "Unsupported R7RS library declaration" decl)))
     (cdr library-def))
+   #t)
+
+ (define (library-declaration type library-def)
    (assq type (cdr library-def)))
- )
+
+)

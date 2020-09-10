@@ -10,7 +10,9 @@
          (rnrs lists))
 
  (define (r7rs-library? exp)
-   (and (pair? exp) (eq? (car exp) 'define-library)))
+   (and (pair? exp)
+        (eq? (car exp) 'define-library)
+        (list? (cdr exp))))
 
  (define library-decltypes
    '(export begin))

@@ -9,6 +9,7 @@ LIBS := lists \
 		wasm-syntax \
 		wasm-module-definitions \
 		compiled-program \
+		compilation-error \
 		expression-compiler \
 		module-compiler
 LIBDIRS = $(addprefix $(LIBDIR),$(LIBS))
@@ -25,6 +26,7 @@ RUN_DRIVER = $(SCHEME) ++path $(LIBDIR) driver.sps
 
 lib/wasm-module-definitions : lib/lists
 lib/compiled-program : lib/wasm-module-definitions
+lib/scheme-r7rs-syntax: lib/compilation-error
 lib/expression-compiler : \
 	lib/lists \
 	lib/scheme-syntax \
@@ -39,6 +41,7 @@ lib/module-compiler : \
 	lib/wasm-syntax \
 	lib/compiled-program \
 	lib/wasm-module-definitions \
+	lib/compilation-error \
 	lib/expression-compiler
 
 .PHONY : compile

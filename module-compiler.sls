@@ -8,6 +8,7 @@
          (lists)
          (scheme-syntax)
          (scheme-r7rs-syntax)
+         (compilation-error)
          (lexical-env)
          (compiled-program)
          (wasm-module-definitions)
@@ -19,12 +20,17 @@
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 
 (define (compile-r7rs-library-to-wasm-module exp)
-  (if (not (and (r7rs-library? exp) (check-library-declarations exp)))
+  (if (not (r7rs-library? exp))
       (error "Invalid R7RS library" exp))
+  (let ((check-result (check-library-declarations exp)))
+    (if (compilation-error? check-result)
+        (raise-as-error check-result)))
   (let*
       ((program
         (let*
-            ((exps
+            ((exports
+              (or (library-declaration 'export exp) '()))
+             (exps
               (or (library-declaration 'begin exp)
                   (error "No begin declaration in library" exp)))
              (exp-sequence

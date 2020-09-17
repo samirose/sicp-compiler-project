@@ -22,6 +22,11 @@
      "Lexical env containing one frame is the global lexical env")
 
     (assert-equal
+     #t
+     (global-address? (find-variable 'a env))
+     "Address of a variable in the only frame is a global address")
+
+    (assert-equal
      '(0 0)
      (let ((address (find-variable 'a env)))
        (list (frame-index address) (var-index address)))
@@ -43,6 +48,11 @@
        #f
        (global-lexical-env? env)
        "Lexical frame containing two frames is not the global lexical env")
+
+      (assert-equal
+       #f
+       (global-address? (find-variable 'a env))
+       "Address of a variable in the second frame is not a global address")
 
       (assert-equal
        '(0 0)

@@ -8,7 +8,8 @@
  (define (make-empty-lexical-env) '())
 
  (define (global-lexical-env? lexical-env)
-   (null? (cdr lexical-env)))
+   (and (not (null? lexical-env))
+        (null? (cdr lexical-env))))
 
  (define (add-new-lexical-frame frame lexical-env)
    (cons frame lexical-env))

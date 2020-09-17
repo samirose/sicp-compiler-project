@@ -9,6 +9,7 @@
          (scheme-syntax)
          (lexical-env)
          (compiled-program)
+         (wasm-syntax)
          (wasm-module-definitions))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
@@ -104,8 +105,7 @@
            (value-code
             (compiled-program-value-code program-with-value-computing-code))
            (const-value?
-            (and (= (length value-code) 2)
-                 (eq? (car value-code) 'i32.const)))
+            (wasm-const-value? value-code))
            (init-expr
             (if const-value? value-code uninitialized-value))
            (global-index

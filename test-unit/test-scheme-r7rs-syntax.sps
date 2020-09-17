@@ -59,3 +59,30 @@
  "Unexpected R7RS library declaration"
   (compilation-error-message (check-library-declarations '(define-library (begin 42) (export foo))))
  "Library declarations must be declared in the order specified in the R7RS spec")
+
+(define test-library
+  '(define-library
+     (export square)
+     (begin
+       (define (square x) (* x x))
+       (square 5))))
+
+(assert-equal
+ '(export square)
+ (library-declaration 'export test-library)
+ "library-declaration returns the whole matching declaration in a library")
+
+(assert-equal
+ #f
+ (library-declaration 'import test-library)
+ "library-declaration returns #f when no matching declaration is found in a library")
+
+(assert-equal
+ '((define (square x) (* x x)) (square 5))
+ (library-declarations 'begin test-library)
+ "library-declarations returns the contents of a matching declaration in a library")
+
+(assert-equal
+ '()
+ (library-declarations 'import test-library)
+ "library-declarations returns an empty list when no matching declaration is found in a library")

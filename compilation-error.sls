@@ -3,7 +3,7 @@
  (compilation-error)
  (export make-compilation-error compilation-error?
          compilation-error-message compilation-error-object
-         raise-as-error)
+         raise-as-error raise-if-error)
  (import (rnrs base))
 
  (define (make-compilation-error message object)
@@ -17,4 +17,8 @@
 
  (define (raise-as-error e)
    (error (compilation-error-message e) (compilation-error-object e)))
+
+ (define (raise-if-error x)
+   (if (compilation-error? x)
+       (raise-as-error x)))
 )

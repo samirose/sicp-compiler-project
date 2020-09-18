@@ -22,9 +22,7 @@
 (define (compile-r7rs-library-to-wasm-module exp)
   (if (not (r7rs-library? exp))
       (error "Invalid R7RS library" exp))
-  (let ((check-result (check-library-declarations exp)))
-    (if (compilation-error? check-result)
-        (raise-as-error check-result)))
+  (raise-if-error (check-library-declarations exp))
   (let*
       ((program
         (let*

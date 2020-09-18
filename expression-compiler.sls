@@ -116,10 +116,10 @@
         (compiled-program-value-code program-with-value-computing-code))
        (const-value?
         (wasm-const-value? value-code))
-       (init-expr
+       (init-instr
         (if const-value? value-code uninitialized-value))
        (global-definition
-        `(global (mut i32) ,init-expr))
+        `(global (mut i32) ,init-instr))
        (global-init
         (if const-value?
             '()

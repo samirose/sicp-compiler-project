@@ -98,34 +98,39 @@
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
 (define (compile-definition exp program lexical-env compile)
-  (if (global-lexical-env? lexical-env)
-      (let*
-          ((program-with-value-computing-code
-            (compile (definition-value exp) program lexical-env))
-           (value-code
-            (compiled-program-value-code program-with-value-computing-code))
-           (const-value?
-            (wasm-const-value? value-code))
-           (init-expr
-            (if const-value? value-code uninitialized-value))
-           (global-index
-            (compiled-program-definitions-count
-             program-with-value-computing-code
-             'global))
-           (global-definition
-            `(global (mut i32) ,init-expr))
-           (global-init
-            (if const-value?
-                '()
-                `((global-init
-                   (,@value-code set_global ,global-index)))))
-           (definitions
-             (cons global-definition global-init)))
-        (compiled-program-with-definitions-and-value-code
-         program-with-value-computing-code
-         definitions
-         unspecified-value))
-      (error "Only top-level define is supported" exp)))
+  (let*
+      ((global-index
+        (begin
+          (if (not (global-lexical-env? lexical-env))
+              (error "Only top-level define is supported" exp))
+          (let ((address (find-variable
+                          (definition-variable exp)
+                          lexical-env)))
+            (if (eq? address 'not-found)
+                (error "Internal compiler error: global binding missing from global lexical env"
+                       (list (definition-variable exp) lexical-env)))
+            (var-index address))))
+       (program-with-value-computing-code
+        (compile (definition-value exp) program lexical-env))
+       (value-code
+        (compiled-program-value-code program-with-value-computing-code))
+       (const-value?
+        (wasm-const-value? value-code))
+       (init-expr
+        (if const-value? value-code uninitialized-value))
+       (global-definition
+        `(global (mut i32) ,init-expr))
+       (global-init
+        (if const-value?
+            '()
+            `((global-init
+               (,@value-code set_global ,global-index)))))
+       (definitions
+         (cons global-definition global-init)))
+    (compiled-program-with-definitions-and-value-code
+     program-with-value-computing-code
+     definitions
+     unspecified-value)))
 
 ;;;open-coded primitives
 

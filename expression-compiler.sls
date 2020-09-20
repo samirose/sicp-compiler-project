@@ -218,7 +218,6 @@
 
 (define (compile-lambda exp program lexical-env compile)
   (let*
-      ; Generate lambda function's type based on number of parameters
       ((formals (lambda-parameters exp))
        ; Compile the lambda procedure body
        (body-program

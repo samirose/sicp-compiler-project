@@ -15,11 +15,6 @@
    (find-variable 'x env)
    "A variable is not found from an empty lexical env")
 
-  (assert-equal
-   '()
-   (current-exported-binding env)
-   "Current exported binding is empty until set")
-
   (let ((env (add-new-lexical-frame '(a b) env)))
     (assert-equal
      #t
@@ -47,32 +42,6 @@
      'not-found
      (find-variable 'x env)
      "Variable not defined in the only frame is not found")
-
-    (assert-equal
-     '()
-     (current-exported-binding env)
-     "Current exported binding is empty until set")
-
-    (let ((env-with-exported-binding (with-current-exported-binding env 'b)))
-      (assert-equal
-       'b
-       (current-exported-binding env-with-exported-binding)
-       "with-current-exported-binding sets the exported binding")
-
-      (assert-equal
-       (current-env env)
-       (current-env env-with-exported-binding)
-       "with-current-exported-binding does not affect the lexical-env environment")
-
-      (assert-equal
-       '()
-       (current-exported-binding (with-current-exported-binding-removed env-with-exported-binding))
-       "with-current-exported-binding-removed removes the exported binding")
-
-      (assert-equal
-       env
-       (with-current-exported-binding-removed env-with-exported-binding)
-       "with-current-exported-binding-removed restores the lexical env to the state before adding the binding"))
 
     (let ((env (add-new-lexical-frame '(x a) env)))
       (assert-equal

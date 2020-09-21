@@ -99,19 +99,32 @@
 
 (define (compile-definition exp program lexical-env compile)
   (let*
-      ((global-index
+      ((variable (definition-variable exp))
+       (global-index
         (begin
           (if (not (global-lexical-env? lexical-env))
               (error "Only top-level define is supported" exp))
-          (let ((address (find-variable
-                          (definition-variable exp)
-                          lexical-env)))
+          (let ((address (find-variable variable lexical-env)))
             (if (eq? address 'not-found)
                 (error "Internal compiler error: global binding missing from global lexical env"
-                       (list (definition-variable exp) lexical-env)))
+                       (list variable lexical-env)))
             (var-index address))))
+       (exported-name
+        (and (memq
+              (definition-variable exp)
+              (cdar (wasm-module-get-definitions
+                     (compiled-program-module-definitions program)
+                     'scheme-library-exports)))
+             (symbol->string variable)))
+       (value (definition-value exp))
        (program-with-value-computing-code
-        (compile (definition-value exp) program lexical-env))
+        (if (lambda? value)
+            (let ((lambda-env
+                   (if exported-name
+                       (with-current-exported-binding lexical-env exported-name)
+                       lexical-env)))
+              (compile-lambda value program lambda-env compile))
+            (compile (definition-value exp) program lexical-env)))
        (value-code
         (compiled-program-value-code program-with-value-computing-code))
        (const-value?
@@ -219,10 +232,14 @@
 (define (compile-lambda exp program lexical-env compile)
   (let*
       ((formals (lambda-parameters exp))
+       (exported-name (current-exported-binding lexical-env))
        ; Compile the lambda procedure body
        (body-program
         (compile-sequence
-         (lambda-body exp) program (add-new-lexical-frame formals lexical-env) compile))
+         (lambda-body exp)
+         program
+         (add-new-lexical-frame formals (with-current-exported-binding-removed lexical-env))
+         compile))
        ; Add function type, if needed and look up its index
        (func-type (scheme-procedure-type-definition (length formals)))
        (type-program
@@ -241,15 +258,22 @@
             (compiled-program-add-definition type-program func-definition)))
        (func-index
         (compiled-program-definition-index func-program func-definition))
+       ; Add export definition for the function if there is an active export binding
+       (export-program
+        (if (not (null? exported-name))
+            (compiled-program-add-definition
+             func-program
+             `(export ,exported-name (func ,func-index)))
+            func-program))
        ; Add table element for the function for indirect calling.
        ; The module compilation procedure compile-r7rs-library-to-wasm-module will combine the elem
        ; items to a single item and add a table element of correct size.
        (elem-definition
         `(elem ,func-index))
        (elem-program
-        (if (compiled-program-contains-definition func-program elem-definition)
-            func-program
-            (compiled-program-add-definition func-program elem-definition)))
+        (if (compiled-program-contains-definition export-program elem-definition)
+            export-program
+            (compiled-program-add-definition export-program elem-definition)))
        (elem-index
         (compiled-program-definition-index elem-program elem-definition)))
        ; Lambda expression's value is the function's index in the table

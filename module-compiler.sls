@@ -103,11 +103,15 @@
        ,@(get-module-definitions 'global)
        ,@global-init-func
        (export "main" (func $main))
-       ,@elem-definition)))
+       ,@elem-definition
+       ,@(get-module-definitions 'export))))
 
 (define (compile-single-exp-to-wasm-module exp)
-  (let* ((sequence (if (begin? exp) exp `(begin ,exp)))
-         (library `(define-library ,sequence)))
+  (let ((library
+         (if (r7rs-library? exp)
+             exp
+             (let ((sequence (if (begin? exp) exp `(begin ,exp))))
+               `(define-library ,sequence)))))
     (compile-r7rs-library-to-wasm-module library)))
 
 )

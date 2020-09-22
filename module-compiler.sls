@@ -40,9 +40,7 @@
              (definition-names
                (map definition-variable definitions))
              (lexical-env
-              (add-new-lexical-frame
-               definition-names
-               (make-empty-lexical-env)))
+              (make-global-lexical-env definition-names exports))
              (definitions-program
                (begin
                  (for-each
@@ -54,11 +52,8 @@
                      (make-empty-compiled-program)
                      (compile-sequence
                       definitions
-                      (compiled-program-add-definition
-                       (make-empty-compiled-program)
-                       (cons 'scheme-library-exports exports))
-                      lexical-env
-                      compile)))))
+                      (make-empty-compiled-program)
+                      lexical-env compile)))))
           (if (null? non-definitions)
               definitions-program
               (compile-sequence
@@ -113,5 +108,19 @@
              (let ((sequence (if (begin? exp) exp `(begin ,exp))))
                `(define-library ,sequence)))))
     (compile-r7rs-library-to-wasm-module library)))
+
+(define (make-global-lexical-env variables exports)
+  (add-new-lexical-frame
+   (make-empty-lexical-env)
+   (make-lexical-frame
+    variables
+    (fold-left
+     (lambda (additional-info var)
+       (if (memq var exports)
+           (cons `(,var (export ,(symbol->string var)))
+                 additional-info)
+           additional-info))
+     '()
+     variables))))
 
 )

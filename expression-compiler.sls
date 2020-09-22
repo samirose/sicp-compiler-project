@@ -30,7 +30,7 @@
         ((if? exp)
          (compile-if exp program lexical-env compile))
         ((lambda? exp)
-         (compile-lambda exp program lexical-env compile))
+         (compile-lambda exp program lexical-env '() compile))
         ((begin? exp)
          (compile-sequence (begin-actions exp) program lexical-env compile))
         ((cond? exp)
@@ -109,22 +109,11 @@
                 (error "Internal compiler error: global binding missing from global lexical env"
                        (list variable lexical-env)))
             (var-index address))))
-       (exported-name
-        (and (memq
-              (definition-variable exp)
-              (cdar (wasm-module-get-definitions
-                     (compiled-program-module-definitions program)
-                     'scheme-library-exports)))
-             (symbol->string variable)))
        (value (definition-value exp))
        (program-with-value-computing-code
         (if (lambda? value)
-            (let ((lambda-env
-                   (if exported-name
-                       (with-current-exported-binding lexical-env exported-name)
-                       lexical-env)))
-              (compile-lambda value program lambda-env compile))
-            (compile (definition-value exp) program lexical-env)))
+            (compile-lambda value program lexical-env variable compile)
+            (compile value program lexical-env)))
        (value-code
         (compiled-program-value-code program-with-value-computing-code))
        (const-value?
@@ -229,16 +218,15 @@
                     (make-list scheme-procedure-param-type arity))))))
     `(type (func ,@param-types (result i32)))))
 
-(define (compile-lambda exp program lexical-env compile)
+(define (compile-lambda exp program lexical-env current-binding compile)
   (let*
       ((formals (lambda-parameters exp))
-       (exported-name (current-exported-binding lexical-env))
        ; Compile the lambda procedure body
        (body-program
         (compile-sequence
          (lambda-body exp)
          program
-         (add-new-lexical-frame formals (with-current-exported-binding-removed lexical-env))
+         (add-new-lexical-frame lexical-env (make-lexical-frame formals '()))
          compile))
        ; Add function type, if needed and look up its index
        (func-type (scheme-procedure-type-definition (length formals)))
@@ -260,11 +248,14 @@
         (compiled-program-definition-index func-program func-definition))
        ; Add export definition for the function if there is an active export binding
        (export-program
-        (if (not (null? exported-name))
-            (compiled-program-add-definition
-             func-program
-             `(export ,exported-name (func ,func-index)))
-            func-program))
+        (let ((exported-name
+               (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
+                     (else #f))))
+          (if exported-name
+              (compiled-program-add-definition
+               func-program
+               `(export ,exported-name (func ,func-index)))
+              func-program)))
        ; Add table element for the function for indirect calling.
        ; The module compilation procedure compile-r7rs-library-to-wasm-module will combine the elem
        ; items to a single item and add a table element of correct size.

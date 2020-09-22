@@ -51,22 +51,20 @@
    (cadddr lexical-address))
 
  (define (find-variable var lexical-env)
-   (define (scan env vars frame frame-index var-index)
+   (define (scan env vars frame-index var-index)
      (if (null? vars)
          (if (null? (cdr env))
              'not-found
-             (let ((next-frame (cadr env)))
-               (scan (cdr env) (frame-variables next-frame) next-frame (+ frame-index 1) 0)))
+             (scan (cdr env) (frame-variables (cadr env)) (+ frame-index 1) 0))
          (if (eq? (car vars) var)
              (make-lexical-address
               frame-index
               var-index
               env
-              (frame-get-additional-info var frame))
-             (scan env (cdr vars) frame frame-index (+ var-index 1)))))
+              (frame-get-additional-info var (car env)))
+             (scan env (cdr vars) frame-index (+ var-index 1)))))
    (if (null? lexical-env)
        'not-found
-       (let ((frame (car lexical-env)))
-         (scan lexical-env (frame-variables frame) frame 0 0))))
+       (scan lexical-env (frame-variables (car lexical-env)) 0 0)))
 
  )

@@ -1,0 +1,7 @@
+(assert_return (invoke "plus-zero-to-positive") (i32.const 2))
+(assert_return (invoke "plus-positive-result") (i32.const 3))
+(assert_return (invoke "signed-plus-positive-result") (i32.const 1))
+(assert_return (invoke "signed-plus-negative-result") (i32.const -1))
+(assert_return (invoke "plus-zero-to-negative") (i32.const -2))
+(assert_return (invoke "plus-multiple") (i32.const 6))
+(assert_return (invoke "complex") (i32.const -8))

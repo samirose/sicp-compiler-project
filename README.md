@@ -58,6 +58,8 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Compilation of Scheme R7RS library to a Wasm module with the top-level code in an exported `func` "main"
 * Top-level `define` of values and procedures
 * `set!` top-level and in-scope binding values
+* Support for exported top-level procedure definitions with R7RS libary syntax
+
 
 ## Known issues
 * Open coding of numerical comparison operators produces incorrect results when the operator is applied to more than two parameters
@@ -65,9 +67,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * The Scheme values are not type checked in the compiled programs: a number can be used as a procedure reference and vice-versa. Using of uninitialized values is not detected.
 * Compiling `(begin)` results in no value
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
-
-## Features currently under work
-* Add support for exported top-level definitions with R7RS libary syntax. The exports can be used for writing more comprehensive tests with multiple calls to the exported procedures and asserting the return values.
 
 ## Backlog
 

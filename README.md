@@ -67,11 +67,11 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Features currently under work
+* Add support for exported top-level definitions with R7RS libary syntax. The exports can be used for writing more comprehensive tests with multiple calls to the exported procedures and asserting the return values.
 
 ## Backlog
 
 * Come up with a name for this project
-* Add support for exported top-level definitions with R7RS libary syntax. The exports can be used for writing more comprehensive tests with multiple calls to the exported procedures and asserting the return values.
 * Implement local bindings (`let` forms), with Wasm locals instead of `lambda`, if possible.
 * _Scan out_ (see [SICP chapter 4.16](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1.6)) internal definitions and implement the bindings with `letrec*`
 * Add support for allocating local temporary variables. They will be needed in the implementation of `and` and `or` expressions for retaining the expression's value. See also [#1102 dup instruction](https://github.com/WebAssembly/design/issues/1102).

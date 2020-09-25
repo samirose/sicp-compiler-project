@@ -9,6 +9,7 @@
          (scheme-syntax)
          (lexical-env)
          (compiled-program)
+         (wasm-syntax)
          (wasm-module-definitions))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
@@ -29,7 +30,7 @@
         ((if? exp)
          (compile-if exp program lexical-env compile))
         ((lambda? exp)
-         (compile-lambda exp program lexical-env compile))
+         (compile-lambda exp program lexical-env '() compile))
         ((begin? exp)
          (compile-sequence (begin-actions exp) program lexical-env compile))
         ((cond? exp)
@@ -97,35 +98,41 @@
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
 (define (compile-definition exp program lexical-env compile)
-  (if (global-lexical-env? lexical-env)
-      (let*
-          ((program-with-value-computing-code
-            (compile (definition-value exp) program lexical-env))
-           (value-code
-            (compiled-program-value-code program-with-value-computing-code))
-           (const-value?
-            (and (= (length value-code) 2)
-                 (eq? (car value-code) 'i32.const)))
-           (init-expr
-            (if const-value? value-code uninitialized-value))
-           (global-index
-            (compiled-program-definitions-count
-             program-with-value-computing-code
-             'global))
-           (global-definition
-            `(global (mut i32) ,init-expr))
-           (global-init
-            (if const-value?
-                '()
-                `((global-init
-                   (,@value-code set_global ,global-index)))))
-           (definitions
-             (cons global-definition global-init)))
-        (compiled-program-with-definitions-and-value-code
-         program-with-value-computing-code
-         definitions
-         unspecified-value))
-      (error "Only top-level define is supported" exp)))
+  (let*
+      ((variable (definition-variable exp))
+       (global-index
+        (begin
+          (if (not (global-lexical-env? lexical-env))
+              (error "Only top-level define is supported" exp))
+          (let ((address (find-variable variable lexical-env)))
+            (if (eq? address 'not-found)
+                (error "Internal compiler error: global binding missing from global lexical env"
+                       (list variable lexical-env)))
+            (var-index address))))
+       (value (definition-value exp))
+       (program-with-value-computing-code
+        (if (lambda? value)
+            (compile-lambda value program lexical-env variable compile)
+            (compile value program lexical-env)))
+       (value-code
+        (compiled-program-value-code program-with-value-computing-code))
+       (const-value?
+        (wasm-const-value? value-code))
+       (init-instr
+        (if const-value? value-code uninitialized-value))
+       (global-definition
+        `(global (mut i32) ,init-instr))
+       (global-init
+        (if const-value?
+            '()
+            `((global-init
+               (,@value-code set_global ,global-index)))))
+       (definitions
+         (cons global-definition global-init)))
+    (compiled-program-with-definitions-and-value-code
+     program-with-value-computing-code
+     definitions
+     unspecified-value)))
 
 ;;;open-coded primitives
 
@@ -211,14 +218,16 @@
                     (make-list scheme-procedure-param-type arity))))))
     `(type (func ,@param-types (result i32)))))
 
-(define (compile-lambda exp program lexical-env compile)
+(define (compile-lambda exp program lexical-env current-binding compile)
   (let*
-      ; Generate lambda function's type based on number of parameters
       ((formals (lambda-parameters exp))
        ; Compile the lambda procedure body
        (body-program
         (compile-sequence
-         (lambda-body exp) program (add-new-lexical-frame formals lexical-env) compile))
+         (lambda-body exp)
+         program
+         (add-new-lexical-frame lexical-env (make-lexical-frame formals '()))
+         compile))
        ; Add function type, if needed and look up its index
        (func-type (scheme-procedure-type-definition (length formals)))
        (type-program
@@ -237,15 +246,25 @@
             (compiled-program-add-definition type-program func-definition)))
        (func-index
         (compiled-program-definition-index func-program func-definition))
+       ; Add export definition for the function if there is an active export binding
+       (export-program
+        (let ((exported-name
+               (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
+                     (else #f))))
+          (if exported-name
+              (compiled-program-add-definition
+               func-program
+               `(export ,exported-name (func ,func-index)))
+              func-program)))
        ; Add table element for the function for indirect calling.
        ; The module compilation procedure compile-r7rs-library-to-wasm-module will combine the elem
        ; items to a single item and add a table element of correct size.
        (elem-definition
         `(elem ,func-index))
        (elem-program
-        (if (compiled-program-contains-definition func-program elem-definition)
-            func-program
-            (compiled-program-add-definition func-program elem-definition)))
+        (if (compiled-program-contains-definition export-program elem-definition)
+            export-program
+            (compiled-program-add-definition export-program elem-definition)))
        (elem-index
         (compiled-program-definition-index elem-program elem-definition)))
        ; Lambda expression's value is the function's index in the table

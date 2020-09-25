@@ -8,6 +8,7 @@
          (lists)
          (scheme-syntax)
          (scheme-r7rs-syntax)
+         (compilation-error)
          (lexical-env)
          (compiled-program)
          (wasm-module-definitions)
@@ -19,12 +20,15 @@
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 
 (define (compile-r7rs-library-to-wasm-module exp)
-  (if (not (and (r7rs-library? exp) (check-library-declarations exp)))
+  (if (not (r7rs-library? exp))
       (error "Invalid R7RS library" exp))
+  (raise-if-error (check-library-declarations exp))
   (let*
       ((program
         (let*
-            ((exps
+            ((exports
+              (library-declarations 'export exp))
+             (exps
               (or (library-declaration 'begin exp)
                   (error "No begin declaration in library" exp)))
              (exp-sequence
@@ -33,18 +37,23 @@
                (filter definition? exp-sequence))
              (non-definitions
               (reject definition? exp-sequence))
+             (definition-names
+               (map definition-variable definitions))
              (lexical-env
-              (add-new-lexical-frame
-               (map definition-variable definitions)
-               (make-empty-lexical-env)))
+              (make-global-lexical-env definition-names exports))
              (definitions-program
-               (if (null? definitions)
-                   (make-empty-compiled-program)
-                   (compile-sequence
-                    definitions
-                    (make-empty-compiled-program)
-                    lexical-env
-                    compile))))
+               (begin
+                 (for-each
+                  (lambda (export)
+                    (if (not (memq export definition-names))
+                        (error "No top-level definition for export" export)))
+                  exports)
+                 (if (null? definitions)
+                     (make-empty-compiled-program)
+                     (compile-sequence
+                      definitions
+                      (make-empty-compiled-program)
+                      lexical-env compile)))))
           (if (null? non-definitions)
               definitions-program
               (compile-sequence
@@ -89,11 +98,29 @@
        ,@(get-module-definitions 'global)
        ,@global-init-func
        (export "main" (func $main))
-       ,@elem-definition)))
+       ,@elem-definition
+       ,@(get-module-definitions 'export))))
 
 (define (compile-single-exp-to-wasm-module exp)
-  (let* ((sequence (if (begin? exp) exp `(begin ,exp)))
-         (library `(define-library ,sequence)))
+  (let ((library
+         (if (r7rs-library? exp)
+             exp
+             (let ((sequence (if (begin? exp) exp `(begin ,exp))))
+               `(define-library ,sequence)))))
     (compile-r7rs-library-to-wasm-module library)))
+
+(define (make-global-lexical-env variables exports)
+  (add-new-lexical-frame
+   (make-empty-lexical-env)
+   (make-lexical-frame
+    variables
+    (fold-left
+     (lambda (additional-info var)
+       (if (memq var exports)
+           (cons `(,var (export ,(symbol->string var)))
+                 additional-info)
+           additional-info))
+     '()
+     variables))))
 
 )

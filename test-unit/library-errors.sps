@@ -31,6 +31,11 @@
            (if (not (eq? (action) expected-error))
                (error "Expected compilation error" expected-error)))))
 
-(assert-raises-compilation-error
- (lambda () (compile-r7rs-library-to-wasm-module 'foo))
+(define (assert-library-raises-compilation-error library expected-message expected-object)
+  (assert-raises-compilation-error
+   (lambda () (compile-r7rs-library-to-wasm-module library))
+   expected-message expected-object))
+
+(assert-library-raises-compilation-error
+ 'foo
  "Invalid R7RS library" 'foo)

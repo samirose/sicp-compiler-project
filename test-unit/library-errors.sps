@@ -22,20 +22,21 @@
 
 (set-compilation-error-handler! error-handler)
 
-(define (assert-raises-compilation-error action expected-message expected-object)
+(define (assert-raises-compilation-error action expected-message expected-object description)
   (let ((expected-error (make-test-compilation-error expected-message expected-object)))
     (guard (cond
              ((test-compilation-error? cond)
               (assert-equal-test-compilation-error expected-error cond)
               expected-error))
            (if (not (eq? (action) expected-error))
-               (error "Expected compilation error" expected-error)))))
+               (error description expected-error)))))
 
-(define (assert-library-raises-compilation-error library expected-message expected-object)
+(define (assert-library-raises-compilation-error library expected-message expected-object description)
   (assert-raises-compilation-error
    (lambda () (compile-r7rs-library-to-wasm-module library))
-   expected-message expected-object))
+   expected-message expected-object description))
 
 (assert-library-raises-compilation-error
  'foo
- "Invalid R7RS library" 'foo)
+ "Invalid R7RS library" 'foo
+ "Symbol is not a library")

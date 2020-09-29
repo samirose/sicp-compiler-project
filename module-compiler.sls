@@ -26,19 +26,22 @@
   (let*
       ((program
         (let*
-            ((exports
-              (library-declarations 'export exp))
-             (exps
-              (or (library-declaration 'begin exp)
-                  (error "No begin declaration in library" exp)))
-             (exp-sequence
-              (begin-actions exps))
+            ((exp-sequence
+              (let* ((exps
+                     (or (library-declaration 'begin exp)
+                         (raise-compilation-error "No begin declaration in library" exp)))
+                     (actions (begin-actions exps)))
+                (if (null? actions)
+                    (raise-compilation-error "Empty begin declaration in library" exp)
+                    actions)))
              (definitions
                (filter definition? exp-sequence))
              (non-definitions
                (reject definition? exp-sequence))
              (definition-names
                (map definition-variable definitions))
+             (exports
+              (library-declarations 'export exp))
              (lexical-env
               (make-global-lexical-env definition-names exports))
              (definitions-program
@@ -46,7 +49,7 @@
                  (for-each
                   (lambda (export)
                     (if (not (memq export definition-names))
-                        (error "No top-level definition for export" export)))
+                        (raise-compilation-error "No top-level definition for export" export)))
                   exports)
                  (if (null? definitions)
                      (make-empty-compiled-program)

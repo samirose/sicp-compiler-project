@@ -28,8 +28,9 @@
              ((test-compilation-error? cond)
               (assert-equal-test-compilation-error expected-error cond)
               expected-error))
-           (if (not (eq? (action) expected-error))
-               (error description expected-error)))))
+           (let ((result (action)))
+             (if (not (eq? result expected-error))
+                 (error description (list (cdr expected-error) result)))))))
 
 (define (assert-library-raises-compilation-error library expected-message expected-object description)
   (assert-raises-compilation-error

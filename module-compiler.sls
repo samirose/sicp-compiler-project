@@ -36,7 +36,7 @@
              (definitions
                (filter definition? exp-sequence))
              (non-definitions
-              (reject definition? exp-sequence))
+               (reject definition? exp-sequence))
              (definition-names
                (map definition-variable definitions))
              (lexical-env

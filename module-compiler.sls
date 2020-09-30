@@ -54,18 +54,12 @@
         (lexical-env
          (make-global-lexical-env definition-names exports))
         (definitions-program
-          (begin
-            (for-each
-             (lambda (export)
-               (if (not (memq export definition-names))
-                   (raise-compilation-error "No top-level definition for export" export)))
-             exports)
             (if (null? definitions)
                 (make-empty-compiled-program)
                 (compile-sequence
                  definitions
                  (make-empty-compiled-program)
-                 lexical-env compile)))))
+                 lexical-env compile))))
      (if (null? non-definitions)
          definitions-program
          (compile-sequence
@@ -120,6 +114,11 @@
    (let ((duplicate-var (first-duplicate variables)))
      (if (not (null? duplicate-var))
          (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
+   (for-each
+    (lambda (export)
+      (if (not (memq export variables))
+          (raise-compilation-error "No top-level definition for export" export)))
+    exports)
    (add-new-lexical-frame
     (make-empty-lexical-env)
     (make-lexical-frame

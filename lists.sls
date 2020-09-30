@@ -10,13 +10,10 @@
    (filter (lambda (elem) (not (predicate elem))) sequence))
 
  (define (index-of-equal l e)
-   (letrec
-       ((search
-         (lambda (l i)
-           (cond ((null? l) #f)
-                 ((equal? (car l) e) i)
-                 (else (search (cdr l) (+ i 1)))))))
-     (search l 0)))
+   (let search ((l l) (i 0))
+     (cond ((null? l) #f)
+           ((equal? (car l) e) i)
+           (else (search (cdr l) (+ i 1))))))
 
  (define (first-duplicate l)
    (let search ((l l))
@@ -25,15 +22,12 @@
            (else (search (cdr l))))))
 
  (define (make-list e n)
-   (letrec
-       ((loop
-         (lambda (l e n)
-           (if (= n 0)
-               l
-               (loop (cons e l) e (- n 1))))))
-     (if (< n 0)
-         (error "Expected positive n -- make-list:" n)
-         (loop '() e n))))
+   (if (< n 0)
+       (error "Expected positive n -- make-list:" n)
+       (let loop ((l '()) (n n))
+         (if (= n 0)
+             l
+             (loop (cons e l) (- n 1))))))
 
  (define (flatten-n n x)
    (cond ((null? x) '())

@@ -117,6 +117,9 @@
         ,@(get-module-definitions 'export))))
 
  (define (make-global-lexical-env variables exports)
+   (let ((duplicate-var (first-duplicate variables)))
+     (if (not (null? duplicate-var))
+         (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
    (add-new-lexical-frame
     (make-empty-lexical-env)
     (make-lexical-frame

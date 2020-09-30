@@ -81,3 +81,8 @@
  '(define-library (export x) (begin 42))
  "No top-level definition for export" 'x
  "Export declaration must name top-level definitions")
+
+(assert-library-raises-compilation-error
+ '(define-library (begin (define (sum a b) (+ a b)) (define sum 42)))
+ "Top-level identifier already defined" 'sum
+ "Top-level definitions must not be duplicated")

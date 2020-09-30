@@ -1,7 +1,7 @@
 #!r6rs
 (library
  (lists)
- (export reject index-of-equal make-list flatten-n
+ (export reject index-of-equal first-duplicate make-list flatten-n
          make-counted-set counted-set-add counted-set-count counted-set-unique-keys)
  (import (rnrs base)
          (rnrs lists))
@@ -17,6 +17,12 @@
                  ((equal? (car l) e) i)
                  (else (search (cdr l) (+ i 1)))))))
      (search l 0)))
+
+ (define (first-duplicate l)
+   (let search ((l l))
+     (cond ((null? l) '())
+           ((memq (car l) (cdr l)))
+           (else (search (cdr l))))))
 
  (define (make-list e n)
    (letrec

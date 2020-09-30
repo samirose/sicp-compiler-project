@@ -36,6 +36,31 @@
 
 (assert-equal
  '()
+ (first-duplicate '())
+ "Empty list does not contain duplicates")
+
+(assert-equal
+ '()
+ (first-duplicate '(1))
+ "List of one element does not contain duplicates")
+
+(assert-equal
+ '()
+ (first-duplicate '(1 2 3 a))
+ "List without duplicates does not contain duplicates")
+
+(assert-equal
+ '(2)
+ (first-duplicate '(1 2 3 a b 2))
+ "first-duplicate returns the remaining list starting from the first found duplicate")
+
+(assert-equal
+ '(2 a b)
+ (first-duplicate '(1 2 3 2 a b))
+ "first-duplicate returns the remaining list starting from the first found duplicate")
+
+(assert-equal
+ '()
  (make-list 'x 0)
  "make-list with zero length results in empty list")
 

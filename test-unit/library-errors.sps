@@ -1,8 +1,6 @@
 #!r6rs
 (import
  (rnrs base)
- (rnrs exceptions)
- (lists)
  (assert)
  (module-compiler))
 

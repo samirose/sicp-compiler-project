@@ -10,8 +10,7 @@
           lambda? lambda-formals lambda-body
           if? if-predicate if-consequent if-alternative
           begin? begin-actions last-exp? first-exp rest-exps
-          application? operator operands
-          cond? cond->if)
+          application? operator operands)
   (import (rnrs base))
 
 ;;;;SCHEME SYNTAX FROM SECTION 4.1.2 OF STRUCTURE AND INTERPRETATION OF
@@ -96,43 +95,4 @@
 (define (first-operand ops) (car ops))
 (define (rest-operands ops) (cdr ops))
 
-;;;**following needed only to implement COND as derived expression,
-;;; not needed by eceval machine in text.  But used by compiler
-
-;; from 4.1.2
-(define (make-if predicate consequent alternative)
-  (list 'if predicate consequent alternative))
-
-
-(define (sequence->exp seq)
-  (cond ((null? seq) seq)
-        ((last-exp? seq) (first-exp seq))
-        (else (make-begin seq))))
-
-(define (make-begin seq) (cons 'begin seq))
-
-(define (cond? exp) (tagged-list? exp 'cond))
-(define (cond-clauses exp) (cdr exp))
-(define (cond-else-clause? clause)
-  (eq? (cond-predicate clause) 'else))
-(define (cond-predicate clause) (car clause))
-(define (cond-actions clause) (cdr clause))
-
-(define (cond->if exp)
-  (expand-clauses (cond-clauses exp)))
-
-(define (expand-clauses clauses)
-  (if (null? clauses)
-      '#f                          ; no else clause
-      (let ((first (car clauses))
-            (rest (cdr clauses)))
-        (if (cond-else-clause? first)
-            (if (null? rest)
-                (sequence->exp (cond-actions first))
-                (error "ELSE clause isn't last -- COND->IF"
-                       clauses))
-            (make-if (cond-predicate first)
-                     (sequence->exp (cond-actions first))
-                     (expand-clauses rest))))))
-;; end of Cond support
 )

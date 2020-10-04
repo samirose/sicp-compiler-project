@@ -34,8 +34,6 @@
          (compile-lambda exp program lexical-env '() compile))
         ((begin? exp)
          (compile-sequence (begin-actions exp) program lexical-env compile))
-        ((cond? exp)
-         (compile (cond->if exp) lexical-env))
         ((open-coded-primitive-application? exp)
          (compile-open-coded-primitive exp program lexical-env compile))
         ((application? exp)

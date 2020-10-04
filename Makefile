@@ -32,7 +32,8 @@ lib/expression-compiler : \
 	lib/scheme-syntax \
 	lib/lexical-env \
 	lib/compiled-program \
-	lib/wasm-module-definitions
+	lib/wasm-module-definitions \
+	lib/compilation-error
 lib/module-compiler : \
 	lib/lists \
 	lib/lexical-env \

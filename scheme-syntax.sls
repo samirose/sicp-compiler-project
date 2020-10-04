@@ -7,7 +7,7 @@
           variable?
           assignment? assignment-variable assignment-value
           definition? definition-variable definition-value
-          lambda? lambda-parameters lambda-body
+          lambda? lambda-formals lambda-body
           if? if-predicate if-consequent if-alternative
           begin? begin-actions last-exp? first-exp rest-exps
           application? operator operands
@@ -22,7 +22,7 @@
 (define (self-evaluating? exp)
   (cond ((number? exp) #t)
         ((boolean? exp) #t)
-        ((string? exp) #f)  ; Strings are not supported yet
+        ((string? exp) #t)
         (else #f)))
 
 
@@ -63,7 +63,7 @@
 
 (define (lambda? exp) (tagged-list? exp 'lambda))
 
-(define (lambda-parameters exp) (cadr exp))
+(define (lambda-formals exp) (cadr exp))
 (define (lambda-body exp) (cddr exp))
 
 (define (make-lambda parameters body)

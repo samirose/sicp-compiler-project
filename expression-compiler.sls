@@ -9,6 +9,7 @@
          (scheme-syntax)
          (lexical-env)
          (compiled-program)
+         (compilation-error)
          (wasm-syntax)
          (wasm-module-definitions))
 
@@ -40,7 +41,7 @@
         ((application? exp)
          (compile-application exp program lexical-env compile))
         (else
-         (error "Unknown expression type -- COMPILE" exp))))
+         (raise-compilation-error "Unknown expression type -- COMPILE" exp))))
 
 ;;;special values
 
@@ -61,21 +62,21 @@
          ((boolean? exp)
           `(i32.const ,(if exp 1 0)))
          (else
-          (error "Unsupported value" exp)))))
+          (raise-compilation-error "Unsupported value" exp)))))
 
 (define (compile-quoted exp program)
-  (error "Quote not supported yet" exp))
+  (raise-compilation-error "Quote not supported yet" exp))
 
 (define (compile-variable exp program lexical-env)
   (let* ((lexical-address
           (find-variable exp lexical-env))
          (get-instr
           (cond ((eq? lexical-address 'not-found)
-                 (error "Lexically unbound variable" exp))
+                 (raise-compilation-error "Lexically unbound variable" exp))
                 ((global-address? lexical-address) 'get_global)
                 ((= (frame-index lexical-address) 0) 'get_local)
                 (else
-                 (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+                 (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp)))))
     (compiled-program-with-value-code
      program
      `(,get-instr ,(var-index lexical-address)))))
@@ -88,11 +89,11 @@
          (set-instr
           (cond
             ((eq? lexical-address 'not-found)
-             (error "Lexically unbound variable" exp))
+             (raise-compilation-error "Lexically unbound variable" exp))
             ((global-address? lexical-address) 'set_global)
             ((= (frame-index lexical-address) 0) 'set_local)
             (else
-             (error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+             (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp)))))
     (compiled-program-append-value-code
      program-with-value-computing-code
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
@@ -103,10 +104,10 @@
        (global-index
         (begin
           (if (not (global-lexical-env? lexical-env))
-              (error "Only top-level define is supported" exp))
+              (raise-compilation-error "Only top-level define is supported" exp))
           (let ((address (find-variable variable lexical-env)))
             (if (eq? address 'not-found)
-                (error "Internal compiler error: global binding missing from global lexical env"
+                (raise-compilation-error "Internal compiler error: global binding missing from global lexical env"
                        (list variable lexical-env)))
             (var-index address))))
        (value (definition-value exp))
@@ -218,15 +219,23 @@
                     (make-list scheme-procedure-param-type arity))))))
     `(type (func ,@param-types (result i32)))))
 
+(define (lambda-body-env lambda-exp lambda-lexical-env formals)
+  (let ((duplicate-param (first-duplicate formals)))
+    (if (null? duplicate-param)
+        (add-new-lexical-frame
+         lambda-lexical-env
+         (make-lexical-frame formals '()))
+        (raise-compilation-error "Duplicate parameter in lambda" lambda-exp))))
+
 (define (compile-lambda exp program lexical-env current-binding compile)
   (let*
-      ((formals (lambda-parameters exp))
+      ((formals (lambda-formals exp))
        ; Compile the lambda procedure body
        (body-program
         (compile-sequence
          (lambda-body exp)
          program
-         (add-new-lexical-frame lexical-env (make-lexical-frame formals '()))
+         (lambda-body-env exp lexical-env formals)
          compile))
        ; Add function type, if needed and look up its index
        (func-type (scheme-procedure-type-definition (length formals)))

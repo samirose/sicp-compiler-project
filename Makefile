@@ -2,16 +2,17 @@ SHELL = /bin/bash
 .SHELLFLAGS = -o pipefail -c
 SCHEME := plt-r6rs
 LIBDIR := lib/
-LIBS := lists \
-        scheme-syntax \
-		scheme-r7rs-syntax \
-		lexical-env \
-		wasm-syntax \
-		wasm-module-definitions \
-		compiled-program \
-		compilation-error \
-		expression-compiler \
-		module-compiler
+LIBS := \
+	lists \
+	scheme-syntax \
+	scheme-r7rs-syntax \
+	lexical-env \
+	wasm-syntax \
+	wasm-module-definitions \
+	compiled-program \
+	compilation-error \
+	expression-compiler \
+	module-compiler
 LIBDIRS = $(addprefix $(LIBDIR),$(LIBS))
 COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
 

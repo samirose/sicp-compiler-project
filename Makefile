@@ -4,6 +4,7 @@ SCHEME := plt-r6rs
 LIBDIR := lib/
 LIBS := \
 	lists \
+	pattern-match \
 	scheme-syntax \
 	scheme-r7rs-syntax \
 	lexical-env \

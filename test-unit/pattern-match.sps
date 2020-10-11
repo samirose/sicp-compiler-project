@@ -37,6 +37,8 @@
                 "The ??* operator matches any number of items in the middle of the list")
 (assert-matches `(a b ,??*) '(a b)
                 "The ??* operator matches zero items at the end of the list")
+(assert-matches `(1 2 ,??* a b ,??* f) '(1 2 3 4 a b c d e f)
+                "Multiple ??* operators can be used in a list")
 
 (assert-does-not-match '() '(1)  "Empty list does not match a non-empty list")
 (assert-does-not-match 'a 'b "Symbol does not match a different symbol")

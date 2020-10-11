@@ -1,5 +1,5 @@
 #!r6rs
-;; Adapted from ch5-syntax.scm for R6RS.
+;; Adapted from SICP ch5-syntax.scm
 
 (library (scheme-syntax)
   (export self-evaluating?
@@ -11,12 +11,9 @@
           if? if-predicate if-consequent if-alternative
           begin? begin-actions last-exp? first-exp rest-exps
           application? operator operands)
-  (import (rnrs base))
-
-;;;;SCHEME SYNTAX FROM SECTION 4.1.2 OF STRUCTURE AND INTERPRETATION OF
-;;;  COMPUTER PROGRAMS, TO SUPPORT CHAPTER 5
-;;;;Loaded by compiler.scm (for use by compiler), and by eceval-support.scm
-;;;; (for simulation of eceval machine operations)
+  (import (rnrs base)
+          (compilation-error)
+          (pattern-match))
 
 (define (self-evaluating? exp)
   (cond ((number? exp) #t)
@@ -24,9 +21,12 @@
         ((string? exp) #t)
         (else #f)))
 
-
 (define (quoted? exp)
-  (tagged-list? exp 'quote))
+  (and (pattern-match `(quote ,??*) exp)
+       (or (not (pattern-match '(quote) exp))
+           (raise-compilation-error "Too few operands" exp))
+       (or (not (pattern-match `(quote ,?? ,?? ,??*) exp))
+           (raise-compilation-error "Too many operands" exp))))
 
 (define (text-of-quotation exp) (cadr exp))
 

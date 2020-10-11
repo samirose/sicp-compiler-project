@@ -29,6 +29,7 @@ RUN_DRIVER = $(SCHEME) ++path $(LIBDIR) driver.sps
 lib/wasm-module-definitions : lib/lists
 lib/compiled-program : lib/wasm-module-definitions
 lib/scheme-r7rs-syntax: lib/compilation-error
+lib/scheme-syntax: lib/compilation-error lib/pattern-match
 lib/expression-compiler : \
 	lib/lists \
 	lib/scheme-syntax \

@@ -21,12 +21,21 @@
         ((string? exp) #t)
         (else #f)))
 
+(define (match-or-error pat exp message object)
+  (cond ((pattern-match pat exp) #t)
+        (else (raise-compilation-error message object))))
+
+(define (raise-error-on-match pat exp message)
+  (if (pattern-match pat exp)
+      (raise-compilation-error message exp)
+      #t))
+
 (define (quoted? exp)
   (and (pattern-match `(quote ,??*) exp)
-       (or (not (pattern-match '(quote) exp))
-           (raise-compilation-error "Too few operands" exp))
-       (or (not (pattern-match `(quote ,?? ,?? ,??*) exp))
-           (raise-compilation-error "Too many operands" exp))))
+       (raise-error-on-match
+        '(quote) exp "Too few operands")
+       (raise-error-on-match
+        `(quote ,?? ,?? ,??*) exp "Too many operands")))
 
 (define (text-of-quotation exp) (cadr exp))
 
@@ -39,7 +48,16 @@
 (define (variable? exp) (symbol? exp))
 
 (define (assignment? exp)
-  (tagged-list? exp 'set!))
+  (and (pattern-match `(set! ,??*) exp)
+       (raise-error-on-match
+        '(set!) exp "Variable and value missing from assignment")
+       (raise-error-on-match
+        `(set! ,??) exp "Variable or value missing from assignment")
+       (raise-error-on-match
+        `(set! ,?? ,?? ,?? ,??*) exp "Too many operands to assignment")
+       (match-or-error
+        `(set! ,variable? ,??) exp
+        "Not an identifier" (assignment-variable exp))))
 
 (define (assignment-variable exp) (cadr exp))
 

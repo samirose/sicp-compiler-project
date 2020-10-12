@@ -17,6 +17,16 @@
  (quoted? '(quote (a b)))
  "Quote with single list is valid")
 
+(assert-equal
+ 'x
+ (text-of-quotation '(quote x))
+ "text-of-quotation returns a single value")
+
+(assert-equal
+ '(a b)
+ (text-of-quotation '(quote (a b)))
+ "text-of-quotation returns a single list value")
+
 (assert-raises-compilation-error
  (lambda () (quoted? '(quote)))
  "Too few operands" '(quote)
@@ -31,7 +41,27 @@
 (assert-equal
  #t
  (assignment? '(set! x 1))
- "Assignment with variable and expression is valid")
+ "Assignment with variable and simple expression is valid")
+
+(assert-equal
+ #t
+ (assignment? '(set! x (+ 1 x)))
+ "Assignment with variable and combination expression is valid")
+
+(assert-equal
+ 'x
+ (assignment-variable '(set! x 1))
+ "assignment-variable variable returns the assignment's variable")
+
+(assert-equal
+ '1
+ (assignment-value '(set! x 1))
+ "assignment-value returns assignment's simple value")
+
+(assert-equal
+ '(+ 1 x)
+ (assignment-value '(set! x (+ 1 x)))
+ "assignment-value returns assignment's combination value")
 
 (assert-raises-compilation-error
  (lambda () (assignment? '(set! x)))

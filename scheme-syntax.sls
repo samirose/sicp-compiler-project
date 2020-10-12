@@ -30,6 +30,7 @@
       (raise-compilation-error message exp)
       #t))
 
+;; quote
 (define (quoted? exp)
   (and (pattern-match `(quote ,??*) exp)
        (raise-error-on-match
@@ -44,7 +45,7 @@
       (eq? (car exp) tag)
       #f))
 
-
+;; assignment
 (define (variable? exp) (symbol? exp))
 
 (define (assignment? exp)

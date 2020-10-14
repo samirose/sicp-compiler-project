@@ -7,13 +7,13 @@
 (define (assert-matches pat exp message)
   (assert-equal
    #t
-   (pattern-match pat exp)
+   (pattern-match? pat exp)
    message))
 
 (define (assert-does-not-match pat exp message)
   (assert-equal
    #f
-   (pattern-match pat exp)
+   (pattern-match? pat exp)
    message))
 
 (assert-matches '() '()  "Empty list matches an empty list")

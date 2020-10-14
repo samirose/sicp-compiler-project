@@ -22,17 +22,17 @@
         (else #f)))
 
 (define (match-or-error pat exp message object)
-  (cond ((pattern-match pat exp) #t)
+  (cond ((pattern-match? pat exp) #t)
         (else (raise-compilation-error message object))))
 
 (define (raise-error-on-match pat exp message)
-  (if (pattern-match pat exp)
+  (if (pattern-match? pat exp)
       (raise-compilation-error message exp)
       #t))
 
 ;; quote
 (define (quoted? exp)
-  (and (pattern-match `(quote ,??*) exp)
+  (and (pattern-match? `(quote ,??*) exp)
        (raise-error-on-match
         '(quote) exp "Too few operands")
        (raise-error-on-match
@@ -49,7 +49,7 @@
 (define (variable? exp) (symbol? exp))
 
 (define (assignment? exp)
-  (and (pattern-match `(set! ,??*) exp)
+  (and (pattern-match? `(set! ,??*) exp)
        (raise-error-on-match
         '(set!) exp "Variable and value missing from assignment")
        (raise-error-on-match
@@ -66,30 +66,30 @@
 
 ;; definition
 (define (variable-definition? exp)
-  (pattern-match `(define ,variable? ,??) exp))
+  (pattern-match? `(define ,variable? ,??) exp))
 
 (define (definition? exp)
   (cond
-    ((not (pattern-match `(define ,??*) exp)) #f)
-    ((pattern-match '(define) exp)
+    ((not (pattern-match? `(define ,??*) exp)) #f)
+    ((pattern-match? '(define) exp)
      (raise-compilation-error "Variable and value missing from definition" exp))
-    ((pattern-match `(define (,?? ,??*)) exp)
+    ((pattern-match? `(define (,?? ,??*)) exp)
      (raise-compilation-error "Empty body in procedure definition" exp))
-    ((pattern-match `(define ,??) exp)
+    ((pattern-match? `(define ,??) exp)
      (raise-compilation-error "Variable or value missing from definition" exp))
     ((variable-definition? exp))
-    ((pattern-match `(define ,variable? ,?? ,?? ,??*) exp)
+    ((pattern-match? `(define ,variable? ,?? ,?? ,??*) exp)
      (raise-compilation-error "Too many operands to variable definition" exp))
-    ((pattern-match `(define (,?? ,??*) ,?? ,??*) exp)
+    ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
      (let check-all-identifiers ((exps (cadr exp)))
        (cond ((null? exps))
              ((variable? (car exps)) (check-all-identifiers (cdr exps)))
              (else (raise-compilation-error "Not an identifier" (car exps))))))
-    ((pattern-match `(define () ,??*) exp)
+    ((pattern-match? `(define () ,??*) exp)
      (raise-compilation-error "Variable missing from procedure definition" exp))
-    ((pattern-match `(define ,?? ,??) exp)
+    ((pattern-match? `(define ,?? ,??) exp)
      (raise-compilation-error "Not an identifier" (cadr exp)))
-    ((pattern-match `(define ,?? ,?? ,?? ,??*) exp)
+    ((pattern-match? `(define ,?? ,?? ,?? ,??*) exp)
      (raise-compilation-error "Not a variable or procedure definition" exp))
     (else (error "Internal compiler error: unexhaustive definition syntax check" exp))))
 

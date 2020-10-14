@@ -2,11 +2,11 @@
 
 (library
  (pattern-match)
- (export pattern-match ?? ??*)
+ (export pattern-match? ?? ??*)
  (import (rnrs base)
          (rnrs lists))
 
- (define (pattern-match pat exp)
+ (define (pattern-match? pat exp)
    (cond
      ((null? pat) (null? exp))
      ((pair? pat)
@@ -15,8 +15,8 @@
           ((memq pat-head list-matchers)
            (pat-head (cdr pat) exp))
           ((pair? exp)
-           (and (pattern-match (car pat) (car exp))
-                (pattern-match (cdr pat) (cdr exp))))
+           (and (pattern-match? (car pat) (car exp))
+                (pattern-match? (cdr pat) (cdr exp))))
           (else #f))))
      ((memq pat list-matchers) #f)
      ((procedure? pat) (pat exp))
@@ -30,7 +30,7 @@
 
  (define (scan-match pat exp)
    (cond ((null? exp) (null? pat))
-         ((pattern-match pat exp) #t)
+         ((pattern-match? pat exp) #t)
          (else (scan-match pat (cdr exp)))))
 
  (define ??* scan-match)

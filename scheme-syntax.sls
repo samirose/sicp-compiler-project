@@ -21,22 +21,17 @@
         ((string? exp) #t)
         (else #f)))
 
-(define (match-or-error pat exp message object)
-  (cond ((pattern-match? pat exp) #t)
-        (else (raise-compilation-error message object))))
-
-(define (raise-error-on-match pat exp message)
+(define (raise-error-on-match pat exp message object)
   (if (pattern-match? pat exp)
-      (raise-compilation-error message exp)
-      #t))
+      (raise-compilation-error message object)
+      #f))
 
 ;; quote
 (define (quoted? exp)
-  (and (pattern-match? `(quote ,??*) exp)
-       (raise-error-on-match
-        '(quote) exp "Too few operands")
-       (raise-error-on-match
-        `(quote ,?? ,?? ,??*) exp "Too many operands")))
+  (cond ((not (pattern-match? `(quote ,??*) exp)) #f)
+        ((pattern-match? `(quote ,??) exp))
+        ((raise-error-on-match '(quote) exp "Too few operands" exp))
+        ((raise-error-on-match `(quote ,?? ,?? ,??*) exp "Too many operands" exp))))
 
 (define (text-of-quotation exp) (cadr exp))
 
@@ -47,18 +42,20 @@
 
 ;; assignment
 (define (variable? exp) (symbol? exp))
+(define (not-variable? exp) (not (variable? exp)))
 
 (define (assignment? exp)
-  (and (pattern-match? `(set! ,??*) exp)
-       (raise-error-on-match
-        '(set!) exp "Variable and value missing from assignment")
-       (raise-error-on-match
-        `(set! ,??) exp "Variable or value missing from assignment")
-       (raise-error-on-match
-        `(set! ,?? ,?? ,?? ,??*) exp "Too many operands to assignment")
-       (match-or-error
-        `(set! ,variable? ,??) exp
-        "Not an identifier" (assignment-variable exp))))
+  (cond ((not (pattern-match? `(set! ,??*) exp)) #f)
+        ((pattern-match? `(set! ,variable? ,??) exp))
+        ((raise-error-on-match
+          '(set!) exp "Variable and value missing from assignment" exp))
+        ((raise-error-on-match
+          `(set! ,??) exp "Variable or value missing from assignment" exp))
+        ((raise-error-on-match
+          `(set! ,?? ,?? ,?? ,??*) exp "Too many operands to assignment" exp))
+       ((raise-error-on-match
+         `(set! ,not-variable? ,??) exp
+         "Not an identifier" (assignment-variable exp)))))
 
 (define (assignment-variable exp) (cadr exp))
 
@@ -71,20 +68,20 @@
 (define (definition? exp)
   (cond
     ((not (pattern-match? `(define ,??*) exp)) #f)
+    ((variable-definition? exp))
+    ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
+     (let check-all-identifiers ((exps (cadr exp)))
+       (cond ((null? exps))
+             ((variable? (car exps)) (check-all-identifiers (cdr exps)))
+             (else (raise-compilation-error "Not an identifier" (car exps))))))
     ((pattern-match? '(define) exp)
      (raise-compilation-error "Variable and value missing from definition" exp))
     ((pattern-match? `(define (,?? ,??*)) exp)
      (raise-compilation-error "Empty body in procedure definition" exp))
     ((pattern-match? `(define ,??) exp)
      (raise-compilation-error "Variable or value missing from definition" exp))
-    ((variable-definition? exp))
     ((pattern-match? `(define ,variable? ,?? ,?? ,??*) exp)
      (raise-compilation-error "Too many operands to variable definition" exp))
-    ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
-     (let check-all-identifiers ((exps (cadr exp)))
-       (cond ((null? exps))
-             ((variable? (car exps)) (check-all-identifiers (cdr exps)))
-             (else (raise-compilation-error "Not an identifier" (car exps))))))
     ((pattern-match? `(define () ,??*) exp)
      (raise-compilation-error "Variable missing from procedure definition" exp))
     ((pattern-match? `(define ,?? ,??) exp)

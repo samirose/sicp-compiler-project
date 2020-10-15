@@ -13,7 +13,8 @@
       (let ((pat-head (car pat)))
         (cond
           ((memq pat-head list-matchers)
-           (pat-head (cdr pat) exp))
+           (and (or (pair? exp) (null? exp))
+                (pat-head (cdr pat) exp)))
           ((pair? exp)
            (and (pattern-match? (car pat) (car exp))
                 (pattern-match? (cdr pat) (cdr exp))))

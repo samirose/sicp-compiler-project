@@ -168,3 +168,59 @@
  (lambda () (definition? '(define 1 2 3)))
  "Not a variable or procedure definition" '(define 1 2 3)
  "Definition's first operand should be an identifier or an identifier list")
+
+;; lambda expression
+(assert-equal
+ #t
+ (lambda? '(lambda () 42))
+ "Lambda expression with empty arguments list and single-expression body is valid")
+
+(assert-equal
+ #t
+ (lambda? '(lambda () (+ 1 2)))
+ "Lambda expression with empty arguments list and combination body is valid")
+
+(assert-equal
+ #t
+ (lambda? '(lambda () 1 2))
+ "Lambda expression with empty arguments list and multi-expression body is valid")
+
+(assert-equal
+ #t
+ (lambda? '(lambda (x) x))
+  "Lambda expression with one argument and single-expression body is valid")
+
+(assert-equal
+ #t
+ (lambda? '(lambda (x) (+ x 1)))
+  "Lambda expression with one argument and combination body is valid")
+
+(assert-equal
+ #t
+ (lambda? '(lambda (a b) (set! a (+ a 1) (+ a b))))
+  "Lambda expression with one argument and multi-expression body is valid")
+
+(assert-raises-compilation-error
+ (lambda () (lambda? '(lambda ())))
+ "Body missing from lambda expression" '(lambda ())
+ "Lambda expression must define a body")
+
+(assert-raises-compilation-error
+ (lambda () (lambda? '(lambda (x))))
+ "Body missing from lambda expression" '(lambda (x))
+ "Lambda expression must define a body")
+
+(assert-raises-compilation-error
+ (lambda () (lambda? '(lambda x)))
+ "Body missing from lambda expression" '(lambda x)
+ "Lambda expression must define a body")
+
+(assert-raises-compilation-error
+ (lambda () (lambda? '(lambda a a)))
+ "Arguments list missing from lambda expression" '(lambda a a)
+ "Lambda expressions must define an argument list (list argument forms are not yet supported)")
+
+(assert-raises-compilation-error
+ (lambda () (lambda? '(lambda (x 1) (+ x 1))))
+ "Not an identifier" 1
+ "Lambda arguments must be identifiers")

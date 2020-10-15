@@ -67,15 +67,17 @@
 (define (variable-definition? exp)
   (pattern-match? `(define ,variable? ,??) exp))
 
+(define (check-all-identifiers exps)
+  (cond ((null? exps))
+        ((variable? (car exps)) (check-all-identifiers (cdr exps)))
+        (else (raise-compilation-error "Not an identifier" (car exps)))))
+
 (define (definition? exp)
   (cond
     ((not (pattern-match? `(define ,??*) exp)) #f)
     ((variable-definition? exp))
     ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
-     (let check-all-identifiers ((exps (cadr exp)))
-       (cond ((null? exps))
-             ((variable? (car exps)) (check-all-identifiers (cdr exps)))
-             (else (raise-compilation-error "Not an identifier" (car exps))))))
+     (check-all-identifiers (cadr exp)))
     ((raise-error-on-match
       '(define) exp "Variable and value missing from definition" exp))
     ((raise-error-on-match
@@ -103,7 +105,18 @@
       (make-lambda (cdadr exp)
                    (cddr exp))))
 
-(define (lambda? exp) (tagged-list? exp 'lambda))
+;; lambda expression
+(define (lambda? exp)
+  (cond ((not (pattern-match? `(lambda ,??*) exp)) #f)
+        ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
+         (check-all-identifiers (lambda-formals exp)))
+        ((raise-error-on-match
+          `(lambda) exp "Arguments and body missing from lambda expression" exp))
+        ((raise-error-on-match
+          `(lambda ,??) exp "Body missing from lambda expression" exp))
+        ((raise-error-on-match
+          `(lambda ,?? ,??) exp "Arguments list missing from lambda expression" exp))
+        (else (error "Internal compiler error: unexhaustive lambda syntax check" exp))))
 
 (define (lambda-formals exp) (cadr exp))
 (define (lambda-body exp) (cddr exp))

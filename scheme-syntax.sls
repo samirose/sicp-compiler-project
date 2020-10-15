@@ -124,7 +124,17 @@
 (define (make-lambda parameters body)
   (cons 'lambda (cons parameters body)))
 
-(define (if? exp) (tagged-list? exp 'if))
+(define (if? exp)
+  (cond ((not (pattern-match? `(if ,??*) exp)) #f)
+        ((pattern-match? `(if ,?? ,?? ,??) exp))
+        ((pattern-match? `(if ,?? ,??) exp))
+        ((raise-error-on-match
+          '(if) exp "Test and consequent missing from if expression" exp))
+        ((raise-error-on-match
+          `(if ,??) exp "Consequent missing from if expression" exp))
+        ((raise-error-on-match
+          `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp))
+        (else (error "Internal compiler error: unexhaustive if expression syntax check"))))
 
 (define (if-predicate exp) (cadr exp))
 

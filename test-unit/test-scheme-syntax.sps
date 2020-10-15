@@ -224,3 +224,44 @@
  (lambda () (lambda? '(lambda (x 1) (+ x 1))))
  "Not an identifier" 1
  "Lambda arguments must be identifiers")
+
+;; if expression
+(assert-equal
+ #t
+ (if? '(if 1 #t))
+ "If with simple test and consequent is valid")
+
+(assert-equal
+ #t
+ (if? '(if 1 #t #f))
+ "If with simple test, consequent and alternative is valid")
+
+(assert-equal
+ #t
+ (if? '(if (< x 0) (set! x (+ x 1))))
+ "If with composite test and consequent is valid")
+
+(assert-equal
+ #t
+ (if? '(if (< x 0) (begin (set! y x) (+ x 1)) (- x 1)))
+ "If with composite test, consequent and alternative is valid")
+
+(assert-raises-compilation-error
+ (lambda () (if? '(if)))
+ "Test and consequent missing from if expression" '(if)
+ "If expression must contain at least test and consequent subexpressions")
+
+(assert-raises-compilation-error
+ (lambda () (if? '(if (= x 0))))
+ "Consequent missing from if expression" '(if (= x 0))
+ "If expression must contain at least test and consequent subexpressions")
+
+(assert-raises-compilation-error
+ (lambda () (if? '(if (= x 0) 1 2 3)))
+ "Too many subexpressions in if expression" '(if (= x 0) 1 2 3)
+ "If expression must not contain more subexpressions than test, consequent and alternative")
+
+(assert-raises-compilation-error
+ (lambda () (if? '(if (= x 0) 1 2 3 4)))
+ "Too many subexpressions in if expression" '(if (= x 0) 1 2 3 4)
+ "If expression must not contain more subexpressions than test, consequent and alternative")

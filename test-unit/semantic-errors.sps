@@ -19,11 +19,6 @@
    expected-message expected-object description))
 
 (assert-expression-raises-compilation-error
- '()
- "Unknown expression type -- COMPILE" '()
- "Unknown expression type cannot be compiled")
-
-(assert-expression-raises-compilation-error
  "a string"
  "Unsupported value" "a string"
  "String values are not yet supported")

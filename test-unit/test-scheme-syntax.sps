@@ -281,3 +281,29 @@
  (lambda () (begin? '(begin)))
  "Empty sequence" '(begin)
  "Sequence without expressions is invalid")
+
+;; application
+(assert-equal
+ #t
+ (application? '(proc))
+ "Procedure application without parameters is valid")
+
+(assert-equal
+ #t
+ (application? '(proc 1))
+ "Procedure application with one simple parameter is valid")
+
+(assert-equal
+ #t
+ (application? '(proc (+ x 1)))
+ "Procedure application with one combination parameter is valid")
+
+(assert-equal
+ #t
+ (application? '(proc 1 (+ x 1) 3))
+ "Procedure application with multiple parameters is valid")
+
+(assert-raises-compilation-error
+ (lambda () (application? '()))
+ "No operator in application" '()
+ "Application must contain at least an operator")

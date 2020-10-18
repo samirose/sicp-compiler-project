@@ -155,7 +155,14 @@
 (define (first-exp seq) (car seq))
 (define (rest-exps seq) (cdr seq))
 
-(define (application? exp) (pair? exp))
+;; application
+(define (application? exp)
+  (cond ((not (pattern-match? `(,??*) exp)) #f)
+        ((pattern-match? `(,?? ,??*) exp))
+        ((raise-error-on-match
+          '() exp "No operator in application" exp))
+        (else (error "Internal compiler error: unexhaustive application syntax check"))))
+
 (define (operator exp) (car exp))
 (define (operands exp) (cdr exp))
 

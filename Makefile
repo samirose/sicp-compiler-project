@@ -99,7 +99,7 @@ $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)/log/%.log : $(TEST_UNIT_DIR)/%.sps $(TEST_U
 test : test-unit test-compiler
 
 .PHONY : cleanall
-cleanall : cleantest cleanlibs cleancompiler
+cleanall : cleantest cleancompiler cleanlibs
 
 .PHONY : cleancompiler
 cleancompiler :

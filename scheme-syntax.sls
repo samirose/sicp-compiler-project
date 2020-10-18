@@ -36,11 +36,6 @@
 
 (define (text-of-quotation exp) (cadr exp))
 
-(define (tagged-list? exp tag)
-  (if (pair? exp)
-      (eq? (car exp) tag)
-      #f))
-
 ;; assignment
 (define (variable? exp) (symbol? exp))
 (define (not-variable? exp) (not (variable? exp)))
@@ -146,8 +141,14 @@
       (cadddr exp)
       #f))
 
+;; sequence
+(define (begin? exp)
+  (cond ((not (pattern-match? `(begin ,??*) exp)) #f)
+        ((pattern-match? `(begin ,?? ,??*) exp))
+        ((raise-error-on-match
+          '(begin) exp "Empty sequence" exp))
+        (else (error "Internal compiler error: unexhaustive sequence syntax check" exp))))
 
-(define (begin? exp) (tagged-list? exp 'begin))
 (define (begin-actions exp) (cdr exp))
 
 (define (last-exp? seq) (null? (cdr seq)))

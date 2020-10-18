@@ -265,3 +265,19 @@
  (lambda () (if? '(if (= x 0) 1 2 3 4)))
  "Too many subexpressions in if expression" '(if (= x 0) 1 2 3 4)
  "If expression must not contain more subexpressions than test, consequent and alternative")
+
+;; sequence
+(assert-equal
+ #t
+ (begin? '(begin 42))
+ "Sequence with one simple expression is valid")
+
+(assert-equal
+ #t
+ (begin? '(begin (+ 1 2) 4 5))
+ "Sequence with multiple expressions is valid")
+
+(assert-raises-compilation-error
+ (lambda () (begin? '(begin)))
+ "Empty sequence" '(begin)
+ "Sequence without expressions is invalid")

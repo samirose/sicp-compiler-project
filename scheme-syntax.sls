@@ -135,7 +135,7 @@
           `(if ,??) exp "Consequent missing from if expression" exp))
         ((raise-error-on-match
           `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp))
-        (else (error "Internal compiler error: unexhaustive if expression syntax check"))))
+        (else (error "Internal compiler error: unexhaustive if expression syntax check" exp))))
 
 (define (if-predicate exp) (cadr exp))
 

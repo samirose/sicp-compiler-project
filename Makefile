@@ -23,6 +23,7 @@ $(COMPILED_COMPILER) &: $(LIBDIRS) driver.sps
 $(LIBDIR)% : %.sls
 	rm -rf $@
 	$(SCHEME) --install --collections $(LIBDIR) $<
+	touch $@
 
 RUN_DRIVER = $(SCHEME) ++path $(LIBDIR) driver.sps
 

@@ -1,5 +1,5 @@
 #!r6rs
-;; Adapted from ch5-syntax.scm for R6RS.
+;; Adapted from SICP ch5-syntax.scm
 
 (library (scheme-syntax)
   (export self-evaluating?
@@ -7,88 +7,162 @@
           variable?
           assignment? assignment-variable assignment-value
           definition? definition-variable definition-value
-          lambda? lambda-parameters lambda-body
+          lambda? lambda-formals lambda-body
           if? if-predicate if-consequent if-alternative
           begin? begin-actions last-exp? first-exp rest-exps
-          application? operator operands
-          cond? cond->if)
-  (import (rnrs base))
-
-;;;;SCHEME SYNTAX FROM SECTION 4.1.2 OF STRUCTURE AND INTERPRETATION OF
-;;;  COMPUTER PROGRAMS, TO SUPPORT CHAPTER 5
-;;;;Loaded by compiler.scm (for use by compiler), and by eceval-support.scm
-;;;; (for simulation of eceval machine operations)
+          application? operator operands)
+  (import (rnrs base)
+          (compilation-error)
+          (pattern-match))
 
 (define (self-evaluating? exp)
   (cond ((number? exp) #t)
         ((boolean? exp) #t)
-        ((string? exp) #f)  ; Strings are not supported yet
+        ((string? exp) #t)
         (else #f)))
 
+(define (raise-error-on-match pat exp message object)
+  (if (pattern-match? pat exp)
+      (raise-compilation-error message object)
+      #f))
 
+;; quote
 (define (quoted? exp)
-  (tagged-list? exp 'quote))
+  (cond ((not (pattern-match? `(quote ,??*) exp)) #f)
+        ((pattern-match? `(quote ,??) exp))
+        ((raise-error-on-match '(quote) exp "Too few operands" exp))
+        ((raise-error-on-match `(quote ,?? ,?? ,??*) exp "Too many operands" exp))
+        (else (error "Internal compiler error: unexhaustive quote syntax check" exp))))
 
 (define (text-of-quotation exp) (cadr exp))
 
-(define (tagged-list? exp tag)
-  (if (pair? exp)
-      (eq? (car exp) tag)
-      #f))
-
-
+;; assignment
 (define (variable? exp) (symbol? exp))
+(define (not-variable? exp) (not (variable? exp)))
 
 (define (assignment? exp)
-  (tagged-list? exp 'set!))
+  (cond ((not (pattern-match? `(set! ,??*) exp)) #f)
+        ((pattern-match? `(set! ,variable? ,??) exp))
+        ((raise-error-on-match
+          '(set!) exp "Variable and value missing from assignment" exp))
+        ((raise-error-on-match
+          `(set! ,??) exp "Variable or value missing from assignment" exp))
+        ((raise-error-on-match
+          `(set! ,?? ,?? ,?? ,??*) exp "Too many operands to assignment" exp))
+       ((raise-error-on-match
+         `(set! ,not-variable? ,??) exp
+         "Not an identifier" (assignment-variable exp)))
+       (else (error "Internal compiler error: unexhaustive assignment syntax check" exp))))
 
 (define (assignment-variable exp) (cadr exp))
 
 (define (assignment-value exp) (caddr exp))
 
+;; definition
+(define (variable-definition? exp)
+  (pattern-match? `(define ,variable? ,??) exp))
+
+(define (check-all-identifiers exps)
+  (cond ((null? exps))
+        ((variable? (car exps)) (check-all-identifiers (cdr exps)))
+        (else (raise-compilation-error "Not an identifier" (car exps)))))
 
 (define (definition? exp)
-  (tagged-list? exp 'define))
+  (cond
+    ((not (pattern-match? `(define ,??*) exp)) #f)
+    ((variable-definition? exp))
+    ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
+     (check-all-identifiers (cadr exp)))
+    ((raise-error-on-match
+      '(define) exp "Variable and value missing from definition" exp))
+    ((raise-error-on-match
+      `(define (,?? ,??*)) exp "Empty body in procedure definition" exp))
+    ((raise-error-on-match
+      `(define ,??) exp "Variable or value missing from definition" exp))
+    ((raise-error-on-match
+      `(define ,variable? ,?? ,?? ,??*) exp "Too many operands to variable definition" exp))
+    ((raise-error-on-match
+      `(define () ,??*) exp "Variable missing from procedure definition" exp))
+    ((raise-error-on-match
+      `(define ,?? ,??) exp "Not an identifier" (cadr exp)))
+    ((raise-error-on-match
+      `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp))
+    (else (error "Internal compiler error: unexhaustive definition syntax check" exp))))
 
 (define (definition-variable exp)
-  (if (symbol? (cadr exp))
+  (if (variable-definition? exp)
       (cadr exp)
       (caadr exp)))
 
 (define (definition-value exp)
-  (if (symbol? (cadr exp))
+  (if (variable-definition? exp)
       (caddr exp)
       (make-lambda (cdadr exp)
                    (cddr exp))))
 
-(define (lambda? exp) (tagged-list? exp 'lambda))
+;; lambda expression
+(define (lambda? exp)
+  (cond ((not (pattern-match? `(lambda ,??*) exp)) #f)
+        ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
+         (check-all-identifiers (lambda-formals exp)))
+        ((raise-error-on-match
+          `(lambda) exp "Arguments and body missing from lambda expression" exp))
+        ((raise-error-on-match
+          `(lambda ,??) exp "Body missing from lambda expression" exp))
+        ((raise-error-on-match
+          `(lambda ,?? ,??) exp "Arguments list missing from lambda expression" exp))
+        (else (error "Internal compiler error: unexhaustive lambda syntax check" exp))))
 
-(define (lambda-parameters exp) (cadr exp))
+(define (lambda-formals exp) (cadr exp))
 (define (lambda-body exp) (cddr exp))
 
 (define (make-lambda parameters body)
   (cons 'lambda (cons parameters body)))
 
-(define (if? exp) (tagged-list? exp 'if))
+;; if expression
+(define (if? exp)
+  (cond ((not (pattern-match? `(if ,??*) exp)) #f)
+        ((pattern-match? `(if ,?? ,?? ,??) exp))
+        ((pattern-match? `(if ,?? ,??) exp))
+        ((raise-error-on-match
+          '(if) exp "Test and consequent missing from if expression" exp))
+        ((raise-error-on-match
+          `(if ,??) exp "Consequent missing from if expression" exp))
+        ((raise-error-on-match
+          `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp))
+        (else (error "Internal compiler error: unexhaustive if expression syntax check" exp))))
 
 (define (if-predicate exp) (cadr exp))
 
 (define (if-consequent exp) (caddr exp))
 
 (define (if-alternative exp)
-  (if (not (null? (cdddr exp)))
+  (if (pattern-match? `(if ,?? ,?? ,??) exp)
       (cadddr exp)
       #f))
 
+;; sequence
+(define (begin? exp)
+  (cond ((not (pattern-match? `(begin ,??*) exp)) #f)
+        ((pattern-match? `(begin ,?? ,??*) exp))
+        ((raise-error-on-match
+          '(begin) exp "Empty sequence" exp))
+        (else (error "Internal compiler error: unexhaustive sequence syntax check" exp))))
 
-(define (begin? exp) (tagged-list? exp 'begin))
 (define (begin-actions exp) (cdr exp))
 
 (define (last-exp? seq) (null? (cdr seq)))
 (define (first-exp seq) (car seq))
 (define (rest-exps seq) (cdr seq))
 
-(define (application? exp) (pair? exp))
+;; application
+(define (application? exp)
+  (cond ((not (pattern-match? `(,??*) exp)) #f)
+        ((pattern-match? `(,?? ,??*) exp))
+        ((raise-error-on-match
+          '() exp "No operator in application" exp))
+        (else (error "Internal compiler error: unexhaustive application syntax check"))))
+
 (define (operator exp) (car exp))
 (define (operands exp) (cdr exp))
 
@@ -96,43 +170,4 @@
 (define (first-operand ops) (car ops))
 (define (rest-operands ops) (cdr ops))
 
-;;;**following needed only to implement COND as derived expression,
-;;; not needed by eceval machine in text.  But used by compiler
-
-;; from 4.1.2
-(define (make-if predicate consequent alternative)
-  (list 'if predicate consequent alternative))
-
-
-(define (sequence->exp seq)
-  (cond ((null? seq) seq)
-        ((last-exp? seq) (first-exp seq))
-        (else (make-begin seq))))
-
-(define (make-begin seq) (cons 'begin seq))
-
-(define (cond? exp) (tagged-list? exp 'cond))
-(define (cond-clauses exp) (cdr exp))
-(define (cond-else-clause? clause)
-  (eq? (cond-predicate clause) 'else))
-(define (cond-predicate clause) (car clause))
-(define (cond-actions clause) (cdr clause))
-
-(define (cond->if exp)
-  (expand-clauses (cond-clauses exp)))
-
-(define (expand-clauses clauses)
-  (if (null? clauses)
-      '#f                          ; no else clause
-      (let ((first (car clauses))
-            (rest (cdr clauses)))
-        (if (cond-else-clause? first)
-            (if (null? rest)
-                (sequence->exp (cond-actions first))
-                (error "ELSE clause isn't last -- COND->IF"
-                       clauses))
-            (make-if (cond-predicate first)
-                     (sequence->exp (cond-actions first))
-                     (expand-clauses rest))))))
-;; end of Cond support
 )

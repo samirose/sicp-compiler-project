@@ -59,7 +59,9 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Top-level `define` of values and procedures
 * `set!` top-level and in-scope binding values
 * Support for exported top-level procedure definitions with R7RS libary syntax
+* Basic syntax and semantic error detection and tests for error handling
 
+## Features currently under work
 
 ## Known issues
 * Open coding of numerical comparison operators produces incorrect results when the operator is applied to more than two parameters

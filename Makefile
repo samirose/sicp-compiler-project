@@ -21,6 +21,7 @@ SCHEME_COMPILE_LIBRARY := plt-r6rs --install --collections ${LIBDIR}
 SCHEME_RUN_PROGRAM := plt-r6rs ++path ${LIBDIR}
 
 $(COMPILED_COMPILER) &: $(LIBDIRS) driver.sps
+	rm -f $(COMPILED_COMPILER)
 	$(SCHEME_COMPILE_PROGRAM) driver.sps
 
 $(LIBDIR)% : %.sls

@@ -124,6 +124,7 @@
 (define (make-lambda parameters body)
   (cons 'lambda (cons parameters body)))
 
+;; if expression
 (define (if? exp)
   (cond ((not (pattern-match? `(if ,??*) exp)) #f)
         ((pattern-match? `(if ,?? ,?? ,??) exp))

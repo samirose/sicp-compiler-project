@@ -141,7 +141,7 @@
 (define (if-consequent exp) (caddr exp))
 
 (define (if-alternative exp)
-  (if (not (null? (cdddr exp)))
+  (if (pattern-match? `(if ,?? ,?? ,??) exp)
       (cadddr exp)
       #f))
 

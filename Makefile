@@ -1,6 +1,5 @@
 SHELL = /bin/bash
 .SHELLFLAGS = -o pipefail -c
-SCHEME := plt-r6rs
 LIBDIR := lib/
 LIBS := \
 	lists \
@@ -16,16 +15,20 @@ LIBS := \
 	module-compiler
 LIBDIRS = $(addprefix $(LIBDIR),$(LIBS))
 COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
+SCHEME := plt-r6rs
+SCHEME_COMPILE_PROGRAM := plt-r6rs ++path ${LIBDIR} --compile
+SCHEME_COMPILE_LIBRARY := plt-r6rs --install --collections ${LIBDIR}
+SCHEME_RUN_PROGRAM := plt-r6rs ++path ${LIBDIR}
 
 $(COMPILED_COMPILER) &: $(LIBDIRS) driver.sps
-	$(SCHEME) ++path $(LIBDIR) --compile driver.sps
+	$(SCHEME_COMPILE_PROGRAM) driver.sps
 
 $(LIBDIR)% : %.sls
 	rm -rf $@
-	$(SCHEME) --install --collections $(LIBDIR) $<
+	$(SCHEME_COMPILE_LIBRARY) $<
 	touch $@
 
-RUN_DRIVER = $(SCHEME) ++path $(LIBDIR) driver.sps
+RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.sps
 
 lib/wasm-module-definitions : lib/lists
 lib/compiled-program : lib/wasm-module-definitions
@@ -89,7 +92,7 @@ $(TEST_UNIT_DIR)/log:
 	mkdir -p $@
 
 $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)/log/%.log : $(TEST_UNIT_DIR)/%.sps $(TEST_UNIT_DIR)/log $(LIBDIRS) $(UNIT_TEST_LIBS)
-	$(SCHEME) ++path $(LIBDIR) $< > $@
+	$(SCHEME_RUN_PROGRAM) $< > $@
 
 .PHONY : test
 test : test-unit test-compiler

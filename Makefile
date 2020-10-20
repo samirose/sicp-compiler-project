@@ -33,7 +33,7 @@ RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.sps
 
 lib/wasm-module-definitions : lib/lists
 lib/compiled-program : lib/wasm-module-definitions
-lib/scheme-r7rs-syntax: lib/compilation-error
+lib/scheme-r7rs-syntax: lib/compilation-error lib/pattern-match
 lib/scheme-syntax: lib/compilation-error lib/pattern-match
 lib/expression-compiler : \
 	lib/lists \

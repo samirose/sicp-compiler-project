@@ -8,25 +8,31 @@
          library-declarations)
  (import (rnrs base)
          (rnrs lists)
+         (pattern-match)
          (compilation-error))
 
  (define (r7rs-library? exp)
-   (and (pair? exp)
-        (eq? (car exp) 'define-library)
-        (list? (cdr exp))))
+   (pattern-match? `(define-library ,??*) exp))
 
  (define library-decltypes
    '(export begin))
 
+ (define (library-decltype? type)
+   (and (memq type library-decltypes) #t))
+
  (define (check-library-declarations library-def)
    (letrec*
-    ((check-all-lists-and-types
+    ((check-declaration
+      (lambda (decl)
+        (cond ((pattern-match? `(,library-decltype? ,??*) decl) 'ok)
+              ((pattern-match? `(,(lambda (d) (not (library-decltype? d))) ,??*) decl)
+               (make-compilation-error "Unsupported R7RS library declaration" decl))
+              ((not (pattern-match? `(,?? ,??*) decl))
+               (make-compilation-error "Illegal R7RS library declaration" decl)))))
+     (check-all-lists-and-types
       (lambda (decls)
         (cond ((null? decls) 'ok)
-              ((not (and (pair? (car decls)) (list? (cdr (car decls)))))
-               (make-compilation-error "Illegal R7RS library declaration" (car decls)))
-              ((not (memq (caar decls) library-decltypes))
-               (make-compilation-error "Unsupported R7RS library declaration" (car decls)))
+              ((check-declaration (car decls)))
               (else (check-all-lists-and-types (cdr decls))))))
      (check-decl-ordering
       (lambda (types decls)

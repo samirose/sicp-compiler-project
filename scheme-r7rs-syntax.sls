@@ -23,7 +23,7 @@
     ((check-all-lists-and-types
       (lambda (decls)
         (cond ((null? decls) 'ok)
-              ((not (list? (car decls)))
+              ((not (and (pair? (car decls)) (list? (cdr (car decls)))))
                (make-compilation-error "Illegal R7RS library declaration" (car decls)))
               ((not (memq (caar decls) library-decltypes))
                (make-compilation-error "Unsupported R7RS library declaration" (car decls)))

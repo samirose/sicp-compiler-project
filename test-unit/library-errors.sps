@@ -32,6 +32,11 @@
  "Library declarations must be lists")
 
 (assert-library-raises-compilation-error
+ '(define-library ())
+ "Illegal R7RS library declaration" '()
+ "Library declarations must be non-empty lists")
+
+(assert-library-raises-compilation-error
  '(define-library (foo bar))
  "Unsupported R7RS library declaration" '(foo bar)
  "Library declarations must be ones defined in R7RS")

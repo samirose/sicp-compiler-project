@@ -7,11 +7,13 @@
           variable?
           assignment? assignment-variable assignment-value
           definition? definition-variable definition-value
+          let? let-bindings let-body
           lambda? lambda-formals lambda-body
           if? if-test if-consequent if-alternate
           begin? begin-actions last-exp? first-exp rest-exps
           application? operator operands)
   (import (rnrs base)
+          (rnrs lists)
           (compilation-error)
           (pattern-match))
 
@@ -97,6 +99,38 @@
       (caddr exp)
       (make-lambda (cdadr exp)
                    (cddr exp))))
+
+;; let expression
+(define (check-binding exp)
+  (cond ((pattern-match? `(,variable? ,??) exp))
+        ((not (pattern-match? `(,??*) exp))
+         (raise-compilation-error "Not a binding" exp))
+        ((raise-error-on-match
+          `(,?? ,??) exp "Not an identifier" (car exp)))
+        ((raise-error-on-match
+          `(,variable?) exp "Value missing from binding" exp))
+        ((raise-error-on-match
+          `(,variable? ,?? ,?? ,??*) exp "Too many operands in binding" exp))
+        ((raise-error-on-match
+          '() exp "Empty binding" exp))
+        (else (raise-compilation-error "Not a binding" exp))))
+
+(define (let? exp)
+  (cond ((not (pattern-match? `(let ,??*) exp)) #f)
+        ((pattern-match? `(let (,?? ,??*) ,?? ,??*) exp)
+         (for-all check-binding (cadr exp)))
+        ((raise-error-on-match
+          `(let () ,?? ,??*) exp "Empty bindings in let expression" exp))
+        ((raise-error-on-match
+          `(let ,?? ,?? ,??*) exp "Bindings missing from let expression" exp))
+        ((raise-error-on-match
+          `(let ,??) exp "Bindings or body missing from let expression" exp))
+        ((raise-error-on-match
+          `(let) exp "Bindings and body missing from let expression" exp))
+        (else (error "Internal compiler error: unexhaustive let syntax check" exp))))
+
+(define (let-bindings exp) (cadr exp))
+(define (let-body exp) (cddr exp))
 
 ;; lambda expression
 (define (lambda? exp)

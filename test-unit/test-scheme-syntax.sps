@@ -253,10 +253,21 @@
    (let? exp)
    "Let expression with one binding and simple body is valid")
 
-  (assert-equal
-   '((a 1))
-   (let-bindings exp)
-   "let-bindings returns let expression's binding list")
+  (let ((bindings (let-bindings exp)))
+    (assert-equal
+     '((a 1))
+     bindings
+     "let-bindings returns let expression's binding list")
+
+    (assert-equal
+     'a
+     (binding-variable (car bindings))
+     "binding-variable returns binding's variable")
+
+    (assert-equal
+     1
+     (binding-value (car bindings))
+     "binding-value returns binding's value expression"))
 
   (assert-equal
    '(a)
@@ -317,10 +328,21 @@
    (let? exp)
    "Let expression with combination values and multi-expression body is valid")
 
-  (assert-equal
-   '((a (+ 1 2)) (b (+ 2 3)))
-   (let-bindings exp)
-   "let-bindings returns let expression's binding list")
+  (let ((bindings (let-bindings exp)))
+    (assert-equal
+     '((a (+ 1 2)) (b (+ 2 3)))
+     bindings
+     "let-bindings returns let expression's binding list")
+
+    (assert-equal
+     'b
+     (binding-variable (cadr bindings))
+     "binding-variable returns binding's variable")
+
+    (assert-equal
+     '(+ 2 3)
+     (binding-value (cadr bindings))
+     "binding-value returns binding's value expression"))
 
   (assert-equal
    '((set! a 3) (+ a b))

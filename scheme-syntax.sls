@@ -7,7 +7,7 @@
           variable?
           assignment? assignment-variable assignment-value
           definition? definition-variable definition-value
-          let? let-bindings let-body
+          let? let-bindings binding-variable binding-value let-body
           lambda? lambda-formals lambda-body
           if? if-test if-consequent if-alternate
           begin? begin-actions last-exp? first-exp rest-exps
@@ -130,6 +130,8 @@
         (else (error "Internal compiler error: unexhaustive let syntax check" exp))))
 
 (define (let-bindings exp) (cadr exp))
+(define (binding-variable b) (car b))
+(define (binding-value b) (cadr b))
 (define (let-body exp) (cddr exp))
 
 ;; lambda expression

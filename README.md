@@ -62,6 +62,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Basic syntax and semantic error detection and tests for error handling
 
 ## Features currently under work
+* Implement local bindings (`let` forms), with Wasm locals instead of `lambda`, if possible. (Using the bindings in closures will need further work)
 
 ## Known issues
 * Open coding of numerical comparison operators produces incorrect results when the operator is applied to more than two parameters
@@ -71,9 +72,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Backlog
-
 * Come up with a name for this project
-* Implement local bindings (`let` forms), with Wasm locals instead of `lambda`, if possible.
 * _Scan out_ (see [SICP chapter 4.16](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1.6)) internal definitions and implement the bindings with `letrec*`
 * Add support for allocating local temporary variables. They will be needed in the implementation of `and` and `or` expressions for retaining the expression's value. See also [#1102 dup instruction](https://github.com/WebAssembly/design/issues/1102).
 * Add compilation of `and` and `or` expressions. They can be implemented with Wasm block structure and conditional branch instructions.

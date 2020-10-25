@@ -55,7 +55,6 @@
        (else (error "Internal compiler error: unexhaustive assignment syntax check" exp))))
 
 (define (assignment-variable exp) (cadr exp))
-
 (define (assignment-value exp) (caddr exp))
 
 ;; definition
@@ -132,9 +131,7 @@
         (else (error "Internal compiler error: unexhaustive if expression syntax check" exp))))
 
 (define (if-predicate exp) (cadr exp))
-
 (define (if-consequent exp) (caddr exp))
-
 (define (if-alternative exp)
   (if (pattern-match? `(if ,?? ,?? ,??) exp)
       (cadddr exp)
@@ -149,7 +146,6 @@
         (else (error "Internal compiler error: unexhaustive sequence syntax check" exp))))
 
 (define (begin-actions exp) (cdr exp))
-
 (define (last-exp? seq) (null? (cdr seq)))
 (define (first-exp seq) (car seq))
 (define (rest-exps seq) (cdr seq))
@@ -164,7 +160,6 @@
 
 (define (operator exp) (car exp))
 (define (operands exp) (cdr exp))
-
 (define (no-operands? ops) (null? ops))
 (define (first-operand ops) (car ops))
 (define (rest-operands ops) (cdr ops))

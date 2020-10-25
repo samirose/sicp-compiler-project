@@ -15,7 +15,7 @@
    (find-variable 'x env)
    "A variable is not found from an empty lexical env")
 
-  (let ((env (add-new-lexical-frame env (make-lexical-frame '(a b) '((b (export "func_b")))))))
+  (let ((env (add-new-lexical-frame env '(a b) '((b (export "func_b"))))))
     (assert-equal
      #t
      (global-lexical-env? env)
@@ -63,7 +63,7 @@
      (find-variable 'x env)
      "Variable not defined in the only frame is not found")
 
-    (let ((env (add-new-lexical-frame env (make-lexical-frame '(x a) '()))))
+    (let ((env (add-new-lexical-frame env '(x a) '())))
       (assert-equal
        #f
        (global-lexical-env? env)
@@ -100,4 +100,38 @@
       (assert-equal
        'not-found
        (find-variable 'y env)
-       "Variable not defined in any frame is not found"))))
+       "Variable not defined in any frame is not found")
+
+      (let* ((prev-frame-size 2)
+             (env (add-new-local-frame env '(y a) '())))
+        (assert-equal
+         `(0 ,prev-frame-size)
+         (let ((address (find-variable 'y env)))
+           (list (frame-index address) (var-index address)))
+         "find-variable of first variable in the last added local frame returns frame-index 0 and var-index (length of previous frame)")
+
+        (assert-equal
+         `(0 ,(+ prev-frame-size 1))
+         (let ((address (find-variable 'a env)))
+           (list (frame-index address) (var-index address)))
+         "Variable with identical name is found first in the last added local frame")
+
+        (assert-equal
+         '(0 0)
+         (let ((address (find-variable 'x env)))
+           (list (frame-index address) (var-index address)))
+         "find-variable of first variable in the last preceeding lexical frame returns frame-index 0 and var-index 0")
+
+        (let ((prev-frames-size 4)
+              (env (add-new-local-frame env '(z) '())))
+          (assert-equal
+           `(0 ,prev-frames-size)
+           (let ((address (find-variable 'z env)))
+             (list (frame-index address) (var-index address)))
+           "find-variable of first variable in the last added local frame returns frame-index 0 and var-index (length of previous local frame and its preceedign frame)")
+
+          (assert-equal
+           '(1 1)
+           (let ((address (find-variable 'b env)))
+             (list (frame-index address) (var-index address)))
+           "find-variable will return frame-index of 1 and correct var-index for variable found in the next lexical frame"))))))

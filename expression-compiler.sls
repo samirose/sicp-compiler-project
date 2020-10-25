@@ -220,9 +220,7 @@
 (define (lambda-body-env lambda-exp lambda-lexical-env formals)
   (let ((duplicate-param (first-duplicate formals)))
     (if (null? duplicate-param)
-        (add-new-lexical-frame
-         lambda-lexical-env
-         (make-lexical-frame formals '()))
+        (add-new-lexical-frame lambda-lexical-env formals '())
         (raise-compilation-error "Duplicate parameter in lambda" lambda-exp))))
 
 (define (compile-lambda exp program lexical-env current-binding compile)

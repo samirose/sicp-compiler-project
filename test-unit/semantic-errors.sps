@@ -11,7 +11,7 @@
 (install-test-compilation-error-handler!)
 
 (define empty-global-env
-  (add-new-lexical-frame (make-empty-lexical-env) (make-lexical-frame '() '())))
+  (add-new-lexical-frame (make-empty-lexical-env) '() '()))
 
 (define (assert-expression-raises-compilation-error exp expected-message expected-object description)
   (assert-raises-compilation-error

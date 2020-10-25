@@ -474,15 +474,86 @@
  "If expression must not contain more subexpressions than test, consequent and alternative")
 
 ;; sequence
-(assert-equal
- #t
- (begin? '(begin 42))
- "Sequence with one simple expression is valid")
+(let ((exp '(begin 42)))
+  (assert-equal
+   #t
+   (begin? exp)
+   "Sequence with one simple expression is valid")
 
-(assert-equal
- #t
- (begin? '(begin (+ 1 2) 4 5))
- "Sequence with multiple expressions is valid")
+  (let ((seq (begin-actions exp)))
+    (assert-equal
+     '(42)
+     seq
+     "begin-actions returns begin form's expression sequence")
+
+    (assert-equal
+     42
+     (first-exp seq)
+     "first-exp returns begin form sequence's first expression")
+
+    (assert-equal
+     '()
+     (rest-exps seq)
+     "rest-exps returns begin form sequence's expressions after the first")
+
+    (assert-equal
+     #t
+     (last-exp? seq)
+     "last-exp? returns true for begin form sequence's last expression")))
+
+(let ((exp '(begin (+ 1 2) 4 5)))
+  (assert-equal
+   #t
+   (begin? exp)
+   "Sequence with multiple expressions is valid")
+
+  (let ((seq (begin-actions exp)))
+    (assert-equal
+     '(+ 1 2)
+     (first-exp seq)
+     "first-exp returns begin form sequence's first expression")
+
+    (assert-equal
+     '(4 5)
+     (rest-exps seq)
+     "rest-exps returns begin form sequence's expressions after the first")
+
+    (assert-equal
+     #f
+     (last-exp? seq)
+     "last-exp? returns true for begin form sequence's last expression")
+
+    (let ((seq (rest-exps seq)))
+      (assert-equal
+       4
+       (first-exp seq)
+       "first-exp returns begin form sequence's first expression")
+
+      (assert-equal
+       '(5)
+       (rest-exps seq)
+       "rest-exps returns begin form sequence's expressions after the first")
+
+      (assert-equal
+       #f
+       (last-exp? seq)
+       "last-exp? returns true for begin form sequence's last expression")
+
+      (let ((seq (rest-exps seq)))
+        (assert-equal
+         5
+         (first-exp seq)
+         "first-exp returns begin form sequence's first expression")
+
+        (assert-equal
+         '()
+         (rest-exps seq)
+         "rest-exps returns begin form sequence's expressions after the first")
+
+        (assert-equal
+         #t
+         (last-exp? seq)
+         "last-exp? returns true for begin form sequence's last expression")))))
 
 (assert-raises-compilation-error
  (lambda () (begin? '(begin)))

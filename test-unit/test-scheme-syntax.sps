@@ -247,35 +247,101 @@
  "Definition's first operand should be an identifier or an identifier list")
 
 ;; lambda expression
-(assert-equal
- #t
- (lambda? '(lambda () 42))
- "Lambda expression with empty arguments list and single-expression body is valid")
+(let ((exp '(lambda () 42)))
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with empty arguments list and single-expression body is valid")
 
-(assert-equal
- #t
- (lambda? '(lambda () (+ 1 2)))
- "Lambda expression with empty arguments list and combination body is valid")
+  (assert-equal
+   '()
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
 
-(assert-equal
- #t
- (lambda? '(lambda () 1 2))
- "Lambda expression with empty arguments list and multi-expression body is valid")
+  (assert-equal
+   '(42)
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
 
-(assert-equal
- #t
- (lambda? '(lambda (x) x))
-  "Lambda expression with one argument and single-expression body is valid")
+(let ((exp '(lambda () (+ 1 2))))
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with empty arguments list and combination body is valid")
 
-(assert-equal
- #t
- (lambda? '(lambda (x) (+ x 1)))
-  "Lambda expression with one argument and combination body is valid")
+  (assert-equal
+   '()
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
 
-(assert-equal
- #t
- (lambda? '(lambda (a b) (set! a (+ a 1)) (+ a b)))
-  "Lambda expression with one argument and multi-expression body is valid")
+  (assert-equal
+   '((+ 1 2))
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
+
+(let ((exp '(lambda () 1 2)))
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with empty arguments list and multi-expression body is valid")
+
+  (assert-equal
+   '()
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
+
+  (assert-equal
+   '(1 2)
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
+
+(let ((exp '(lambda (x) x)) )
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with one argument and single-expression body is valid")
+
+  (assert-equal
+   '(x)
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
+
+  (assert-equal
+   '(x)
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
+
+(let ((exp '(lambda (x) (+ x 1))))
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with one argument and combination body is valid")
+
+  (assert-equal
+   '(x)
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
+
+  (assert-equal
+   '((+ x 1))
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
+
+(let ((exp '(lambda (a b) (set! a (+ a 1)) (+ a b))))
+  (assert-equal
+   #t
+   (lambda? '(lambda (a b) (set! a (+ a 1)) (+ a b)))
+   "Lambda expression with one argument and multi-expression body is valid")
+
+  (assert-equal
+   '(a b)
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
+
+  (assert-equal
+   '((set! a (+ a 1)) (+ a b))
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
 
 (assert-raises-compilation-error
  (lambda () (lambda? '(lambda ())))

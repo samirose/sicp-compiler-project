@@ -69,7 +69,7 @@
   (let* ((lexical-address
           (find-variable exp lexical-env))
          (get-instr
-          (cond ((eq? lexical-address 'not-found)
+          (cond ((not lexical-address)
                  (raise-compilation-error "Lexically unbound variable" exp))
                 ((global-address? lexical-address) 'get_global)
                 ((= (frame-index lexical-address) 0) 'get_local)
@@ -86,7 +86,7 @@
           (compile (assignment-value exp) program lexical-env))
          (set-instr
           (cond
-            ((eq? lexical-address 'not-found)
+            ((not lexical-address)
              (raise-compilation-error "Lexically unbound variable" exp))
             ((global-address? lexical-address) 'set_global)
             ((= (frame-index lexical-address) 0) 'set_local)
@@ -104,7 +104,7 @@
           (if (not (global-lexical-env? lexical-env))
               (raise-compilation-error "Only top-level define is supported" exp))
           (let ((address (find-variable variable lexical-env)))
-            (if (eq? address 'not-found)
+            (if (not address)
                 (raise-compilation-error "Internal compiler error: global binding missing from global lexical env"
                        (list variable lexical-env)))
             (var-index address))))

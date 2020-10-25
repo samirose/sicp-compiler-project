@@ -78,14 +78,14 @@
 
  (define (find-variable var lexical-env)
    (if (null? lexical-env)
-       'not-found
+       #f
        (let scan ((env lexical-env)
                   (vars (frame-variables (car lexical-env)))
                   (frame-index 0)
                   (var-index (frame-index-offset (car lexical-env))))
          (if (null? vars)
              (if (null? (cdr env))
-                 'not-found
+                 #f
                  (let* ((curr-frame (car env))
                         (next-env (cdr env))
                         (next-frame (car next-env))

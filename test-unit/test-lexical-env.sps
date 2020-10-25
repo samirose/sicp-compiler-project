@@ -11,7 +11,7 @@
    "Empty lexical env is not the global lexical env")
 
   (assert-equal
-   'not-found
+   #f
    (find-variable 'x env)
    "A variable is not found from an empty lexical env")
 
@@ -59,7 +59,7 @@
      "env-get-additional-info of a variable without additional info returns empty info")
 
     (assert-equal
-     'not-found
+     #f
      (find-variable 'x env)
      "Variable not defined in the only frame is not found")
 
@@ -98,7 +98,7 @@
        "env-get-additional-info returns info only from the topmost frame")
 
       (assert-equal
-       'not-found
+       #f
        (find-variable 'y env)
        "Variable not defined in any frame is not found")
 

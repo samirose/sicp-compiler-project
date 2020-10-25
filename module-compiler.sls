@@ -121,15 +121,14 @@
     exports)
    (add-new-lexical-frame
     (make-empty-lexical-env)
-    (make-lexical-frame
-     variables
-     (fold-left
-      (lambda (additional-info var)
-        (if (memq var exports)
-            (cons `(,var (export ,(symbol->string var)))
-                  additional-info)
-            additional-info))
-      '()
-      variables))))
+    variables
+    (fold-left
+     (lambda (additional-info var)
+       (if (memq var exports)
+           (cons `(,var (export ,(symbol->string var)))
+                 additional-info)
+           additional-info))
+     '()
+     variables)))
 
  )

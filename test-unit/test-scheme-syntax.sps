@@ -246,6 +246,137 @@
  "Not a variable or procedure definition" '(define 1 2 3)
  "Definition's first operand should be an identifier or an identifier list")
 
+;; let expression
+(let ((exp '(let ((a 1)) a)))
+  (assert-equal
+   #t
+   (let? exp)
+   "Let expression with one binding and simple body is valid")
+
+  (assert-equal
+   '((a 1))
+   (let-bindings exp)
+   "let-bindings returns let expression's binding list")
+
+  (assert-equal
+   '(a)
+   (let-body exp)
+   "let-body returns let expression's body"))
+
+(let ((exp '(let ((a 1) (b 2)) b)))
+  (assert-equal
+   #t
+   (let? exp)
+   "Let expression with two bindings and simple body is valid")
+
+  (assert-equal
+   '((a 1) (b 2))
+   (let-bindings exp)
+   "let-bindings returns let expression's binding list")
+
+  (assert-equal
+   '(b)
+   (let-body exp)
+   "let-body returns let expression's body"))
+
+(let ((exp '(let ((a 1) (b 2)) (+ a b))))
+  (assert-equal
+   #t
+   (let? exp)
+   "Let expression with two bindings and combination body is valid")
+
+  (assert-equal
+   '((a 1) (b 2))
+   (let-bindings exp)
+   "let-bindings returns let expression's binding list")
+
+  (assert-equal
+   '((+ a b))
+   (let-body exp)
+   "let-body returns let expression's body"))
+
+(let ((exp '(let ((a 1) (b 2)) (set! a 3) (+ a b))))
+  (assert-equal
+   #t
+   (let? exp)
+   "Let expression with two bindings and multi-expression body is valid")
+
+  (assert-equal
+   '((a 1) (b 2))
+   (let-bindings exp)
+   "let-bindings returns let expression's binding list")
+
+  (assert-equal
+   '((set! a 3) (+ a b))
+   (let-body exp)
+   "let-body returns let expression's body"))
+
+(let ((exp '(let ((a (+ 1 2)) (b (+ 2 3))) (set! a 3) (+ a b))))
+  (assert-equal
+   #t
+   (let? exp)
+   "Let expression with combination values and multi-expression body is valid")
+
+  (assert-equal
+   '((a (+ 1 2)) (b (+ 2 3)))
+   (let-bindings exp)
+   "let-bindings returns let expression's binding list")
+
+  (assert-equal
+   '((set! a 3) (+ a b))
+   (let-body exp)
+   "let-body returns let expression's body"))
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let () 42)))
+ "Empty bindings in let expression" '(let () 42)
+ "Let expression must define bindings")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let ((a 1)))))
+ "Bindings or body missing from let expression" '(let ((a 1)))
+ "Let expression must have a body")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let)))
+ "Bindings and body missing from let expression" '(let)
+ "Let expression must have bindings and body")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let a 42)))
+ "Bindings missing from let expression" '(let a 42)
+ "Bindings should be a list")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let (a) a)))
+ "Not a binding" 'a
+ "Bindings must define a variable and value")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let (1) 42)))
+ "Not a binding" 1
+ "Bindings must define a variable and value")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let (b 1) b)))
+ "Not a binding" 'b
+ "Bindings is a list of variable-value pairs")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let ((a)) a)))
+ "Value missing from binding" '(a)
+ "Bindings must define a variable and value")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let ((1 2)) 42)))
+ "Not an identifier" 1
+ "Bindings must define a variable and value")
+
+(assert-raises-compilation-error
+ (lambda () (let? '(let ((a 1 2)) a)))
+ "Too many operands in binding" '(a 1 2)
+ "Bindings must define a variable and single value")
+
 ;; lambda expression
 (let ((exp '(lambda () 42)))
   (assert-equal

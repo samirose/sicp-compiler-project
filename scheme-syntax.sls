@@ -68,26 +68,25 @@
         (else (raise-compilation-error "Not an identifier" (car exps)))))
 
 (define (definition? exp)
-  (cond
-    ((not (pattern-match? `(define ,??*) exp)) #f)
-    ((variable-definition? exp))
-    ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
-     (check-all-identifiers (cadr exp)))
-    ((raise-error-on-match
-      '(define) exp "Variable and value missing from definition" exp))
-    ((raise-error-on-match
-      `(define (,?? ,??*)) exp "Empty body in procedure definition" exp))
-    ((raise-error-on-match
-      `(define ,??) exp "Variable or value missing from definition" exp))
-    ((raise-error-on-match
-      `(define ,variable? ,?? ,?? ,??*) exp "Too many operands to variable definition" exp))
-    ((raise-error-on-match
-      `(define () ,??*) exp "Variable missing from procedure definition" exp))
-    ((raise-error-on-match
-      `(define ,?? ,??) exp "Not an identifier" (cadr exp)))
-    ((raise-error-on-match
-      `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp))
-    (else (error "Internal compiler error: unexhaustive definition syntax check" exp))))
+  (cond ((not (pattern-match? `(define ,??*) exp)) #f)
+        ((variable-definition? exp))
+        ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
+         (check-all-identifiers (cadr exp)))
+        ((raise-error-on-match
+          '(define) exp "Variable and value missing from definition" exp))
+        ((raise-error-on-match
+          `(define (,?? ,??*)) exp "Empty body in procedure definition" exp))
+        ((raise-error-on-match
+          `(define ,??) exp "Variable or value missing from definition" exp))
+        ((raise-error-on-match
+          `(define ,variable? ,?? ,?? ,??*) exp "Too many operands to variable definition" exp))
+        ((raise-error-on-match
+          `(define () ,??*) exp "Variable missing from procedure definition" exp))
+        ((raise-error-on-match
+          `(define ,?? ,??) exp "Not an identifier" (cadr exp)))
+        ((raise-error-on-match
+          `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp))
+        (else (error "Internal compiler error: unexhaustive definition syntax check" exp))))
 
 (define (definition-variable exp)
   (if (variable-definition? exp)

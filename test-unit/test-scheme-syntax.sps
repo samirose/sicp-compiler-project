@@ -79,40 +79,117 @@
  "Assignment with too many operands raises an error")
 
 ;; definition
-(assert-equal
- #t
- (definition? '(define x 42))
- "Variable definition with variable and simple value is valid")
+(let ((exp '(define x 42)))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Variable definition with variable and simple value is valid")
 
-(assert-equal
- #t
- (definition? '(define x (+ 1 2)))
- "Variable definition with variable and combination value is valid")
+  (assert-equal
+   'x
+   (definition-variable exp)
+   "definition-variable returns the variable of variable definition")
 
-(assert-equal
- #t
- (definition? '(define (zero) 0))
- "Procedure definition with zero arguments and simple body is valid")
+  (assert-equal
+   42
+   (definition-value exp)
+   "definition-value returns the value of variable definition"))
 
-(assert-equal
- #t
- (definition? '(define (one) (+ 0 1)))
- "Procedure definition with zero arguments and combination body is valid")
+(let ((exp '(define x (+ 1 2))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Variable definition with variable and combination value is valid")
 
-(assert-equal
- #t
- (definition? '(define (one) (display "one:") (+ 0 1)))
- "Procedure definition with multi-expression body is valid")
+  (assert-equal
+   'x
+   (definition-variable exp)
+   "definition-variable returns the variable of variable definition")
 
-(assert-equal
- #t
- (definition? '(define (square x) (* x x)))
- "Procedure definition with single parameter and body is valid")
+  (assert-equal
+   '(+ 1 2)
+   (definition-value exp)
+   "definition-value returns the value of variable definition"))
 
-(assert-equal
- #t
- (definition? '(define (sum-of-squares x y) (+ (* x x) (* y y))))
- "Procedure definition with multiple parameters and body is valid")
+(let ((exp '(define (zero) 0)))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with zero parameters and simple body is valid")
+
+  (assert-equal
+   'zero
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda () 0)
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
+
+(let ((exp '(define (one) (+ 0 1))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with zero parameters and combination body is valid")
+
+  (assert-equal
+   'one
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda () (+ 0 1))
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
+
+(let ((exp '(define (one) (display "one:") (+ 0 1))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with multi-expression body is valid")
+
+  (assert-equal
+   'one
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda () (display "one:") (+ 0 1))
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
+
+(let ((exp '(define (square x) (* x x))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with single parameter and body is valid")
+
+  (assert-equal
+   'square
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda (x) (* x x))
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
+
+(let ((exp '(define (sum-of-squares x y) (+ (* x x) (* y y)))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with multiple parameters and body is valid")
+
+  (assert-equal
+   'sum-of-squares
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda (x y) (+ (* x x) (* y y)))
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
 
 (assert-raises-compilation-error
  (lambda () (definition? '(define)))

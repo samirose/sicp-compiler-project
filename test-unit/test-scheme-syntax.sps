@@ -561,25 +561,69 @@
  "Sequence without expressions is invalid")
 
 ;; application
-(assert-equal
- #t
- (application? '(proc))
- "Procedure application without parameters is valid")
+(let ((exp '(proc)))
+  (assert-equal
+   #t
+   (application? exp)
+   "Procedure application without parameters is valid")
 
-(assert-equal
- #t
- (application? '(proc 1))
- "Procedure application with one simple parameter is valid")
+  (assert-equal
+   'proc
+   (operator exp)
+   "operator returns procedure application's operator")
 
-(assert-equal
- #t
- (application? '(proc (+ x 1)))
- "Procedure application with one combination parameter is valid")
+  (assert-equal
+   '()
+   (operands exp)
+   "operands returns procedure application's operands"))
 
-(assert-equal
- #t
- (application? '(proc 1 (+ x 1) 3))
- "Procedure application with multiple parameters is valid")
+(let ((exp '(proc 1)))
+  (assert-equal
+   #t
+   (application? exp)
+   "Procedure application with one simple parameter is valid")
+
+  (assert-equal
+   'proc
+   (operator exp)
+   "operator returns procedure application's operator")
+
+  (assert-equal
+   '(1)
+   (operands exp)
+   "operands returns procedure application's operands"))
+
+(let ((exp '(proc (+ x 1))))
+  (assert-equal
+   #t
+   (application? exp)
+   "Procedure application with one combination parameter is valid")
+
+  (assert-equal
+   'proc
+   (operator exp)
+   "operator returns procedure application's operator")
+
+  (assert-equal
+   '((+ x 1))
+   (operands exp)
+   "operands returns procedure application's operands"))
+
+(let ((exp '(m-proc 1 (+ x 1) 3)))
+  (assert-equal
+   #t
+   (application? exp)
+   "Procedure application with multiple parameters is valid")
+
+  (assert-equal
+   'm-proc
+   (operator exp)
+   "operator returns procedure application's operator")
+
+  (assert-equal
+   '(1 (+ x 1) 3)
+   (operands exp)
+   "operands returns procedure application's operands"))
 
 (assert-raises-compilation-error
  (lambda () (application? '()))

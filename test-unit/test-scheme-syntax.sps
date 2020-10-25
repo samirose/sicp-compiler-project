@@ -197,7 +197,7 @@
 
 (assert-equal
  #t
- (lambda? '(lambda (a b) (set! a (+ a 1) (+ a b))))
+ (lambda? '(lambda (a b) (set! a (+ a 1)) (+ a b)))
   "Lambda expression with one argument and multi-expression body is valid")
 
 (assert-raises-compilation-error

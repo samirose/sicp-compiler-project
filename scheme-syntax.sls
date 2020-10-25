@@ -8,7 +8,7 @@
           assignment? assignment-variable assignment-value
           definition? definition-variable definition-value
           lambda? lambda-formals lambda-body
-          if? if-predicate if-consequent if-alternative
+          if? if-test if-consequent if-alternate
           begin? begin-actions last-exp? first-exp rest-exps
           application? operator operands)
   (import (rnrs base)
@@ -130,9 +130,9 @@
           `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp))
         (else (error "Internal compiler error: unexhaustive if expression syntax check" exp))))
 
-(define (if-predicate exp) (cadr exp))
+(define (if-test exp) (cadr exp))
 (define (if-consequent exp) (caddr exp))
-(define (if-alternative exp)
+(define (if-alternate exp)
   (if (pattern-match? `(if ,?? ,?? ,??) exp)
       (cadddr exp)
       #f))

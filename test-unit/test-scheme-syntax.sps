@@ -369,25 +369,89 @@
  "Lambda arguments must be identifiers")
 
 ;; if expression
-(assert-equal
- #t
- (if? '(if 1 #t))
- "If with simple test and consequent is valid")
+(let ((exp '(if 1 #t)))
+  (assert-equal
+   #t
+   (if? exp)
+   "If with simple test and consequent is valid")
 
-(assert-equal
- #t
- (if? '(if 1 #t #f))
- "If with simple test, consequent and alternative is valid")
+  (assert-equal
+   1
+   (if-test exp)
+   "if-test returns if expression's test expression")
 
-(assert-equal
- #t
- (if? '(if (< x 0) (set! x (+ x 1))))
- "If with composite test and consequent is valid")
+  (assert-equal
+   #t
+   (if-consequent exp)
+   "if-consequent returns if expression's consequent expression")
 
-(assert-equal
- #t
- (if? '(if (< x 0) (begin (set! y x) (+ x 1)) (- x 1)))
- "If with composite test, consequent and alternative is valid")
+  (assert-equal
+   #f
+   (if-alternate exp)
+   "if-alternate returns if expression's alternate expression or false"))
+
+(let ((exp '(if 1 #t #f)))
+  (assert-equal
+   #t
+   (if? exp)
+   "If with simple test, consequent and alternate is valid")
+
+  (assert-equal
+   1
+   (if-test exp)
+   "if-test returns if expression's test expression")
+
+  (assert-equal
+   #t
+   (if-consequent exp)
+   "if-consequent returns if expression's consequent expression")
+
+  (assert-equal
+   #f
+   (if-alternate exp)
+   "if-alternate returns if expression's alternate expression or false"))
+
+(let ((exp '(if (< x 0) (set! x (+ x 1)))))
+  (assert-equal
+   #t
+   (if? exp)
+   "If with composite test and consequent is valid")
+
+  (assert-equal
+   '(< x 0)
+   (if-test exp)
+   "if-test returns if expression's test expression")
+
+  (assert-equal
+   '(set! x (+ x 1))
+   (if-consequent exp)
+   "if-consequent returns if expression's consequent expression")
+
+  (assert-equal
+   #f
+   (if-alternate exp)
+   "if-alternate returns if expression's alternate expression or false"))
+
+(let ((exp '(if (< x 0) (begin (set! y x) (+ x 1)) (- x 1))))
+  (assert-equal
+   #t
+   (if? exp)
+   "If with composite test, consequent and alternative is valid")
+
+  (assert-equal
+   '(< x 0)
+   (if-test exp)
+   "if-test returns if expression's test expression")
+
+  (assert-equal
+   '(begin (set! y x) (+ x 1))
+   (if-consequent exp)
+   "if-consequent returns if expression's consequent expression")
+
+  (assert-equal
+   '(- x 1)
+   (if-alternate exp)
+   "if-alternate returns if expression's alternate expression or false"))
 
 (assert-raises-compilation-error
  (lambda () (if? '(if)))

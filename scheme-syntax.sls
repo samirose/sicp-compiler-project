@@ -8,7 +8,7 @@
           assignment? assignment-variable assignment-value
           definition? definition-variable definition-value
           lambda? lambda-formals lambda-body
-          if? if-predicate if-consequent if-alternative
+          if? if-test if-consequent if-alternate
           begin? begin-actions last-exp? first-exp rest-exps
           application? operator operands)
   (import (rnrs base)
@@ -55,7 +55,6 @@
        (else (error "Internal compiler error: unexhaustive assignment syntax check" exp))))
 
 (define (assignment-variable exp) (cadr exp))
-
 (define (assignment-value exp) (caddr exp))
 
 ;; definition
@@ -68,26 +67,25 @@
         (else (raise-compilation-error "Not an identifier" (car exps)))))
 
 (define (definition? exp)
-  (cond
-    ((not (pattern-match? `(define ,??*) exp)) #f)
-    ((variable-definition? exp))
-    ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
-     (check-all-identifiers (cadr exp)))
-    ((raise-error-on-match
-      '(define) exp "Variable and value missing from definition" exp))
-    ((raise-error-on-match
-      `(define (,?? ,??*)) exp "Empty body in procedure definition" exp))
-    ((raise-error-on-match
-      `(define ,??) exp "Variable or value missing from definition" exp))
-    ((raise-error-on-match
-      `(define ,variable? ,?? ,?? ,??*) exp "Too many operands to variable definition" exp))
-    ((raise-error-on-match
-      `(define () ,??*) exp "Variable missing from procedure definition" exp))
-    ((raise-error-on-match
-      `(define ,?? ,??) exp "Not an identifier" (cadr exp)))
-    ((raise-error-on-match
-      `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp))
-    (else (error "Internal compiler error: unexhaustive definition syntax check" exp))))
+  (cond ((not (pattern-match? `(define ,??*) exp)) #f)
+        ((variable-definition? exp))
+        ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
+         (check-all-identifiers (cadr exp)))
+        ((raise-error-on-match
+          '(define) exp "Variable and value missing from definition" exp))
+        ((raise-error-on-match
+          `(define (,?? ,??*)) exp "Empty body in procedure definition" exp))
+        ((raise-error-on-match
+          `(define ,??) exp "Variable or value missing from definition" exp))
+        ((raise-error-on-match
+          `(define ,variable? ,?? ,?? ,??*) exp "Too many operands to variable definition" exp))
+        ((raise-error-on-match
+          `(define () ,??*) exp "Variable missing from procedure definition" exp))
+        ((raise-error-on-match
+          `(define ,?? ,??) exp "Not an identifier" (cadr exp)))
+        ((raise-error-on-match
+          `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp))
+        (else (error "Internal compiler error: unexhaustive definition syntax check" exp))))
 
 (define (definition-variable exp)
   (if (variable-definition? exp)
@@ -132,11 +130,9 @@
           `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp))
         (else (error "Internal compiler error: unexhaustive if expression syntax check" exp))))
 
-(define (if-predicate exp) (cadr exp))
-
+(define (if-test exp) (cadr exp))
 (define (if-consequent exp) (caddr exp))
-
-(define (if-alternative exp)
+(define (if-alternate exp)
   (if (pattern-match? `(if ,?? ,?? ,??) exp)
       (cadddr exp)
       #f))
@@ -150,7 +146,6 @@
         (else (error "Internal compiler error: unexhaustive sequence syntax check" exp))))
 
 (define (begin-actions exp) (cdr exp))
-
 (define (last-exp? seq) (null? (cdr seq)))
 (define (first-exp seq) (car seq))
 (define (rest-exps seq) (cdr seq))
@@ -165,9 +160,5 @@
 
 (define (operator exp) (car exp))
 (define (operands exp) (cdr exp))
-
-(define (no-operands? ops) (null? ops))
-(define (first-operand ops) (car ops))
-(define (rest-operands ops) (cdr ops))
 
 )

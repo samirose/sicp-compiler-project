@@ -170,15 +170,15 @@
 ;;;conditional expressions
 
 (define (compile-if exp program lexical-env compile)
-  (let* ((p-prog (compile (if-predicate exp) program lexical-env))
-         (c-prog (compile (if-consequent exp) p-prog lexical-env))
+  (let* ((t-prog (compile (if-test exp) program lexical-env))
+         (c-prog (compile (if-consequent exp) t-prog lexical-env))
          (a-prog
-          (if (if-alternative exp)
-              (compile (if-alternative exp) c-prog lexical-env)
+          (if (if-alternate exp)
+              (compile (if-alternate exp) c-prog lexical-env)
               (compiled-program-with-value-code c-prog unspecified-value))))
     (compiled-program-with-value-code
      a-prog
-     `(,@(compiled-program-value-code p-prog)
+     `(,@(compiled-program-value-code t-prog)
        if (result i32)
        ,@(compiled-program-value-code c-prog)
        else

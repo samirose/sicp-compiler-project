@@ -79,40 +79,117 @@
  "Assignment with too many operands raises an error")
 
 ;; definition
-(assert-equal
- #t
- (definition? '(define x 42))
- "Variable definition with variable and simple value is valid")
+(let ((exp '(define x 42)))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Variable definition with variable and simple value is valid")
 
-(assert-equal
- #t
- (definition? '(define x (+ 1 2)))
- "Variable definition with variable and combination value is valid")
+  (assert-equal
+   'x
+   (definition-variable exp)
+   "definition-variable returns the variable of variable definition")
 
-(assert-equal
- #t
- (definition? '(define (zero) 0))
- "Procedure definition with zero arguments and simple body is valid")
+  (assert-equal
+   42
+   (definition-value exp)
+   "definition-value returns the value of variable definition"))
 
-(assert-equal
- #t
- (definition? '(define (one) (+ 0 1)))
- "Procedure definition with zero arguments and combination body is valid")
+(let ((exp '(define x (+ 1 2))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Variable definition with variable and combination value is valid")
 
-(assert-equal
- #t
- (definition? '(define (one) (display "one:") (+ 0 1)))
- "Procedure definition with multi-expression body is valid")
+  (assert-equal
+   'x
+   (definition-variable exp)
+   "definition-variable returns the variable of variable definition")
 
-(assert-equal
- #t
- (definition? '(define (square x) (* x x)))
- "Procedure definition with single parameter and body is valid")
+  (assert-equal
+   '(+ 1 2)
+   (definition-value exp)
+   "definition-value returns the value of variable definition"))
 
-(assert-equal
- #t
- (definition? '(define (sum-of-squares x y) (+ (* x x) (* y y))))
- "Procedure definition with multiple parameters and body is valid")
+(let ((exp '(define (zero) 0)))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with zero parameters and simple body is valid")
+
+  (assert-equal
+   'zero
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda () 0)
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
+
+(let ((exp '(define (one) (+ 0 1))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with zero parameters and combination body is valid")
+
+  (assert-equal
+   'one
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda () (+ 0 1))
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
+
+(let ((exp '(define (one) (display "one:") (+ 0 1))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with multi-expression body is valid")
+
+  (assert-equal
+   'one
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda () (display "one:") (+ 0 1))
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
+
+(let ((exp '(define (square x) (* x x))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with single parameter and body is valid")
+
+  (assert-equal
+   'square
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda (x) (* x x))
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
+
+(let ((exp '(define (sum-of-squares x y) (+ (* x x) (* y y)))))
+  (assert-equal
+   #t
+   (definition? exp)
+   "Procedure definition with multiple parameters and body is valid")
+
+  (assert-equal
+   'sum-of-squares
+   (definition-variable exp)
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '(lambda (x y) (+ (* x x) (* y y)))
+   (definition-value exp)
+   "definition-value returns a lambda of procedure definition body"))
 
 (assert-raises-compilation-error
  (lambda () (definition? '(define)))
@@ -170,35 +247,101 @@
  "Definition's first operand should be an identifier or an identifier list")
 
 ;; lambda expression
-(assert-equal
- #t
- (lambda? '(lambda () 42))
- "Lambda expression with empty arguments list and single-expression body is valid")
+(let ((exp '(lambda () 42)))
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with empty arguments list and single-expression body is valid")
 
-(assert-equal
- #t
- (lambda? '(lambda () (+ 1 2)))
- "Lambda expression with empty arguments list and combination body is valid")
+  (assert-equal
+   '()
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
 
-(assert-equal
- #t
- (lambda? '(lambda () 1 2))
- "Lambda expression with empty arguments list and multi-expression body is valid")
+  (assert-equal
+   '(42)
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
 
-(assert-equal
- #t
- (lambda? '(lambda (x) x))
-  "Lambda expression with one argument and single-expression body is valid")
+(let ((exp '(lambda () (+ 1 2))))
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with empty arguments list and combination body is valid")
 
-(assert-equal
- #t
- (lambda? '(lambda (x) (+ x 1)))
-  "Lambda expression with one argument and combination body is valid")
+  (assert-equal
+   '()
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
 
-(assert-equal
- #t
- (lambda? '(lambda (a b) (set! a (+ a 1) (+ a b))))
-  "Lambda expression with one argument and multi-expression body is valid")
+  (assert-equal
+   '((+ 1 2))
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
+
+(let ((exp '(lambda () 1 2)))
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with empty arguments list and multi-expression body is valid")
+
+  (assert-equal
+   '()
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
+
+  (assert-equal
+   '(1 2)
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
+
+(let ((exp '(lambda (x) x)) )
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with one argument and single-expression body is valid")
+
+  (assert-equal
+   '(x)
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
+
+  (assert-equal
+   '(x)
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
+
+(let ((exp '(lambda (x) (+ x 1))))
+  (assert-equal
+   #t
+   (lambda? exp)
+   "Lambda expression with one argument and combination body is valid")
+
+  (assert-equal
+   '(x)
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
+
+  (assert-equal
+   '((+ x 1))
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
+
+(let ((exp '(lambda (a b) (set! a (+ a 1)) (+ a b))))
+  (assert-equal
+   #t
+   (lambda? '(lambda (a b) (set! a (+ a 1)) (+ a b)))
+   "Lambda expression with one argument and multi-expression body is valid")
+
+  (assert-equal
+   '(a b)
+   (lambda-formals exp)
+   "lambda-formals returns lambda expression's formal parameter list")
+
+  (assert-equal
+   '((set! a (+ a 1)) (+ a b))
+   (lambda-body exp)
+   "lambda-body returns lambda expression's body"))
 
 (assert-raises-compilation-error
  (lambda () (lambda? '(lambda ())))
@@ -226,25 +369,89 @@
  "Lambda arguments must be identifiers")
 
 ;; if expression
-(assert-equal
- #t
- (if? '(if 1 #t))
- "If with simple test and consequent is valid")
+(let ((exp '(if 1 #t)))
+  (assert-equal
+   #t
+   (if? exp)
+   "If with simple test and consequent is valid")
 
-(assert-equal
- #t
- (if? '(if 1 #t #f))
- "If with simple test, consequent and alternative is valid")
+  (assert-equal
+   1
+   (if-test exp)
+   "if-test returns if expression's test expression")
 
-(assert-equal
- #t
- (if? '(if (< x 0) (set! x (+ x 1))))
- "If with composite test and consequent is valid")
+  (assert-equal
+   #t
+   (if-consequent exp)
+   "if-consequent returns if expression's consequent expression")
 
-(assert-equal
- #t
- (if? '(if (< x 0) (begin (set! y x) (+ x 1)) (- x 1)))
- "If with composite test, consequent and alternative is valid")
+  (assert-equal
+   #f
+   (if-alternate exp)
+   "if-alternate returns if expression's alternate expression or false"))
+
+(let ((exp '(if 1 #t #f)))
+  (assert-equal
+   #t
+   (if? exp)
+   "If with simple test, consequent and alternate is valid")
+
+  (assert-equal
+   1
+   (if-test exp)
+   "if-test returns if expression's test expression")
+
+  (assert-equal
+   #t
+   (if-consequent exp)
+   "if-consequent returns if expression's consequent expression")
+
+  (assert-equal
+   #f
+   (if-alternate exp)
+   "if-alternate returns if expression's alternate expression or false"))
+
+(let ((exp '(if (< x 0) (set! x (+ x 1)))))
+  (assert-equal
+   #t
+   (if? exp)
+   "If with composite test and consequent is valid")
+
+  (assert-equal
+   '(< x 0)
+   (if-test exp)
+   "if-test returns if expression's test expression")
+
+  (assert-equal
+   '(set! x (+ x 1))
+   (if-consequent exp)
+   "if-consequent returns if expression's consequent expression")
+
+  (assert-equal
+   #f
+   (if-alternate exp)
+   "if-alternate returns if expression's alternate expression or false"))
+
+(let ((exp '(if (< x 0) (begin (set! y x) (+ x 1)) (- x 1))))
+  (assert-equal
+   #t
+   (if? exp)
+   "If with composite test, consequent and alternative is valid")
+
+  (assert-equal
+   '(< x 0)
+   (if-test exp)
+   "if-test returns if expression's test expression")
+
+  (assert-equal
+   '(begin (set! y x) (+ x 1))
+   (if-consequent exp)
+   "if-consequent returns if expression's consequent expression")
+
+  (assert-equal
+   '(- x 1)
+   (if-alternate exp)
+   "if-alternate returns if expression's alternate expression or false"))
 
 (assert-raises-compilation-error
  (lambda () (if? '(if)))
@@ -267,15 +474,86 @@
  "If expression must not contain more subexpressions than test, consequent and alternative")
 
 ;; sequence
-(assert-equal
- #t
- (begin? '(begin 42))
- "Sequence with one simple expression is valid")
+(let ((exp '(begin 42)))
+  (assert-equal
+   #t
+   (begin? exp)
+   "Sequence with one simple expression is valid")
 
-(assert-equal
- #t
- (begin? '(begin (+ 1 2) 4 5))
- "Sequence with multiple expressions is valid")
+  (let ((seq (begin-actions exp)))
+    (assert-equal
+     '(42)
+     seq
+     "begin-actions returns begin form's expression sequence")
+
+    (assert-equal
+     42
+     (first-exp seq)
+     "first-exp returns begin form sequence's first expression")
+
+    (assert-equal
+     '()
+     (rest-exps seq)
+     "rest-exps returns begin form sequence's expressions after the first")
+
+    (assert-equal
+     #t
+     (last-exp? seq)
+     "last-exp? returns true for begin form sequence's last expression")))
+
+(let ((exp '(begin (+ 1 2) 4 5)))
+  (assert-equal
+   #t
+   (begin? exp)
+   "Sequence with multiple expressions is valid")
+
+  (let ((seq (begin-actions exp)))
+    (assert-equal
+     '(+ 1 2)
+     (first-exp seq)
+     "first-exp returns begin form sequence's first expression")
+
+    (assert-equal
+     '(4 5)
+     (rest-exps seq)
+     "rest-exps returns begin form sequence's expressions after the first")
+
+    (assert-equal
+     #f
+     (last-exp? seq)
+     "last-exp? returns true for begin form sequence's last expression")
+
+    (let ((seq (rest-exps seq)))
+      (assert-equal
+       4
+       (first-exp seq)
+       "first-exp returns begin form sequence's first expression")
+
+      (assert-equal
+       '(5)
+       (rest-exps seq)
+       "rest-exps returns begin form sequence's expressions after the first")
+
+      (assert-equal
+       #f
+       (last-exp? seq)
+       "last-exp? returns true for begin form sequence's last expression")
+
+      (let ((seq (rest-exps seq)))
+        (assert-equal
+         5
+         (first-exp seq)
+         "first-exp returns begin form sequence's first expression")
+
+        (assert-equal
+         '()
+         (rest-exps seq)
+         "rest-exps returns begin form sequence's expressions after the first")
+
+        (assert-equal
+         #t
+         (last-exp? seq)
+         "last-exp? returns true for begin form sequence's last expression")))))
 
 (assert-raises-compilation-error
  (lambda () (begin? '(begin)))
@@ -283,25 +561,69 @@
  "Sequence without expressions is invalid")
 
 ;; application
-(assert-equal
- #t
- (application? '(proc))
- "Procedure application without parameters is valid")
+(let ((exp '(proc)))
+  (assert-equal
+   #t
+   (application? exp)
+   "Procedure application without parameters is valid")
 
-(assert-equal
- #t
- (application? '(proc 1))
- "Procedure application with one simple parameter is valid")
+  (assert-equal
+   'proc
+   (operator exp)
+   "operator returns procedure application's operator")
 
-(assert-equal
- #t
- (application? '(proc (+ x 1)))
- "Procedure application with one combination parameter is valid")
+  (assert-equal
+   '()
+   (operands exp)
+   "operands returns procedure application's operands"))
 
-(assert-equal
- #t
- (application? '(proc 1 (+ x 1) 3))
- "Procedure application with multiple parameters is valid")
+(let ((exp '(proc 1)))
+  (assert-equal
+   #t
+   (application? exp)
+   "Procedure application with one simple parameter is valid")
+
+  (assert-equal
+   'proc
+   (operator exp)
+   "operator returns procedure application's operator")
+
+  (assert-equal
+   '(1)
+   (operands exp)
+   "operands returns procedure application's operands"))
+
+(let ((exp '(proc (+ x 1))))
+  (assert-equal
+   #t
+   (application? exp)
+   "Procedure application with one combination parameter is valid")
+
+  (assert-equal
+   'proc
+   (operator exp)
+   "operator returns procedure application's operator")
+
+  (assert-equal
+   '((+ x 1))
+   (operands exp)
+   "operands returns procedure application's operands"))
+
+(let ((exp '(m-proc 1 (+ x 1) 3)))
+  (assert-equal
+   #t
+   (application? exp)
+   "Procedure application with multiple parameters is valid")
+
+  (assert-equal
+   'm-proc
+   (operator exp)
+   "operator returns procedure application's operator")
+
+  (assert-equal
+   '(1 (+ x 1) 3)
+   (operands exp)
+   "operands returns procedure application's operands"))
 
 (assert-raises-compilation-error
  (lambda () (application? '()))

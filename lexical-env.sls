@@ -83,22 +83,23 @@
                   (vars (frame-variables (car lexical-env)))
                   (frame-index 0)
                   (var-index (frame-index-offset (car lexical-env))))
-         (if (null? vars)
-             (if (null? (cdr env))
-                 #f
-                 (let* ((curr-frame (car env))
-                        (next-env (cdr env))
-                        (next-frame (car next-env))
-                        (frame-index-incr (if (lexical-frame? curr-frame) 1 0)))
-                   (scan next-env
-                         (frame-variables next-frame)
-                         (+ frame-index frame-index-incr)
-                         (frame-index-offset next-frame))))
-             (if (eq? (car vars) var)
-                 (make-lexical-address
-                  frame-index
-                  var-index
-                  env
-                  (frame-get-additional-info var (car env)))
-                 (scan env (cdr vars) frame-index (+ var-index 1)))))))
+         (cond ((null? vars)
+                (let ((next-env (cdr env)))
+                  (if (null? next-env)
+                      #f
+                      (let* ((curr-frame (car env))
+                             (next-frame (car next-env))
+                             (frame-index-incr (if (lexical-frame? curr-frame) 1 0)))
+                        (scan next-env
+                              (frame-variables next-frame)
+                              (+ frame-index frame-index-incr)
+                              (frame-index-offset next-frame))))))
+               ((eq? (car vars) var)
+                (make-lexical-address
+                 frame-index
+                 var-index
+                 env
+                 (frame-get-additional-info var (car env))))
+               (else
+                (scan env (cdr vars) frame-index (+ var-index 1)))))))
  )

@@ -71,8 +71,8 @@
          (get-instr
           (cond ((not lexical-address)
                  (raise-compilation-error "Lexically unbound variable" exp))
-                ((global-address? lexical-address) 'get_global)
-                ((= (frame-index lexical-address) 0) 'get_local)
+                ((global-address? lexical-address) 'global.get)
+                ((= (frame-index lexical-address) 0) 'local.get)
                 (else
                  (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp)))))
     (compiled-program-with-value-code
@@ -88,8 +88,8 @@
           (cond
             ((not lexical-address)
              (raise-compilation-error "Lexically unbound variable" exp))
-            ((global-address? lexical-address) 'set_global)
-            ((= (frame-index lexical-address) 0) 'set_local)
+            ((global-address? lexical-address) 'global.set)
+            ((= (frame-index lexical-address) 0) 'local.set)
             (else
              (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp)))))
     (compiled-program-append-value-code
@@ -125,7 +125,7 @@
         (if const-value?
             '()
             `((global-init
-               (,@value-code set_global ,global-index)))))
+               (,@value-code global.set ,global-index)))))
        (definitions
          (cons global-definition global-init)))
     (compiled-program-with-definitions-and-value-code

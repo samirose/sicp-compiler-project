@@ -105,6 +105,11 @@
       (let* ((prev-frame-size 2)
              (env (add-new-local-frame env '(y a) '())))
         (assert-equal
+         prev-frame-size
+         (env-var-index-offset env)
+         "env-var-index-offset with local frame added returns the length of the previous frame")
+
+        (assert-equal
          `(0 ,prev-frame-size)
          (let ((address (find-variable 'y env)))
            (list (frame-index address) (var-index address)))
@@ -124,6 +129,11 @@
 
         (let ((prev-frames-size 4)
               (env (add-new-local-frame env '(z) '())))
+          (assert-equal
+           prev-frames-size
+           (env-var-index-offset env)
+           "env-var-index-offset with local frame added returns the length of the previous local frame and its preceeding frame")
+
           (assert-equal
            `(0 ,prev-frames-size)
            (let ((address (find-variable 'z env)))

@@ -11,7 +11,8 @@
          (compiled-program)
          (compilation-error)
          (wasm-syntax)
-         (wasm-module-definitions))
+         (wasm-module-definitions)
+         (pattern-match))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
@@ -32,6 +33,8 @@
          (compile-if exp program lexical-env compile))
         ((lambda? exp)
          (compile-lambda exp program lexical-env '() compile))
+        ((let? exp)
+         (compile-let exp program lexical-env compile))
         ((begin? exp)
          (compile-sequence (begin-actions exp) program lexical-env compile))
         ((open-coded-primitive-application? exp)
@@ -276,6 +279,53 @@
     (compiled-program-with-value-code
      elem-program
      `(i32.const ,elem-index))))
+
+;;;let expression
+(define (define-locals n)
+  (cons
+   (cons 'local (make-list 'i32 n))
+   '()))
+
+(define (compile-compute-and-assign exps program lexical-env compile assign-code)
+  (let loop ((es exps)
+             (n 0)
+             (p program))
+    (if (null? es)
+        p
+        (loop (cdr es)
+              (+ n 1)
+              (compiled-program-append-value-codes
+               p
+               (compiled-program-append-value-code
+                (compile (car es) p lexical-env)
+                (assign-code n)))))))
+
+(define (compile-let exp program lexical-env compile)
+  (let*
+      ((bindings (let-bindings exp))
+       (variables (map binding-variable bindings))
+       (values (map binding-value bindings))
+       (body (let-body exp))
+       (local-defs-program
+        (compiled-program-append-value-code
+         program
+         (define-locals (length variables))))
+        (body-env
+         (add-new-local-frame lexical-env variables '()))
+       (var-index-offset (env-var-index-offset body-env))
+       (compute-and-assign-values-program
+        (compile-compute-and-assign
+         values
+         local-defs-program
+         lexical-env
+         compile
+         (lambda (n)
+           `(local.set ,(+ var-index-offset n)))))
+        (body-program
+         (compile-sequence body compute-and-assign-values-program body-env compile)))
+    (compiled-program-append-value-codes
+     compute-and-assign-values-program
+     body-program)))
 
 ;;;combinations
 

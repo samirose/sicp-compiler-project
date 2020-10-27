@@ -4,7 +4,7 @@
  (export make-empty-lexical-env global-lexical-env?
          add-new-lexical-frame add-new-local-frame
          find-variable frame-index var-index additional-info global-address?
-         env-get-additional-info)
+         env-get-additional-info env-var-index-offset)
  (import (rnrs base)
          (rnrs lists))
 
@@ -37,6 +37,11 @@
    (if (lexical-frame? frame)
        0
        (local-frame-index-offset frame)))
+
+ (define (env-var-index-offset lexical-env)
+   (if (null? lexical-env)
+       0
+       (frame-index-offset (car lexical-env))))
 
  (define (frame-variables frame)
    (cadr frame))
@@ -82,7 +87,7 @@
        (let scan ((env lexical-env)
                   (vars (frame-variables (car lexical-env)))
                   (frame-index 0)
-                  (var-index (frame-index-offset (car lexical-env))))
+                  (var-index (env-var-index-offset lexical-env)))
          (cond ((null? vars)
                 (let ((next-env (cdr env)))
                   (if (null? next-env)

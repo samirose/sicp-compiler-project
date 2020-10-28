@@ -1,13 +1,18 @@
 #!r6rs
 (library
  (lists)
- (export reject index-of-equal first-duplicate make-list flatten-n
+ (export partition-list index-of-equal first-duplicate make-list flatten-n
          make-counted-set counted-set-add counted-set-count counted-set-unique-keys)
  (import (rnrs base)
          (rnrs lists))
 
- (define (reject predicate sequence)
-   (filter (lambda (elem) (not (predicate elem))) sequence))
+ (define (partition-list p l)
+   (let collect ((l l)
+                 (lt '())
+                 (lf '()))
+     (cond ((null? l) (cons (reverse lt) (reverse lf)))
+           ((p (car l)) (collect (cdr l) (cons (car l) lt) lf))
+           (else (collect (cdr l) lt  (cons (car l) lf))))))
 
  (define (index-of-equal l e)
    (let search ((l l) (i 0))
@@ -49,7 +54,7 @@
                      (+ (cdr existing) 1)
                      1))
           (new-head (cons key count))
-          (rest (reject (lambda (entry) (eq? key (car entry))) s)))
+          (rest (filter (lambda (entry) (not (eq? key (car entry)))) s)))
      (cons new-head rest)))
 
  (define (counted-set-count s key)

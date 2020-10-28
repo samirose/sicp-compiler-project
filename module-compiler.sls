@@ -43,10 +43,12 @@
            (if (null? actions)
                (raise-compilation-error "Empty begin declaration in library" library)
                actions)))
+        (definitions-and-non-definitions
+          (partition-list definition? exp-sequence))
         (definitions
-          (filter definition? exp-sequence))
+          (car definitions-and-non-definitions))
         (non-definitions
-          (reject definition? exp-sequence))
+          (cdr definitions-and-non-definitions))
         (definition-names
           (map definition-variable definitions))
         (exports

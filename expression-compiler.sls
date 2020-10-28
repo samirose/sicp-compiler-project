@@ -307,7 +307,7 @@
        (values (map binding-value bindings))
        (body (let-body exp))
        (local-defs-program
-        (compiled-program-append-value-code
+        (compiled-program-with-value-code
          program
          (define-locals (length variables))))
         (body-env

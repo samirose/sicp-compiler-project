@@ -19,7 +19,7 @@
 
  (define (make-local-frame lexical-env variables additional-info-map)
    (let ((index-offset
-          (if (null? lexical-env)
+          (if (or (null? lexical-env) (global-lexical-env? lexical-env))
               0
               (let* ((curr-frame (car lexical-env))
                      (curr-frame-length (length (frame-variables curr-frame)))

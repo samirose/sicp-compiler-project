@@ -11,6 +11,17 @@
    "Empty lexical env is not the global lexical env")
 
   (assert-equal
+   0
+   (env-var-index-offset env)
+   "env-var-index-offset of the empty lexical env is zero")
+
+  (let ((local-env (add-new-local-frame env '(a b) '())))
+    (assert-equal
+     0
+     (env-var-index-offset local-env)
+     "env-var-index-offset of a local env following empty lexical env is zero"))
+
+  (assert-equal
    #f
    (find-variable 'x env)
    "A variable is not found from an empty lexical env")
@@ -62,6 +73,12 @@
      #f
      (find-variable 'x env)
      "Variable not defined in the only frame is not found")
+
+    (let ((local-env (add-new-local-frame env '(a b) '())))
+      (assert-equal
+       0
+       (env-var-index-offset local-env)
+       "env-var-index-offset of a local env following the global lexical env is zero"))
 
     (let ((env (add-new-lexical-frame env '(x a) '())))
       (assert-equal

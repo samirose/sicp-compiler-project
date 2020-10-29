@@ -22,10 +22,11 @@
  (define wasm-const-instructions
    '(i32.const f32.const))
 
- (define (wasm-const-value? exp)
-   (and (list? exp)
-        (= (length exp) 2)
-        (memq (car exp) wasm-const-instructions)))
+ (define (wasm-const-instruction? instr)
+   (memq instr wasm-const-instructions))
+
+ (define (wasm-const-value? instr)
+   (pattern-match? '(,wasm-const-instruction? ,??) instr))
 
  (define (wasm-define-locals type n)
    (cons 'local (make-list type n)))

@@ -5,3 +5,4 @@
 (assert_return (invoke "lambda-as-let-value") (i32.const 12))
 (assert_return (invoke "let-value-referring-lambda-arg") (i32.const 18))
 (assert_return (invoke "let-value-shadowing-lambda-arg") (i32.const 36))
+(assert_return (invoke "main") (i32.const 9))

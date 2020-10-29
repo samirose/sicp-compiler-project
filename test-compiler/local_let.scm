@@ -53,5 +53,8 @@
             (double (lambda (x) (+ x x))))
         (double prod)))
 
+    (let ((a 2) (b 3))
+      (let ((c 4))
+        (+ a b c)))
     )
   )

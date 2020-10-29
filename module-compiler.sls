@@ -64,7 +64,7 @@
                  lexical-env compile))))
      (if (null? non-definitions)
          definitions-program
-         (compile-sequence
+         (compile-procedure-body
           non-definitions
           definitions-program
           lexical-env compile))))

@@ -2,7 +2,8 @@
 (library
  (expression-compiler)
  (export compile
-         compile-sequence)
+         compile-sequence
+         compile-procedure-body)
  (import (rnrs base)
          (rnrs lists)
          (lists)

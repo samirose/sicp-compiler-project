@@ -20,6 +20,16 @@
       (let ((a 2) (b 3))
         (* a b)))
 
+    (define (nested-let)
+      (let ((a 2))
+        (let ((b 3))
+          (* a b))))
+
+    (define (let-shadowing-let)
+      (let ((a 2) (b 3))
+        (let ((b 5))
+          (* a b))))
+
     (define (let-in-lambda)
       ((lambda (x)
          (let ((a 2))

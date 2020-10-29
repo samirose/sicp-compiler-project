@@ -18,6 +18,7 @@
    (lambda () (compile exp (make-empty-compiled-program) empty-global-env))
    expected-message expected-object description))
 
+;; self-evaluating expressions
 (assert-expression-raises-compilation-error
  "a string"
  "Unsupported value" "a string"
@@ -28,11 +29,13 @@
  "Unsupported value" 3.14
  "Floating-point values are not yet supported")
 
+;; quote
 (assert-expression-raises-compilation-error
  '(quote x)
  "Quote not supported yet" '(quote x)
  "Quoted values are not yet supported")
 
+;; lambda expression
 (assert-expression-raises-compilation-error
  '(lambda (x) (+ y x))
  "Lexically unbound variable" 'y
@@ -59,12 +62,13 @@
  "Assigning to variables out of current lexical or global scope is not yet supported")
 
 (assert-expression-raises-compilation-error
+ '(lambda (x x) (+ x x))
+ "Duplicate parameter in lambda" '(lambda (x x) (+ x x))
+ "Lambda parameters should not be duplicated")
+
+;; definitions
+(assert-expression-raises-compilation-error
  '(define x 42)
  "Internal compiler error: global binding missing from global lexical env"
  (list 'x empty-global-env)
  "Module compilation stage should set up bindings in global lexical environment")
-
-(assert-expression-raises-compilation-error
- '(lambda (x x) (+ x x))
- "Duplicate parameter in lambda" '(lambda (x x) (+ x x))
- "Lambda parameters should not be duplicated")

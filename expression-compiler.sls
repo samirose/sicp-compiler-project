@@ -309,7 +309,7 @@
        (local-defs-program
         (compiled-program-with-value-code
          program
-         (list (wasm-define-locals (length variables)))))
+         (list (wasm-define-locals 'i32 (length variables)))))
         (body-env
          (add-new-local-frame lexical-env variables '()))
        (var-index-offset (env-var-index-offset body-env))

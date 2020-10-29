@@ -226,12 +226,23 @@
         (add-new-lexical-frame lambda-lexical-env formals '())
         (raise-compilation-error "Duplicate parameter in lambda" lambda-exp))))
 
+(define (compile-procedure-body seq program lexical-env compile)
+  (let*
+      ((body-program
+        (compile-sequence seq program lexical-env compile))
+       (body-code
+        (let* ((code (compiled-program-value-code body-program))
+               (split-code (partition-list wasm-locals-definition? code)))
+          ; Move any locals definition to the top of the function
+          (append (car split-code) (cdr split-code)))))
+    (compiled-program-with-value-code body-program body-code)))
+
 (define (compile-lambda exp program lexical-env current-binding compile)
   (let*
       ((formals (lambda-formals exp))
        ; Compile the lambda procedure body
        (body-program
-        (compile-sequence
+        (compile-procedure-body
          (lambda-body exp)
          program
          (lambda-body-env exp lexical-env formals)
@@ -244,15 +255,10 @@
             (compiled-program-add-definition body-program func-type)))
        (type-index
         (compiled-program-definition-index type-program func-type))
-       (body-code
-        (let* ((code (compiled-program-value-code body-program))
-               (split-code (partition-list wasm-locals-definition? code)))
-          ; Move any locals defintion to the top of the function
-          (append (car split-code) (cdr split-code))))
        ; Add function to the module and look up its index
        (func-definition
         `(func (type ,type-index)
-               ,@body-code))
+               ,@(compiled-program-value-code body-program)))
        (func-program
         (if (compiled-program-contains-definition type-program func-definition)
             type-program

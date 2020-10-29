@@ -3,9 +3,12 @@
  (wasm-syntax)
  (export wasm-definition-type wasm-definition-type?
          wasm-elem-definition-func-index
-         wasm-const-value?)
+         wasm-const-value?
+         wasm-define-locals wasm-locals-definition?)
  (import (rnrs base)
-         (rnrs lists))
+         (rnrs lists)
+         (lists)
+         (pattern-match))
 
  (define (wasm-definition-type wasm-definition)
    (car wasm-definition))
@@ -23,5 +26,11 @@
    (and (list? exp)
         (= (length exp) 2)
         (memq (car exp) wasm-const-instructions)))
+
+ (define (wasm-define-locals n)
+   (cons 'local (make-list 'i32 n)))
+
+ (define (wasm-locals-definition? exp)
+   (pattern-match? `(local ,?? ,??*) exp))
 
  )

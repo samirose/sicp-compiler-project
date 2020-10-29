@@ -244,10 +244,15 @@
             (compiled-program-add-definition body-program func-type)))
        (type-index
         (compiled-program-definition-index type-program func-type))
+       (body-code
+        (let* ((code (compiled-program-value-code body-program))
+               (split-code (partition-list wasm-locals-definition? code)))
+          ; Move any locals defintion to the top of the function
+          (append (car split-code) (cdr split-code))))
        ; Add function to the module and look up its index
        (func-definition
         `(func (type ,type-index)
-               ,@(compiled-program-value-code body-program)))
+               ,@body-code))
        (func-program
         (if (compiled-program-contains-definition type-program func-definition)
             type-program
@@ -281,11 +286,6 @@
      `(i32.const ,elem-index))))
 
 ;;;let expression
-(define (define-locals n)
-  (cons
-   (cons 'local (make-list 'i32 n))
-   '()))
-
 (define (compile-compute-and-assign exps program lexical-env compile assign-code)
   (let loop ((es exps)
              (n 0)
@@ -309,7 +309,7 @@
        (local-defs-program
         (compiled-program-with-value-code
          program
-         (define-locals (length variables))))
+         (list (wasm-define-locals (length variables)))))
         (body-env
          (add-new-local-frame lexical-env variables '()))
        (var-index-offset (env-var-index-offset body-env))

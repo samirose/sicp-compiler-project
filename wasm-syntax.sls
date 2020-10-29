@@ -27,8 +27,8 @@
         (= (length exp) 2)
         (memq (car exp) wasm-const-instructions)))
 
- (define (wasm-define-locals n)
-   (cons 'local (make-list 'i32 n)))
+ (define (wasm-define-locals type n)
+   (cons 'local (make-list type n)))
 
  (define (wasm-locals-definition? exp)
    (pattern-match? `(local ,?? ,??*) exp))

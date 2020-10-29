@@ -72,3 +72,9 @@
  "Internal compiler error: global binding missing from global lexical env"
  (list 'x empty-global-env)
  "Module compilation stage should set up bindings in global lexical environment")
+
+;; let expression
+(assert-expression-raises-compilation-error
+ '(let ((a 1) (b 2) (a 3) (c 4)) (+ a b c))
+ "Duplicate variable in let expression" '(let ((a 1) (b 2) (a 3) (c 4)) (+ a b c))
+ "Let bindings should not define the same variable multiple times")

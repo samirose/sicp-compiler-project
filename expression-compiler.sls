@@ -310,7 +310,12 @@
 (define (compile-let exp program lexical-env compile)
   (let*
       ((bindings (let-bindings exp))
-       (variables (map binding-variable bindings))
+       (variables
+        (let* ((vars (map binding-variable bindings))
+               (duplicate-var (first-duplicate vars)))
+          (if (null? duplicate-var)
+              vars
+              (raise-compilation-error "Duplicate variable in let expression" exp))))
        (values (map binding-value bindings))
        (body (let-body exp))
        (local-defs-program

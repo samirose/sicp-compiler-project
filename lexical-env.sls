@@ -15,33 +15,28 @@
         (null? (cdr lexical-env))))
 
  (define (make-lexical-frame variables additional-info-map)
-   (list make-lexical-frame variables additional-info-map))
+   (list (cons 1 0) variables additional-info-map))
 
  (define (make-local-frame lexical-env variables additional-info-map)
-   (let ((index-offset
-          (if (or (null? lexical-env) (global-lexical-env? lexical-env))
+   (let ((vars-offset
+          (if (global-lexical-env? lexical-env)
               0
               (let* ((curr-frame (car lexical-env))
                      (curr-frame-length (length (frame-variables curr-frame)))
-                     (curr-frame-index-offset (frame-index-offset curr-frame)))
-                (+ curr-frame-index-offset curr-frame-length)))))
-     (list index-offset variables additional-info-map)))
-
- (define (lexical-frame? frame)
-   (eq? (car frame) make-lexical-frame))
-
- (define (local-frame-index-offset frame)
-   (car frame))
+                     (curr-var-index-offset (var-index-offset curr-frame)))
+                (+ curr-var-index-offset curr-frame-length)))))
+     (list (cons 0 vars-offset) variables additional-info-map)))
 
  (define (frame-index-offset frame)
-   (if (lexical-frame? frame)
-       0
-       (local-frame-index-offset frame)))
+   (caar frame))
+
+ (define (var-index-offset frame)
+   (cdar frame))
 
  (define (env-var-index-offset lexical-env)
    (if (null? lexical-env)
        0
-       (frame-index-offset (car lexical-env))))
+       (var-index-offset (car lexical-env))))
 
  (define (frame-variables frame)
    (cadr frame))
@@ -63,8 +58,10 @@
          lexical-env))
 
  (define (add-new-local-frame lexical-env variables additional-info-map)
-   (cons (make-local-frame lexical-env variables additional-info-map)
-         lexical-env))
+   (if (null? lexical-env)
+       (error "Internal compiler error: cannot add new local frame to an empty environment" variables)
+       (cons (make-local-frame lexical-env variables additional-info-map)
+             lexical-env)))
 
  (define (make-lexical-address frame-index var-index lexical-env additional-info)
    (list frame-index var-index lexical-env additional-info))
@@ -92,13 +89,12 @@
                 (let ((next-env (cdr env)))
                   (if (null? next-env)
                       #f
-                      (let* ((curr-frame (car env))
-                             (next-frame (car next-env))
-                             (frame-index-incr (if (lexical-frame? curr-frame) 1 0)))
+                      (let ((curr-frame (car env))
+                            (next-frame (car next-env)))
                         (scan next-env
                               (frame-variables next-frame)
-                              (+ frame-index frame-index-incr)
-                              (frame-index-offset next-frame))))))
+                              (+ frame-index (frame-index-offset curr-frame))
+                              (var-index-offset next-frame))))))
                ((eq? (car vars) var)
                 (make-lexical-address
                  frame-index

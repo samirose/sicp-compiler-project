@@ -5,6 +5,7 @@
  (export make-empty-wasm-module-definitions
          wasm-module-definitions-count
          wasm-module-add-definition
+         wasm-module-remove-definitions
          wasm-module-contains-definition
          wasm-module-definition-index
          wasm-module-get-definitions)
@@ -35,6 +36,12 @@
    (make-wasm-module-definitions
     (cons def (definitions defs))
     (counted-set-add (definition-counts defs) (car def))))
+
+ (define (wasm-module-remove-definitions defs type)
+   (make-wasm-module-definitions
+    (filter (lambda (def) (not (wasm-definition-type? type def)))
+            (definitions defs))
+    (counted-set-remove-all (definition-counts defs) type)))
 
  (define (wasm-module-contains-definition defs def)
    (if (member def (definitions defs)) #t #f))

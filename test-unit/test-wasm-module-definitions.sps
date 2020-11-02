@@ -143,4 +143,21 @@
          '((func $f (result i32)) (func $g (param i32) (result i32)))
          (wasm-module-get-definitions ds 'func)
          "Module definitions with two funcs and one global added contains the func definitions in addition order")
+
+        (let ((ds (wasm-module-add-definition ds '(local i32 i32))))
+          (let ((ds (wasm-module-add-definition ds '(func $h (result i32)))))
+            (let ((ds (wasm-module-add-definition ds '(local i32))))
+              (assert-equal
+               2
+               (wasm-module-definitions-count ds 'local)
+               "Added local definitions are reflected in definitions count")
+              (let ((ds (wasm-module-remove-definitions ds 'local)))
+                (assert-equal
+                 0
+                 (wasm-module-definitions-count ds 'local)
+                 "remove-definitions removes the specified definitions completely")
+                (assert-equal
+                 '()
+                 (wasm-module-get-definitions ds 'local)
+                 "remove-definitions removes the specified definitions completely")))))
         ))))

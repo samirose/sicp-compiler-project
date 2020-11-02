@@ -128,6 +128,12 @@
 (assert-equal
  0
  (let ((s (make-counted-set)))
+   (counted-set-unique-keys s))
+ "empty set contains 0 unique keys")
+
+(assert-equal
+ 0
+ (let ((s (make-counted-set)))
    (let ((s (counted-set-add s 'x)))
      (counted-set-count s 'y)))
  "counted-set-count results to 0 when the key has not been added")
@@ -170,3 +176,39 @@
      (let ((s (counted-set-add s 'x)))
        (counted-set-unique-keys s))))
  "counted-set-count should have 1 unique key when the same key has been added twice")
+
+ (let ((s (make-counted-set)))
+   (let ((s (counted-set-add s 'x)))
+     (let ((s (counted-set-add s 'y)))
+       (let ((s (counted-set-add s 'x)))
+         (assert-equal
+          2
+          (counted-set-unique-keys s)
+          "counted-set-unique-keys returns the number of unique keys in the set")
+         (let ((s (counted-set-remove-all s 'z)))
+           (assert-equal
+            2
+            (counted-set-unique-keys s)
+            "remove-all of a key not in the set leaves the set intact"))
+         (let ((s (counted-set-remove-all s 'x)))
+           (assert-equal
+            0
+            (counted-set-count s 'x)
+            "remove-all removes all entries of specified key")
+           (assert-equal
+            1
+            (counted-set-count s 'y)
+            "remove-all removes only entries of specified key")
+           (assert-equal
+            1
+            (counted-set-unique-keys s)
+            "counted-set-unique-keys returns the number of unique keys in the set")
+           (let ((s (counted-set-remove-all s 'y)))
+             (assert-equal
+              0
+              (counted-set-count s 'y)
+              "remove-all removes all entries of specified key")
+             (assert-equal
+              0
+              (counted-set-unique-keys s)
+              "counted-set-unique-keys returns the number of unique keys in the set")))))))

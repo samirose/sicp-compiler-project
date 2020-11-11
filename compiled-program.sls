@@ -8,6 +8,7 @@
          compiled-program-append-value-code
          compiled-program-append-value-codes
          compiled-program-add-definition
+         compiled-program-remove-definitions
          compiled-program-contains-definition
          compiled-program-definition-index
          compiled-program-definitions-count
@@ -53,6 +54,13 @@
      (wasm-module-add-definition
       (compiled-program-module-definitions cp)
       definition)
+     (compiled-program-value-code cp)))
+
+  (define (compiled-program-remove-definitions cp type)
+    (make-compiled-program
+     (wasm-module-remove-definitions
+      (compiled-program-module-definitions cp)
+      type)
      (compiled-program-value-code cp)))
 
   (define (compiled-program-contains-definition cp definition)

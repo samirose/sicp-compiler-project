@@ -3,7 +3,7 @@
  (expression-compiler)
  (export compile
          compile-sequence
-         compile-procedure-body)
+         compile-proc-to-func)
  (import (rnrs base)
          (rnrs lists)
          (lists)
@@ -227,27 +227,51 @@
         (add-new-lexical-frame lambda-lexical-env formals '())
         (raise-compilation-error "Duplicate parameter in lambda" lambda-exp))))
 
-(define (compile-procedure-body seq program lexical-env compile)
+(define (compile-proc-to-func formals body program lexical-env exported-name)
   (let*
       ((body-program
-        (compile-sequence seq program lexical-env compile))
-       (body-code
-        (let* ((code (compiled-program-value-code body-program))
-               (split-code (partition-list wasm-locals-definition? code)))
-          ; Move any locals definition to the top of the function
-          (append (car split-code) (cdr split-code)))))
-    (compiled-program-with-value-code body-program body-code)))
+        (compile-sequence
+         (lambda-body exp)
+         program
+         (lambda-body-env exp lexical-env formals)
+         compile))
+       (func-type (scheme-procedure-type-definition (length formals)))
+       (type-program
+        (if (compiled-program-contains-definition body-program func-type)
+            body-program
+            (compiled-program-add-definition body-program func-type)))
+       (type-index
+        (compiled-program-definition-index type-program func-type))
+       (local-definitions
+        (wasm-module-get-definitions
+         (compiled-program-module-definitions body-program)
+         'local))
+       (func-definition
+        `(func (type ,type-index)
+               ,@local-definitions
+               ,@(compiled-program-value-code body-program)))
+       (func-program
+        (compiled-program-add-definition type-program func-definition))
+       (func-index
+        (- (compiled-program-definitions-count func-program) 1)))
+    (if exported-name
+        (compiled-program-add-definition
+         func-program
+         `(export ,exported-name (func ,func-index)))
+        func-program)))
 
 (define (compile-lambda exp program lexical-env current-binding compile)
   (let*
       ((formals (lambda-formals exp))
        ; Compile the lambda procedure body
        (body-program
-        (compile-procedure-body
+        (compile-sequence
          (lambda-body exp)
          program
          (lambda-body-env exp lexical-env formals)
          compile))
+       (locals-count
+        (compiled-program-definitions-count body-program 'local))
        ; Add function type, if needed and look up its index
        (func-type (scheme-procedure-type-definition (length formals)))
        (type-program
@@ -289,7 +313,7 @@
         (compiled-program-definition-index elem-program elem-definition)))
        ; Lambda expression's value is the function's index in the table
     (compiled-program-with-value-code
-     elem-program
+     (compiled-program-remove-definitions elem-program 'local)
      `(i32.const ,elem-index))))
 
 ;;;let expression
@@ -319,9 +343,10 @@
        (values (map binding-value bindings))
        (body (let-body exp))
        (local-defs-program
-        (compiled-program-with-value-code
+        (compiled-program-with-definitions-and-value-code
          program
-         (list (wasm-define-locals 'i32 (length variables)))))
+         (make-list '(local i32) (length variables))
+         '()))
         (body-env
          (add-new-local-frame lexical-env variables '()))
        (var-index-offset (env-var-index-offset body-env))

@@ -36,10 +36,11 @@
  (define (compile-library-to-program library)
    (let*
        ((exp-sequence
-         (let* ((exps
-                 (or (library-declaration 'begin library)
-                     (raise-compilation-error "No begin declaration in library" library)))
-                (actions (begin-actions exps)))
+         (let*
+             ((exps
+               (cond ((library-declaration 'begin library))
+                     (else (raise-compilation-error "No begin declaration in library" library))))
+              (actions (begin-actions exps)))
            (if (null? actions)
                (raise-compilation-error "Empty begin declaration in library" library)
                actions)))

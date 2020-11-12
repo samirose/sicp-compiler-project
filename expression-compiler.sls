@@ -256,7 +256,10 @@
         (func-index
          (compiled-program-definitions-count type-program 'func))
         (func-program
-         (compiled-program-add-definition type-program func-definition)))
+         (compiled-program-with-definition-and-value-code
+          type-program
+          func-definition
+          '())))
      ; Add export definition for the function if exported name is defined
      (if exported-name
          (compiled-program-add-definition

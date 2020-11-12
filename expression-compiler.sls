@@ -3,7 +3,8 @@
  (expression-compiler)
  (export compile
          compile-sequence
-         compile-procedure-body)
+         compile-procedure-body
+         compile-proc-to-func)
  (import (rnrs base)
          (rnrs lists)
          (lists)
@@ -221,12 +222,6 @@
                     (make-list scheme-procedure-param-type arity))))))
     `(type (func ,@param-types (result i32)))))
 
-(define (lambda-body-env lambda-exp lambda-lexical-env formals)
-  (let ((duplicate-param (first-duplicate formals)))
-    (if (null? duplicate-param)
-        (add-new-lexical-frame lambda-lexical-env formals '())
-        (raise-compilation-error "Duplicate parameter in lambda" lambda-exp))))
-
 (define (compile-procedure-body seq program lexical-env compile)
   (let*
       ((body-program
@@ -238,55 +233,63 @@
           (append (car split-code) (cdr split-code)))))
     (compiled-program-with-value-code body-program body-code)))
 
+(define (compile-proc-to-func context-exp formals body program lexical-env exported-name compile)
+   (let*
+       ; Compile the procedure body
+       ((body-env
+         (let ((duplicate-param (first-duplicate formals)))
+           (if (null? duplicate-param)
+               (add-new-lexical-frame lexical-env formals '())
+               (raise-compilation-error "Duplicate parameter in" context-exp))))
+        (body-program
+         (compile-procedure-body body program body-env compile))
+        ; Add function type, if needed, and look up its index
+        (func-type (scheme-procedure-type-definition (length formals)))
+        (type-program
+         (if (compiled-program-contains-definition body-program func-type)
+             body-program
+             (compiled-program-add-definition body-program func-type)))
+        (type-index
+         (compiled-program-definition-index type-program func-type))
+        ; Add function definition and look up its index
+        (func-definition
+         `(func (type ,type-index)
+                ,@(compiled-program-value-code body-program)))
+        (func-index
+         (compiled-program-definitions-count type-program 'func))
+        (func-program
+         (compiled-program-add-definition type-program func-definition)))
+     ; Add export definition for the function if exported name is defined
+     (if exported-name
+         (compiled-program-add-definition
+          func-program
+          `(export ,exported-name (func ,func-index)))
+         func-program)))
+
 (define (compile-lambda exp program lexical-env current-binding compile)
   (let*
       ((formals (lambda-formals exp))
-       ; Compile the lambda procedure body
-       (body-program
-        (compile-procedure-body
+       (exported-name
+        (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
+              (else #f)))
+       (func-program
+        (compile-proc-to-func
+         exp
+         formals
          (lambda-body exp)
          program
-         (lambda-body-env exp lexical-env formals)
+         lexical-env
+         exported-name
          compile))
-       ; Add function type, if needed and look up its index
-       (func-type (scheme-procedure-type-definition (length formals)))
-       (type-program
-        (if (compiled-program-contains-definition body-program func-type)
-            body-program
-            (compiled-program-add-definition body-program func-type)))
-       (type-index
-        (compiled-program-definition-index type-program func-type))
-       ; Add function to the module and look up its index
-       (func-definition
-        `(func (type ,type-index)
-               ,@(compiled-program-value-code body-program)))
-       (func-program
-        (if (compiled-program-contains-definition type-program func-definition)
-            type-program
-            (compiled-program-add-definition type-program func-definition)))
+       ; Add table element for the function for indirect calling
        (func-index
-        (compiled-program-definition-index func-program func-definition))
-       ; Add export definition for the function if there is an active export binding
-       (export-program
-        (let ((exported-name
-               (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
-                     (else #f))))
-          (if exported-name
-              (compiled-program-add-definition
-               func-program
-               `(export ,exported-name (func ,func-index)))
-              func-program)))
-       ; Add table element for the function for indirect calling.
-       ; The module compilation procedure compile-r7rs-library-to-wasm-module will combine the elem
-       ; items to a single item and add a table element of correct size.
+        (- (compiled-program-definitions-count func-program 'func) 1))
        (elem-definition
         `(elem ,func-index))
-       (elem-program
-        (if (compiled-program-contains-definition export-program elem-definition)
-            export-program
-            (compiled-program-add-definition export-program elem-definition)))
        (elem-index
-        (compiled-program-definition-index elem-program elem-definition)))
+        (compiled-program-definitions-count func-program 'elem))
+       (elem-program
+        (compiled-program-add-definition func-program elem-definition)))
        ; Lambda expression's value is the function's index in the table
     (compiled-program-with-value-code
      elem-program

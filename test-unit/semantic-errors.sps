@@ -63,7 +63,7 @@
 
 (assert-expression-raises-compilation-error
  '(lambda (x x) (+ x x))
- "Duplicate parameter in lambda" '(lambda (x x) (+ x x))
+ "Duplicate parameter in" '(lambda (x x) (+ x x))
  "Lambda parameters should not be duplicated")
 
 ;; definitions

@@ -227,10 +227,8 @@
       ((body-program
         (compile-sequence seq program lexical-env compile))
        (body-code
-        (let* ((code (compiled-program-value-code body-program))
-               (split-code (partition-list wasm-locals-definition? code)))
-          ; Move any locals definition to the top of the function
-          (append (car split-code) (cdr split-code)))))
+        (wasm-local-definitions-to-top
+         (compiled-program-value-code body-program))))
     (compiled-program-with-value-code body-program body-code)))
 
 (define (compile-proc-to-func context-exp formals body program lexical-env exported-name compile)

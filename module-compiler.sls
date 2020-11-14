@@ -56,62 +56,70 @@
          (library-declarations 'export library))
         (lexical-env
          (make-global-lexical-env definition-names exports))
-        (definitions-program
+        (program
             (if (null? definitions)
                 (make-empty-compiled-program)
                 (compile-sequence
                  definitions
                  (make-empty-compiled-program)
-                 lexical-env compile))))
-     (if (null? non-definitions)
-         definitions-program
-         (compile-procedure-body
-          non-definitions
-          definitions-program
-          lexical-env compile))))
-
- (define (compile-program-to-module program)
-   (let*
-       ((get-module-definitions
-         (let ((module-definitions
-                (compiled-program-module-definitions program)))
-           (lambda (type)
-             (wasm-module-get-definitions
-              module-definitions
-              type))))
+                 lexical-env compile)))
+        (program
+         (if (null? non-definitions)
+             program
+             (compile-proc-to-func
+              "$main"
+              '()
+              non-definitions
+              program
+              lexical-env
+              "main"
+              compile)))
         (elem-defs
-         (get-module-definitions 'elem))
+         (compiled-program-get-definitions program 'elem))
         (elem-func-indices
          (map wasm-elem-definition-func-index elem-defs))
-        (table-definition
+        (program
          (if (null? elem-func-indices)
-             '()
-             `((table ,(length elem-func-indices) funcref))))
-        (elem-definition
+             program
+             (compiled-program-add-definition
+              program
+              `(table ,(length elem-func-indices) funcref))))
+        (program
          (if (null? elem-func-indices)
-             '()
-             `((elem (i32.const 0) func ,@elem-func-indices))))
+             program
+             (compiled-program-add-definition
+              program
+              `(elem (i32.const 0) func ,@elem-func-indices))))
         (global-init-defs
-         (map cdr (get-module-definitions 'global-init)))
-        (global-init-func
+         (map cdr (compiled-program-get-definitions program 'global-init)))
+        (global-init-func-defs
          (if (null? global-init-defs)
              '()
              `((func $global-init
                      ,@(flatten-n 2 global-init-defs))
                (start $global-init))))
-        (top-level-code
-         (compiled-program-value-code program)))
+        (program
+         (if (null? global-init-func-defs)
+             program
+             (compiled-program-with-definitions-and-value-code
+              program
+              global-init-func-defs
+              '()))))
+     program))
+
+ (define (compile-program-to-module program)
+   (let
+       ((get-module-definitions
+         (lambda (type)
+           (compiled-program-get-definitions program type))))
      `(module
         ,@(get-module-definitions 'type)
         ,@(get-module-definitions 'func)
-        (func $main (result i32)
-              ,@top-level-code)
-        ,@table-definition
+        ,@(get-module-definitions 'table)
         ,@(get-module-definitions 'global)
-        ,@global-init-func
-        (export "main" (func $main))
-        ,@elem-definition
-        ,@(get-module-definitions 'export))))
+        ,@(get-module-definitions 'export)
+        ,@(get-module-definitions 'start)
+        ,@(get-module-definitions 'elem))))
 
  (define (make-global-lexical-env variables exports)
    (let ((duplicate-var (first-duplicate variables)))

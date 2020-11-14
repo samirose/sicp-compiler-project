@@ -96,7 +96,7 @@
          (if (null? global-init-defs)
              '()
              `((func $global-init
-                     ,@(flatten-n 2 global-init-defs))
+                     ,@(wasm-local-definitions-to-top (flatten-n 2 global-init-defs)))
                (start $global-init))))
         (program
          (if (null? global-init-func-defs)

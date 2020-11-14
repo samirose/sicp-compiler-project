@@ -5,7 +5,8 @@
           let-in-lambda
           let-value-referring-lambda-arg
           let-value-shadowing-lambda-arg
-          lambda-as-let-value)
+          lambda-as-let-value
+          get-global-with-let-value)
 
   (begin
     (define (constant-let)
@@ -52,6 +53,13 @@
       (let ((prod (* 2 3))
             (double (lambda (x) (+ x x))))
         (double prod)))
+
+    (define global-with-let-value
+      (let ((x 2) (y 3))
+        (+ x y)))
+
+    (define (get-global-with-let-value)
+      global-with-let-value)
 
     (let ((a 2) (b 3))
       (let ((c 4))

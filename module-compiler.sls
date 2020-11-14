@@ -57,12 +57,27 @@
         (lexical-env
          (make-global-lexical-env definition-names exports))
         (program
-            (if (null? definitions)
-                (make-empty-compiled-program)
-                (compile-sequence
-                 definitions
-                 (make-empty-compiled-program)
-                 lexical-env compile)))
+         (make-empty-compiled-program))
+        (program
+         (if (null? definitions)
+             program
+             (compile-values
+              definitions
+              program
+              lexical-env compile)))
+        (global-init-code
+         (compiled-program-value-code
+          program))
+        (program
+         (if (null? global-init-code)
+             program
+             (let ((global-init-func-index
+                    (compiled-program-definitions-count program 'func)))
+               (compiled-program-with-definitions-and-value-code
+                program
+                `((func ,@(wasm-local-definitions-to-top global-init-code))
+                  (start ,global-init-func-index))
+                '()))))
         (program
          (if (null? non-definitions)
              program
@@ -89,22 +104,7 @@
              program
              (compiled-program-add-definition
               program
-              `(elem (i32.const 0) func ,@elem-func-indices))))
-        (global-init-defs
-         (map cdr (compiled-program-get-definitions program 'global-init)))
-        (global-init-func-defs
-         (if (null? global-init-defs)
-             '()
-             `((func $global-init
-                     ,@(wasm-local-definitions-to-top (flatten-n 2 global-init-defs)))
-               (start $global-init))))
-        (program
-         (if (null? global-init-func-defs)
-             program
-             (compiled-program-with-definitions-and-value-code
-              program
-              global-init-func-defs
-              '()))))
+              `(elem (i32.const 0) func ,@elem-func-indices)))))
      program))
 
  (define (compile-program-to-module program)

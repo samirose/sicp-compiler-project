@@ -2,7 +2,7 @@
 (library
  (expression-compiler)
  (export compile
-         compile-sequence
+         compile-values
          compile-procedure-body
          compile-proc-to-func)
  (import (rnrs base)
@@ -120,23 +120,20 @@
             (compile value program lexical-env)))
        (value-code
         (compiled-program-value-code program-with-value-computing-code))
-       (const-value?
-        (wasm-const-value? value-code))
        (init-instr
-        (if const-value? value-code uninitialized-value))
+        (if (wasm-const-value? value-code)
+            value-code
+            uninitialized-value))
        (global-definition
         `(global (mut i32) ,init-instr))
-       (global-init
-        (if const-value?
+       (init-code
+        (if (wasm-const-value? value-code)
             '()
-            `((global-init
-               (,@value-code global.set ,global-index)))))
-       (definitions
-         (cons global-definition global-init)))
-    (compiled-program-with-definitions-and-value-code
+            `(,@value-code global.set ,global-index))))
+    (compiled-program-with-definition-and-value-code
      program-with-value-computing-code
-     definitions
-     unspecified-value)))
+     global-definition
+     init-code)))
 
 ;;;open-coded primitives
 

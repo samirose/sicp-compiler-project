@@ -345,6 +345,19 @@
 
 ;;;combinations
 
+(define (compile-values exps program lexical-env compile)
+  (if (null? exps)
+      (compiled-program-with-value-code program '())
+      (let ((first-operand-program
+             (compile (car exps) program lexical-env)))
+        (fold-left
+         (lambda (program exp)
+           (compiled-program-append-value-codes
+            program
+            (compile exp program lexical-env)))
+         first-operand-program
+         (cdr exps)))))
+
 (define (compile-application exp program lexical-env compile)
   (let*
       ((operands (operands exp))
@@ -356,17 +369,7 @@
        (type-index
         (compiled-program-definition-index type-program func-type))
        (operands-program
-        (if (null? operands)
-            (compiled-program-with-value-code type-program '())
-            (let ((first-operand-program
-                   (compile (car operands) type-program lexical-env)))
-              (fold-left
-               (lambda (program operand)
-                 (compiled-program-append-value-codes
-                  program
-                  (compile operand program lexical-env)))
-               first-operand-program
-               (cdr operands)))))
+        (compile-values operands type-program lexical-env compile))
        (operands-and-operator-program
         (compiled-program-append-value-codes
          operands-program

@@ -231,10 +231,9 @@
    (let*
        ; Compile the procedure body
        ((body-env
-         (let ((duplicate-param (first-duplicate formals)))
-           (if (null? duplicate-param)
-               (add-new-lexical-frame lexical-env formals '())
-               (raise-compilation-error "Duplicate parameter in" context-exp))))
+         (if (null? (first-duplicate formals))
+             (add-new-lexical-frame lexical-env formals '())
+             (raise-compilation-error "Duplicate parameter in" context-exp)))
         (body-program
          (compile-procedure-body body program body-env compile))
         ; Add function type, if needed, and look up its index

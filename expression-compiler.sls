@@ -13,8 +13,7 @@
          (compiled-program)
          (compilation-error)
          (wasm-syntax)
-         (wasm-module-definitions)
-         (pattern-match))
+         (wasm-module-definitions))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF

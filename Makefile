@@ -61,14 +61,18 @@ TEST_COMPILER_DIR := test-compiler
 COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)/*.scm)
 COMPILER_TEST_LOGS = $(patsubst $(TEST_COMPILER_DIR)/%.scm,$(TEST_COMPILER_DIR)/log/%.log,$(COMPILER_TEST_PROGRAMS))
 
-.PHONY : test-compiler
-test-compiler : $(COMPILER_TEST_LOGS)
+.PHONY : test-compiler-dirs test-compiler
+test-compiler : test-compiler-dirs $(COMPILER_TEST_LOGS)
 
-$(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log:
+test-compiler-dirs : $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log
+$(TEST_COMPILER_DIR)/build :
+	mkdir -p $@
+ $(TEST_COMPILER_DIR)/log :
 	mkdir -p $@
 
-$(COMPILER_TEST_LOGS) : $(TEST_COMPILER_DIR)/log/%.log : $(TEST_COMPILER_DIR)/build/%.json $(TEST_COMPILER_DIR)/log
-	spectest-interp $< | tee $@
+$(TEST_COMPILER_DIR)/log/%.log : $(TEST_COMPILER_DIR)/build/%.json
+	spectest-interp $< | tee $@.tmp \
+	  && mv -f $@.tmp $@
 
 $(TEST_COMPILER_DIR)/build/%.json : $(TEST_COMPILER_DIR)/build/%.wast
 	wast2json $< -o $@
@@ -86,14 +90,16 @@ UNIT_TEST_LIBS = lib/assert
 UNIT_TEST_PROGRAMS = $(wildcard $(TEST_UNIT_DIR)/*.sps)
 UNIT_TEST_LOGS = $(patsubst $(TEST_UNIT_DIR)/%.sps,$(TEST_UNIT_DIR)/log/%.log,$(UNIT_TEST_PROGRAMS))
 
-.PHONY : test-unit
-test-unit : $(UNIT_TEST_LOGS)
+.PHONY : test-unit-dirs test-unit
+test-unit : test-unit-dirs $(UNIT_TEST_LOGS)
 
-$(TEST_UNIT_DIR)/log:
+test-unit-dirs : $(TEST_UNIT_DIR)/log
+$(TEST_UNIT_DIR)/log :
 	mkdir -p $@
 
-$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)/log/%.log : $(TEST_UNIT_DIR)/%.sps $(TEST_UNIT_DIR)/log $(LIBDIRS) $(UNIT_TEST_LIBS)
-	$(SCHEME_RUN_PROGRAM) $< > $@
+$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)/log/%.log : $(TEST_UNIT_DIR)/%.sps $(LIBDIRS) $(UNIT_TEST_LIBS)
+	$(SCHEME_RUN_PROGRAM) $< > $@.tmp \
+	  && mv -f $@.tmp $@
 
 .PHONY : test
 test : test-unit test-compiler

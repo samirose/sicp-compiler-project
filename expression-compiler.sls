@@ -338,6 +338,40 @@
      compute-and-assign-values-program
      body-program)))
 
+(define (compile-let* exp program lexical-env compile)
+  (let*
+      ((bindings (let-bindings exp))
+       (variables (map binding-variable bindings))
+       (values (map binding-value bindings))
+       (local-defs-program
+        (compiled-program-with-value-code
+         program
+         (list (wasm-define-locals 'i32 (length variables))))))
+    (let collect
+      ((vars variables)
+       (vals values)
+       (program local-defs-program)
+       (env lexical-env))
+      (if (null? vars)
+          (compiled-program-append-value-codes
+           program
+           (compile-sequence (let-body exp) program env compile))
+          (let*
+              ((value-prog
+                (compiled-program-append-value-codes
+                 program
+                 (compile (car vals) program env)))
+               (var (car vars))
+               (env-with-var
+                (add-new-local-frame env (list var) '()))
+               (index
+                (var-index (find-variable var env-with-var))))
+            (collect
+             (cdr vars)
+             (cdr vals)
+             (compiled-program-append-value-code value-prog `(local.set ,index))
+             env-with-var))))))
+
 ;;;combinations
 
 (define (compile-values exps program lexical-env compile)

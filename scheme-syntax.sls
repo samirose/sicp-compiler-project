@@ -115,19 +115,25 @@
           '() exp "Empty binding" exp))
         (else (raise-compilation-error "Not a binding" exp))))
 
+(define (let-keyword? s)
+  (or (eq? 'let s) (eq? 'let* s)))
+
 (define (let? exp)
-  (cond ((not (pattern-match? `(let ,??*) exp)) #f)
-        ((pattern-match? `(let (,?? ,??*) ,?? ,??*) exp)
-         (for-all check-binding (cadr exp)))
-        ((raise-error-on-match
-          `(let () ,?? ,??*) exp "Empty bindings in let expression" exp))
-        ((raise-error-on-match
-          `(let ,?? ,?? ,??*) exp "Bindings missing from let expression" exp))
-        ((raise-error-on-match
-          `(let ,??) exp "Bindings or body missing from let expression" exp))
-        ((raise-error-on-match
-          `(let) exp "Bindings and body missing from let expression" exp))
-        (else (error "Internal compiler error: unexhaustive let syntax check" exp))))
+  (if (not (pattern-match? `(,let-keyword? ,??*) exp))
+      #f
+      (let ((args (cdr exp)))
+        (cond
+          ((pattern-match? `((,?? ,??*) ,?? ,??*) args)
+           (for-all check-binding (car args)))
+          ((raise-error-on-match
+            `(() ,?? ,??*) args "Empty bindings in let expression" exp))
+          ((raise-error-on-match
+            `(,?? ,?? ,??*) args "Bindings missing from let expression" exp))
+          ((raise-error-on-match
+            `(,??) args "Bindings or body missing from let expression" exp))
+          ((raise-error-on-match
+            `() args "Bindings and body missing from let expression" exp))
+          (else (error "Internal compiler error: unexhaustive let syntax check" exp))))))
 
 (define (let-bindings exp) (cadr exp))
 (define (binding-variable b) (car b))

@@ -2,6 +2,8 @@
   (export constant-let
           expression-let
           multi-variable-let
+          nested-let
+          let-shadowing-let
           let-in-lambda
           let-value-referring-lambda-arg
           let-value-shadowing-lambda-arg

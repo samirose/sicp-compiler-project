@@ -1,21 +1,24 @@
 #!r6rs
 ;; Adapted from SICP ch5-syntax.scm
 
-(library (scheme-syntax)
-  (export self-evaluating?
-          quoted? text-of-quotation
-          variable?
-          assignment? assignment-variable assignment-value
-          definition? definition-variable definition-value
-          let? let-bindings binding-variable binding-value let-body
-          lambda? lambda-formals lambda-body
-          if? if-test if-consequent if-alternate
-          begin? begin-actions last-exp? first-exp rest-exps
-          application? operator operands)
-  (import (rnrs base)
-          (rnrs lists)
-          (compilation-error)
-          (pattern-match))
+(library
+ (scheme-syntax)
+
+ (export self-evaluating?
+         quoted? text-of-quotation
+         variable?
+         assignment? assignment-variable assignment-value
+         definition? definition-variable definition-value
+         let? let-bindings binding-variable binding-value let-body
+         lambda? lambda-formals lambda-body
+         if? if-test if-consequent if-alternate
+         begin? begin-actions last-exp? first-exp rest-exps
+         application? operator operands)
+
+ (import (rnrs base)
+         (rnrs lists)
+         (compilation-error)
+         (pattern-match))
 
 (define (self-evaluating? exp)
   (cond ((number? exp) #t)

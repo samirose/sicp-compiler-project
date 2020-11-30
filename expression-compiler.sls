@@ -1,10 +1,12 @@
 #!r6rs
 (library
  (expression-compiler)
+
  (export compile
          compile-values
          compile-procedure-body
          compile-proc-to-func)
+
  (import (rnrs base)
          (rnrs lists)
          (lists)

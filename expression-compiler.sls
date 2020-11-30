@@ -38,6 +38,8 @@
          (compile-lambda exp program lexical-env '() compile))
         ((let? exp)
          (compile-let exp program lexical-env compile))
+        ((let*? exp)
+         (compile-let* exp program lexical-env compile))
         ((begin? exp)
          (compile-sequence (begin-actions exp) program lexical-env compile))
         ((open-coded-primitive-application? exp)

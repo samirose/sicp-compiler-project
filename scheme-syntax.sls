@@ -9,7 +9,7 @@
          variable?
          assignment? assignment-variable assignment-value
          definition? definition-variable definition-value
-         let? let-bindings binding-variable binding-value let-body
+         let? let*? let-bindings binding-variable binding-value let-body
          lambda? lambda-formals lambda-body
          if? if-test if-consequent if-alternate
          begin? begin-actions last-exp? first-exp rest-exps
@@ -118,11 +118,8 @@
           '() exp "Empty binding" exp))
         (else (raise-compilation-error "Not a binding" exp))))
 
-(define (let-keyword? s)
-  (or (eq? 'let s) (eq? 'let* s)))
-
-(define (let? exp)
-  (if (not (pattern-match? `(,let-keyword? ,??*) exp))
+(define (let-form? keyword exp)
+  (if (not (pattern-match? `(,keyword ,??*) exp))
       #f
       (let ((args (cdr exp)))
         (cond
@@ -137,6 +134,12 @@
           ((raise-error-on-match
             `() args "Bindings and body missing from let expression" exp))
           (else (error "Internal compiler error: unexhaustive let syntax check" exp))))))
+
+(define (let? exp)
+  (let-form? 'let exp))
+
+(define (let*? exp)
+  (let-form? 'let* exp))
 
 (define (let-bindings exp) (cadr exp))
 (define (binding-variable b) (car b))

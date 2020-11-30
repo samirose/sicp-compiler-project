@@ -248,11 +248,11 @@
  "Definition's first operand should be an identifier or an identifier list")
 
 ;; let expression
-(define (test-let keyword)
+(define (test-let keyword predicate)
   (let ((exp `(,keyword ((a 1)) a)))
     (assert-equal
      #t
-     (let? exp)
+     (predicate exp)
      "Let expression with one binding and simple body is valid")
 
     (let ((bindings (let-bindings exp)))
@@ -279,7 +279,7 @@
   (let ((exp `(,keyword ((a 1) (b 2)) b)))
     (assert-equal
      #t
-     (let? exp)
+     (predicate exp)
      "Let expression with two bindings and simple body is valid")
 
     (assert-equal
@@ -295,7 +295,7 @@
   (let ((exp `(,keyword ((a 1) (b 2)) (+ a b))))
     (assert-equal
      #t
-     (let? exp)
+     (predicate exp)
      "Let expression with two bindings and combination body is valid")
 
     (assert-equal
@@ -311,7 +311,7 @@
   (let ((exp `(,keyword ((a 1) (b 2)) (set! a 3) (+ a b))))
     (assert-equal
      #t
-     (let? exp)
+     (predicate exp)
      "Let expression with two bindings and multi-expression body is valid")
 
     (assert-equal
@@ -327,7 +327,7 @@
   (let ((exp `(,keyword ((a (+ 1 2)) (b (+ 2 3))) (set! a 3) (+ a b))))
     (assert-equal
      #t
-     (let? exp)
+     (predicate exp)
      "Let expression with combination values and multi-expression body is valid")
 
     (let ((bindings (let-bindings exp)))
@@ -352,56 +352,57 @@
      "let-body returns let expression's body"))
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword () 42)))
+   (lambda () (predicate `(,keyword () 42)))
    "Empty bindings in let expression" `(,keyword () 42)
    "Let expression must define bindings")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword ((a 1)))))
+   (lambda () (predicate `(,keyword ((a 1)))))
    "Bindings or body missing from let expression" `(,keyword ((a 1)))
    "Let expression must have a body")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword)))
+   (lambda () (predicate `(,keyword)))
    "Bindings and body missing from let expression" `(,keyword)
    "Let expression must have bindings and body")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword a 42)))
+   (lambda () (predicate `(,keyword a 42)))
    "Bindings missing from let expression" `(,keyword a 42)
    "Bindings should be a list")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword (a) a)))
+   (lambda () (predicate `(,keyword (a) a)))
    "Not a binding" 'a
    "Bindings must define a variable and value")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword (1) 42)))
+   (lambda () (predicate `(,keyword (1) 42)))
    "Not a binding" 1
    "Bindings must define a variable and value")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword (b 1) b)))
+   (lambda () (predicate `(,keyword (b 1) b)))
    "Not a binding" 'b
    "Bindings is a list of variable-value pairs")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword ((a)) a)))
+   (lambda () (predicate `(,keyword ((a)) a)))
    "Value missing from binding" '(a)
    "Bindings must define a variable and value")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword ((1 2)) 42)))
+   (lambda () (predicate `(,keyword ((1 2)) 42)))
    "Not an identifier" 1
    "Bindings must define a variable and value")
 
   (assert-raises-compilation-error
-   (lambda () (let? `(,keyword ((a 1 2)) a)))
+   (lambda () (predicate `(,keyword ((a 1 2)) a)))
    "Too many operands in binding" '(a 1 2)
    "Bindings must define a variable and single value"))
 
-(for-all test-let '(let let*))
+(test-let 'let let?)
+(test-let 'let* let*?)
 
 ;; lambda expression
 (let ((exp '(lambda () 42)))

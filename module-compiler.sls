@@ -89,27 +89,27 @@
               lexical-env
               "main"
               compile)))
-        (elem-defs
-         (compiled-program-get-definitions program 'elem))
-        (elem-func-indices
-         (map wasm-elem-definition-func-index elem-defs))
+        (elem-defs-count
+         (compiled-program-definitions-count program 'elem))
         (program
-         (if (null? elem-func-indices)
+         (if (= elem-defs-count 0)
              program
              (compiled-program-add-definition
               program
-              `(table ,(length elem-func-indices) funcref))))
-        (program
-         (if (null? elem-func-indices)
-             program
-             (compiled-program-add-definition
-              program
-              `(elem (i32.const 0) func ,@elem-func-indices)))))
+              `(table ,elem-defs-count funcref)))))
      program))
 
  (define (compile-program-to-module program)
-   (let
-       ((get-module-definitions
+   (let*
+       ((elem-defs
+         (compiled-program-get-definitions program 'elem))
+        (elem-func-indices
+         (map wasm-elem-definition-func-index elem-defs))
+        (elems-def
+         (if (null? elem-defs)
+             '()
+             `((elem (i32.const 0) func ,@elem-func-indices))))
+        (get-module-definitions
          (lambda (type)
            (compiled-program-get-definitions program type))))
      `(module
@@ -119,7 +119,7 @@
         ,@(get-module-definitions 'global)
         ,@(get-module-definitions 'export)
         ,@(get-module-definitions 'start)
-        ,@(get-module-definitions 'elem))))
+        ,@elems-def)))
 
  (define (make-global-lexical-env variables exports)
    (let ((duplicate-var (first-duplicate variables)))

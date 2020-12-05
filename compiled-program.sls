@@ -1,6 +1,7 @@
 #!r6rs
 (library
  (compiled-program)
+
  (export make-empty-compiled-program
          compiled-program-module-definitions
          compiled-program-value-code
@@ -14,6 +15,7 @@
          compiled-program-definitions-count
          compiled-program-with-definition-and-value-code
          compiled-program-with-definitions-and-value-code)
+
  (import (rnrs base)
          (rnrs lists)
          (wasm-module-definitions))

@@ -1,10 +1,12 @@
 #!r6rs
 (library
  (compilation-error)
+
  (export make-compilation-error compilation-error?
          compilation-error-message compilation-error-object
          raise-as-error raise-if-error
          raise-compilation-error set-compilation-error-handler!)
+
  (import (rnrs base))
 
  (define compilation-error-handler error)

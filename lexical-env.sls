@@ -1,10 +1,12 @@
 #!r6rs
 (library
  (lexical-env)
+
  (export make-empty-lexical-env global-lexical-env?
          add-new-lexical-frame add-new-local-frame
          find-variable frame-index var-index additional-info global-address?
          env-get-additional-info env-var-index-offset)
+
  (import (rnrs base)
          (rnrs lists))
 

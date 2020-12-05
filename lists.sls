@@ -1,8 +1,10 @@
 #!r6rs
 (library
  (lists)
+
  (export partition-list index-of-equal first-duplicate make-list flatten-n
          make-counted-set counted-set-add counted-set-count counted-set-unique-keys)
+
  (import (rnrs base)
          (rnrs lists))
 

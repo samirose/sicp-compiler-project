@@ -17,8 +17,8 @@
 
  (import (rnrs base)
          (rnrs lists)
-         (compilation-error)
-         (pattern-match))
+         (pattern-match)
+         (compilation-error))
 
 (define (self-evaluating? exp)
   (cond ((number? exp) #t)

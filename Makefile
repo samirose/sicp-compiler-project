@@ -40,8 +40,9 @@ lib/expression-compiler : \
 	lib/scheme-syntax \
 	lib/lexical-env \
 	lib/compiled-program \
-	lib/wasm-module-definitions \
-	lib/compilation-error
+	lib/compilation-error \
+	lib/wasm-syntax \
+	lib/wasm-module-definitions
 lib/module-compiler : \
 	lib/lists \
 	lib/scheme-syntax \

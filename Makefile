@@ -44,13 +44,12 @@ lib/expression-compiler : \
 	lib/compilation-error
 lib/module-compiler : \
 	lib/lists \
-	lib/lexical-env \
 	lib/scheme-syntax \
 	lib/scheme-r7rs-syntax \
-	lib/wasm-syntax \
-	lib/compiled-program \
-	lib/wasm-module-definitions \
 	lib/compilation-error \
+	lib/lexical-env \
+	lib/compiled-program \
+	lib/wasm-syntax \
 	lib/expression-compiler
 
 .PHONY : compile

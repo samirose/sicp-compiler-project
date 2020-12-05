@@ -1,8 +1,10 @@
 #!r6rs
 (library
  (module-compiler)
+
  (export compile-r7rs-library-to-wasm-module
          compile-single-exp-to-wasm-module)
+
  (import (rnrs base)
          (rnrs lists)
          (lists)
@@ -11,7 +13,6 @@
          (compilation-error)
          (lexical-env)
          (compiled-program)
-         (wasm-module-definitions)
          (wasm-syntax)
          (expression-compiler))
 

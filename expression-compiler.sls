@@ -368,12 +368,12 @@
                (var (car vars))
                (env-with-var
                 (add-new-local-frame env (list var) '()))
-               (index
+               (local-index
                 (var-index (find-variable var env-with-var))))
             (collect
              (cdr vars)
              (cdr vals)
-             (compiled-program-append-value-code value-prog `(local.set ,index))
+             (compiled-program-append-value-code value-prog `(local.set ,local-index))
              env-with-var))))))
 
 ;;;combinations

@@ -31,7 +31,9 @@ $(LIBDIR)% : %.sls
 
 RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.sps
 
-lib/wasm-module-definitions : lib/lists
+lib/wasm-module-definitions : \
+	lib/lists \
+	lib/wasm-syntax
 lib/compiled-program : lib/wasm-module-definitions
 lib/scheme-r7rs-syntax: lib/compilation-error lib/pattern-match
 lib/scheme-syntax: lib/compilation-error lib/pattern-match

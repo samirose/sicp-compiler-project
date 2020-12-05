@@ -1,19 +1,24 @@
 #!r6rs
 ;; Adapted from SICP ch5-syntax.scm
 
-(library (scheme-syntax)
-  (export self-evaluating?
-          quoted? text-of-quotation
-          variable?
-          assignment? assignment-variable assignment-value
-          definition? definition-variable definition-value
-          lambda? lambda-formals lambda-body
-          if? if-test if-consequent if-alternate
-          begin? begin-actions last-exp? first-exp rest-exps
-          application? operator operands)
-  (import (rnrs base)
-          (compilation-error)
-          (pattern-match))
+(library
+ (scheme-syntax)
+
+ (export self-evaluating?
+         quoted? text-of-quotation
+         variable?
+         assignment? assignment-variable assignment-value
+         definition? definition-variable definition-value
+         let? let*? let-bindings binding-variable binding-value let-body
+         lambda? lambda-formals lambda-body
+         if? if-test if-consequent if-alternate
+         begin? begin-actions last-exp? first-exp rest-exps
+         application? operator operands)
+
+ (import (rnrs base)
+         (rnrs lists)
+         (pattern-match)
+         (compilation-error))
 
 (define (self-evaluating? exp)
   (cond ((number? exp) #t)
@@ -97,6 +102,49 @@
       (caddr exp)
       (make-lambda (cdadr exp)
                    (cddr exp))))
+
+;; let expression
+(define (check-binding exp)
+  (cond ((pattern-match? `(,variable? ,??) exp))
+        ((not (pattern-match? `(,??*) exp))
+         (raise-compilation-error "Not a binding" exp))
+        ((raise-error-on-match
+          `(,?? ,??) exp "Not an identifier" (car exp)))
+        ((raise-error-on-match
+          `(,variable?) exp "Value missing from binding" exp))
+        ((raise-error-on-match
+          `(,variable? ,?? ,?? ,??*) exp "Too many operands in binding" exp))
+        ((raise-error-on-match
+          '() exp "Empty binding" exp))
+        (else (raise-compilation-error "Not a binding" exp))))
+
+(define (let-form? keyword exp)
+  (if (not (pattern-match? `(,keyword ,??*) exp))
+      #f
+      (let ((args (cdr exp)))
+        (cond
+          ((pattern-match? `((,?? ,??*) ,?? ,??*) args)
+           (for-all check-binding (car args)))
+          ((raise-error-on-match
+            `(() ,?? ,??*) args "Empty bindings in let expression" exp))
+          ((raise-error-on-match
+            `(,?? ,?? ,??*) args "Bindings missing from let expression" exp))
+          ((raise-error-on-match
+            `(,??) args "Bindings or body missing from let expression" exp))
+          ((raise-error-on-match
+            `() args "Bindings and body missing from let expression" exp))
+          (else (error "Internal compiler error: unexhaustive let syntax check" exp))))))
+
+(define (let? exp)
+  (let-form? 'let exp))
+
+(define (let*? exp)
+  (let-form? 'let* exp))
+
+(define (let-bindings exp) (cadr exp))
+(define (binding-variable b) (car b))
+(define (binding-value b) (cadr b))
+(define (let-body exp) (cddr exp))
 
 ;; lambda expression
 (define (lambda? exp)

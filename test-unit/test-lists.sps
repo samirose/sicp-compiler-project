@@ -5,19 +5,24 @@
  (assert))
 
 (assert-equal
- '()
- (reject (lambda (x) #f) '())
- "Rejecting from empty list results to empty list")
+ (cons '() '())
+ (partition-list even? '())
+ "Partitioning an empty list returns a pair of empty lists")
 
 (assert-equal
- '()
- (reject (lambda (x) #t) '(1 2 3))
- "Rejecting all from a list results to empty list")
+ (cons '(2 4 6) '())
+ (partition-list even? '(2 4 6))
+ "Partitioning a list with all matching elements returns all elements in car")
 
 (assert-equal
- '(1 2)
- (reject (lambda (x) (> x 2)) '(1 5 2 4 3))
- "Reject removes items from the result for which predicate returns true")
+ (cons '() '(1 3 5))
+ (partition-list even? '(1 3 5))
+ "Partitioning a list with all non-matching elements returns all elements in cdr")
+
+(assert-equal
+ (cons '(4 2 6) '(3 1 1 5 9))
+ (partition-list even? '(3 1 4 1 5 9 2 6))
+ "Partitioning a list with collects matching elements to car and non-matching to cdr")
 
 (assert-equal
  #f

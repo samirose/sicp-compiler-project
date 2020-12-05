@@ -2,7 +2,9 @@
 
 (library
  (pattern-match)
+
  (export pattern-match? ?? ??*)
+
  (import (rnrs base)
          (rnrs lists))
 

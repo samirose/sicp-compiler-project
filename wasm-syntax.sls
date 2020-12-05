@@ -3,9 +3,12 @@
  (wasm-syntax)
  (export wasm-definition-type wasm-definition-type?
          wasm-elem-definition-func-index
-         wasm-const-value?)
+         wasm-const-value?
+         wasm-define-locals wasm-locals-definition? wasm-local-definitions-to-top)
  (import (rnrs base)
-         (rnrs lists))
+         (rnrs lists)
+         (lists)
+         (pattern-match))
 
  (define (wasm-definition-type wasm-definition)
    (car wasm-definition))
@@ -19,9 +22,20 @@
  (define wasm-const-instructions
    '(i32.const f32.const))
 
- (define (wasm-const-value? exp)
-   (and (list? exp)
-        (= (length exp) 2)
-        (memq (car exp) wasm-const-instructions)))
+ (define (wasm-const-instruction? instr)
+   (memq instr wasm-const-instructions))
+
+ (define (wasm-const-value? instr)
+   (pattern-match? '(,wasm-const-instruction? ,??) instr))
+
+ (define (wasm-define-locals type n)
+   (cons 'local (make-list type n)))
+
+ (define (wasm-locals-definition? exp)
+   (pattern-match? `(local ,?? ,??*) exp))
+
+ (define (wasm-local-definitions-to-top seq)
+   (let ((split-code (partition-list wasm-locals-definition? seq)))
+     (append (car split-code) (cdr split-code))))
 
  )

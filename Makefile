@@ -31,26 +31,33 @@ $(LIBDIR)% : %.sls
 
 RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.sps
 
-lib/wasm-module-definitions : lib/lists
-lib/compiled-program : lib/wasm-module-definitions
-lib/scheme-r7rs-syntax: lib/compilation-error lib/pattern-match
-lib/scheme-syntax: lib/compilation-error lib/pattern-match
+lib/wasm-module-definitions : \
+	lib/lists \
+	lib/wasm-syntax
+lib/compiled-program : \
+	lib/wasm-module-definitions
+lib/scheme-r7rs-syntax: \
+	lib/pattern-match \
+	lib/compilation-error
+lib/scheme-syntax: \
+	lib/pattern-match \
+	lib/compilation-error
 lib/expression-compiler : \
 	lib/lists \
 	lib/scheme-syntax \
 	lib/lexical-env \
 	lib/compiled-program \
-	lib/wasm-module-definitions \
-	lib/compilation-error
+	lib/compilation-error \
+	lib/wasm-syntax \
+	lib/wasm-module-definitions
 lib/module-compiler : \
 	lib/lists \
-	lib/lexical-env \
 	lib/scheme-syntax \
 	lib/scheme-r7rs-syntax \
-	lib/wasm-syntax \
-	lib/compiled-program \
-	lib/wasm-module-definitions \
 	lib/compilation-error \
+	lib/lexical-env \
+	lib/compiled-program \
+	lib/wasm-syntax \
 	lib/expression-compiler
 
 .PHONY : compile

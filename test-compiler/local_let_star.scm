@@ -1,0 +1,58 @@
+(define-library
+  (export constant-let*
+          expression-let*
+          let*-shadowing
+          let*-in-lambda
+          let*-value-referring-lambda-arg
+          let*-value-shadowing-lambda-arg
+          lambda-as-let*-value
+          get-global-with-let*-value)
+
+  (begin
+    (define (constant-let*)
+      (let* ((a 2))
+        (+ 40 a)))
+
+    (define (expression-let*)
+      (let* ((a (* 2 3))
+             (b (* 5 a)))
+        b))
+
+    (define (let*-shadowing)
+      (let* ((a 2) (b 3) (b 5))
+          (* a b)))
+
+    (define (let*-in-lambda)
+      ((lambda (x)
+         (let* ((a 2))
+           (* a x)))
+       5))
+
+    (define (let*-value-referring-lambda-arg)
+      ((lambda (x)
+         (let* ((a (* x 2)))
+           (* a x)))
+       3))
+
+    (define (let*-value-shadowing-lambda-arg)
+      ((lambda (x)
+         (let* ((x (* x 2)))
+           (* x x)))
+       3))
+
+    (define (lambda-as-let*-value)
+      (let* ((prod (* 2 3))
+             (double (lambda (x) (+ x x))))
+        (double prod)))
+
+    (define global-with-let*-value
+      (let* ((x 2) (y (+ x 1)))
+        (+ x y)))
+
+    (define (get-global-with-let*-value)
+      global-with-let*-value)
+
+    (let* ((a 2) (b 3) (b (+ a b 4)))
+      b)
+  )
+)

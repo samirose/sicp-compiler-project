@@ -1,8 +1,10 @@
 #!r6rs
 (library
  (module-compiler)
+
  (export compile-r7rs-library-to-wasm-module
          compile-single-exp-to-wasm-module)
+
  (import (rnrs base)
          (rnrs lists)
          (lists)
@@ -11,7 +13,6 @@
          (compilation-error)
          (lexical-env)
          (compiled-program)
-         (wasm-module-definitions)
          (wasm-syntax)
          (expression-compiler))
 
@@ -36,79 +37,90 @@
  (define (compile-library-to-program library)
    (let*
        ((exp-sequence
-         (let* ((exps
-                 (or (library-declaration 'begin library)
-                     (raise-compilation-error "No begin declaration in library" library)))
-                (actions (begin-actions exps)))
+         (let*
+             ((exps
+               (cond ((library-declaration 'begin library))
+                     (else (raise-compilation-error "No begin declaration in library" library))))
+              (actions (begin-actions exps)))
            (if (null? actions)
                (raise-compilation-error "Empty begin declaration in library" library)
                actions)))
+        (definitions-and-non-definitions
+          (partition-list definition? exp-sequence))
         (definitions
-          (filter definition? exp-sequence))
+          (car definitions-and-non-definitions))
         (non-definitions
-          (reject definition? exp-sequence))
+          (cdr definitions-and-non-definitions))
         (definition-names
           (map definition-variable definitions))
         (exports
          (library-declarations 'export library))
         (lexical-env
          (make-global-lexical-env definition-names exports))
-        (definitions-program
-            (if (null? definitions)
-                (make-empty-compiled-program)
-                (compile-sequence
-                 definitions
-                 (make-empty-compiled-program)
-                 lexical-env compile))))
-     (if (null? non-definitions)
-         definitions-program
-         (compile-sequence
-          non-definitions
-          definitions-program
-          lexical-env compile))))
+        (program
+         (make-empty-compiled-program))
+        (program
+         (if (null? definitions)
+             program
+             (compile-values
+              definitions
+              program
+              lexical-env compile)))
+        (global-init-code
+         (compiled-program-value-code
+          program))
+        (program
+         (if (null? global-init-code)
+             program
+             (let ((global-init-func-index
+                    (compiled-program-definitions-count program 'func)))
+               (compiled-program-with-definitions-and-value-code
+                program
+                `((func ,@(wasm-local-definitions-to-top global-init-code))
+                  (start ,global-init-func-index))
+                '()))))
+        (program
+         (if (null? non-definitions)
+             program
+             (compile-proc-to-func
+              "$main"
+              '()
+              non-definitions
+              program
+              lexical-env
+              "main"
+              compile)))
+        (elem-defs-count
+         (compiled-program-definitions-count program 'elem))
+        (program
+         (if (= elem-defs-count 0)
+             program
+             (compiled-program-add-definition
+              program
+              `(table ,elem-defs-count funcref)))))
+     program))
 
  (define (compile-program-to-module program)
    (let*
-       ((get-module-definitions
-         (let ((module-definitions
-                (compiled-program-module-definitions program)))
-           (lambda (type)
-             (wasm-module-get-definitions
-              module-definitions
-              type))))
-        (elem-defs
-         (get-module-definitions 'elem))
+       ((elem-defs
+         (compiled-program-get-definitions program 'elem))
         (elem-func-indices
          (map wasm-elem-definition-func-index elem-defs))
-        (table-definition
-         (if (null? elem-func-indices)
-             '()
-             `((table ,(length elem-func-indices) funcref))))
-        (elem-definition
-         (if (null? elem-func-indices)
+        (elems-def
+         (if (null? elem-defs)
              '()
              `((elem (i32.const 0) func ,@elem-func-indices))))
-        (global-init-defs
-         (map cdr (get-module-definitions 'global-init)))
-        (global-init-func
-         (if (null? global-init-defs)
-             '()
-             `((func $global-init
-                     ,@(flatten-n 2 global-init-defs))
-               (start $global-init))))
-        (top-level-code
-         (compiled-program-value-code program)))
+        (get-module-definitions
+         (lambda (type)
+           (compiled-program-get-definitions program type))))
      `(module
         ,@(get-module-definitions 'type)
         ,@(get-module-definitions 'func)
-        (func $main (result i32)
-              ,@top-level-code)
-        ,@table-definition
+        ,@(get-module-definitions 'table)
         ,@(get-module-definitions 'global)
-        ,@global-init-func
-        (export "main" (func $main))
-        ,@elem-definition
-        ,@(get-module-definitions 'export))))
+        ,@(get-module-definitions 'export)
+        ,@(get-module-definitions 'start)
+        ,@elems-def)))
 
  (define (make-global-lexical-env variables exports)
    (let ((duplicate-var (first-duplicate variables)))
@@ -121,15 +133,14 @@
     exports)
    (add-new-lexical-frame
     (make-empty-lexical-env)
-    (make-lexical-frame
-     variables
-     (fold-left
-      (lambda (additional-info var)
-        (if (memq var exports)
-            (cons `(,var (export ,(symbol->string var)))
-                  additional-info)
-            additional-info))
-      '()
-      variables))))
+    variables
+    (fold-left
+     (lambda (additional-info var)
+       (if (memq var exports)
+           (cons `(,var (export ,(symbol->string var)))
+                 additional-info)
+           additional-info))
+     '()
+     variables)))
 
  )

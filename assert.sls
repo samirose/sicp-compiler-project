@@ -1,8 +1,10 @@
 #!r6rs
 (library
  (assert)
+
  (export assert-equal
          install-test-compilation-error-handler! assert-raises-compilation-error)
+
  (import (rnrs base)
          (rnrs exceptions)
          (compilation-error))

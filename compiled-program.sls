@@ -1,6 +1,7 @@
 #!r6rs
 (library
  (compiled-program)
+
  (export make-empty-compiled-program
          compiled-program-module-definitions
          compiled-program-value-code
@@ -8,11 +9,13 @@
          compiled-program-append-value-code
          compiled-program-append-value-codes
          compiled-program-add-definition
+         compiled-program-get-definitions
          compiled-program-contains-definition
          compiled-program-definition-index
          compiled-program-definitions-count
          compiled-program-with-definition-and-value-code
          compiled-program-with-definitions-and-value-code)
+
  (import (rnrs base)
          (rnrs lists)
          (wasm-module-definitions))
@@ -54,6 +57,11 @@
       (compiled-program-module-definitions cp)
       definition)
      (compiled-program-value-code cp)))
+
+  (define (compiled-program-get-definitions cp type)
+    (wasm-module-get-definitions
+     (compiled-program-module-definitions cp)
+     type))
 
   (define (compiled-program-contains-definition cp definition)
     (wasm-module-contains-definition

@@ -68,7 +68,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Open coding of numerical comparison operators produces incorrect results when the operator is applied to more than two parameters
 * Numerical operator special cases `(+)`, `(*)`, `(+ x)`, `(* x)`, `(- x)`, `(/ x)` are not supported
 * The Scheme values are not type checked in the compiled programs: a number can be used as a procedure reference and vice-versa. Using of uninitialized values is not detected.
-* Compiling `(begin)` results in no value
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Backlog

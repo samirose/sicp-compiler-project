@@ -3,6 +3,7 @@
           expression-let
           multi-variable-let
           nested-let
+          nested-let-referring-outer-let
           let-shadowing-let
           let-in-lambda
           let-value-referring-lambda-arg
@@ -26,6 +27,11 @@
     (define (nested-let)
       (let ((a 2))
         (let ((b 3))
+          (* a b))))
+
+    (define (nested-let-referring-outer-let)
+      (let ((a 2))
+        (let ((b (+ a 1)))
           (* a b))))
 
     (define (let-shadowing-let)

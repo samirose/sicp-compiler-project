@@ -42,6 +42,8 @@ lib/scheme-r7rs-syntax: \
 lib/scheme-syntax: \
 	lib/pattern-match \
 	lib/compilation-error
+lib/lexical-env: \
+	lib/lists
 lib/expression-compiler : \
 	lib/lists \
 	lib/scheme-syntax \

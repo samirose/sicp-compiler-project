@@ -178,4 +178,17 @@
            '(1 1)
            (let ((address (find-variable 'b env)))
              (list (frame-index address) (var-index address)))
-           "find-variable will return frame-index of 1 and correct var-index for variable found in the next lexical frame"))))))
+           "find-variable will return frame-index of 1 and correct var-index for variable found in the next lexical frame")
+
+          (let ((prev-frames-size 5)
+                (env (add-new-local-temporaries-frame env 2)))
+            (assert-equal
+             prev-frames-size
+             (env-var-index-offset env)
+             "env-var-index-offset with local frame added returns the length of the previous local frame and its preceeding frame")
+
+            (let ((env (add-new-local-frame env '(t) '())))
+              (assert-equal
+               7
+               (env-var-index-offset env)
+               "add-new-local-temporaries-frame reserves index space for specified number of variables"))))))))

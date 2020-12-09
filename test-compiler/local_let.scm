@@ -9,6 +9,7 @@
           let-value-referring-lambda-arg
           let-value-shadowing-lambda-arg
           lambda-as-let-value
+          mutate-locals
           get-global-with-let-value)
 
   (begin
@@ -61,6 +62,14 @@
       (let ((prod (* 2 3))
             (double (lambda (x) (+ x x))))
         (double prod)))
+
+    (define (mutate-locals)
+      (let ((a 1) (b 2))
+        (let ((c 3))
+          (set! a b)
+          (set! b c)
+          (set! c (+ c 1))
+          (+ a b c))))
 
     (define global-with-let-value
       (let ((x 2) (y 3))

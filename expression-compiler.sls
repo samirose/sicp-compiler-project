@@ -410,6 +410,4 @@
     (compiled-program-append-value-code
      operands-and-operator-program
      `(call_indirect (type ,type-index)))))
-
-'(COMPILER LOADED)
 )

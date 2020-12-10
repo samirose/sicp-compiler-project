@@ -34,6 +34,8 @@
          (compile-definition exp program lexical-env compile))
         ((if? exp)
          (compile-if exp program lexical-env compile))
+        ((and? exp)
+         (compile-and exp program lexical-env compile))
         ((lambda? exp)
          (compile-lambda exp program lexical-env '() compile))
         ((let? exp)
@@ -189,6 +191,60 @@
        else
        ,@(compiled-program-value-code a-prog)
        end))))
+
+(define (compile-and exp program lexical-env compile)
+  (let ((exps (and-expressions exp)))
+    (cond
+      ((null? exps)
+       (compile #t program lexical-env))
+      ((null? (cdr exps))
+       (compile (car exps) program lexical-env))
+      (else
+       (let
+           ((blocks-prog
+             (let generate ((exps exps)
+                            (prog program))
+               (cond
+                 ((null? (cdr exps))
+                  (let*
+                      ((env (add-new-local-temporaries-frame lexical-env 1))
+                       (temp-var-index (env-var-index-offset env))
+                       (value-prog (compile (car exps) prog env))
+                       (value-code (compiled-program-value-code value-prog)))
+                    (compiled-program-with-value-code
+                     value-prog
+                     `(block
+                         ,@value-code
+                         (local i32)
+                         local.tee ,temp-var-index
+                         br_if 0
+                         br 1
+                       end
+                       local.get ,temp-var-index
+                       br 1))))
+                 (else
+                  (let*
+                      ((value-prog (compile (car exps) prog lexical-env))
+                       (value-code (compiled-program-value-code value-prog))
+                       (block-prog
+                        (compiled-program-with-value-code
+                         value-prog
+                         `(block
+                             ,@value-code
+                             br_if 0
+                             br 1
+                           end))))
+                    (compiled-program-append-value-codes
+                     block-prog
+                     (generate (cdr exps) block-prog))))))))
+         (compiled-program-with-value-code
+          blocks-prog
+          `(block (result i32)
+              block
+                ,@(compiled-program-value-code blocks-prog)
+              end
+              ,@(compiled-program-value-code (compile #f blocks-prog lexical-env))
+            end)))))))
 
 ;;; sequences
 

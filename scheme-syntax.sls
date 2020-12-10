@@ -12,6 +12,7 @@
          let? let*? let-bindings binding-variable binding-value let-body
          lambda? lambda-formals lambda-body
          if? if-test if-consequent if-alternate
+         and? and-expressions
          begin? begin-actions last-exp? first-exp rest-exps
          application? operator operands)
 
@@ -184,6 +185,13 @@
   (if (pattern-match? `(if ,?? ,?? ,??) exp)
       (cadddr exp)
       #f))
+
+;; and expression
+(define (and? exp)
+  (pattern-match? `(and ,??*) exp))
+
+(define (and-expressions exp)
+  (cdr exp))
 
 ;; sequence
 (define (begin? exp)

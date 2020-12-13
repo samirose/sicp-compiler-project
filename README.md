@@ -64,6 +64,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 
 ## Features currently under work
 * Add support for allocating local temporary variables. They will be needed in the implementation of `and` and `or` expressions for retaining the expression's value. See also [#1102 dup instruction](https://github.com/WebAssembly/design/issues/1102).
+* Add compilation of `and` and `or` expressions. They can be implemented with Wasm block structure and conditional branch instructions.
 
 ## Known issues
 * Open coding of numerical comparison operators produces incorrect results when the operator is applied to more than two parameters
@@ -73,7 +74,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 
 ## Backlog
 * Come up with a name for this project
-* Add compilation of `and` and `or` expressions. They can be implemented with Wasm block structure and conditional branch instructions.
 * Restrict numerical comparison operators to two parameters (see [Known issues](#known-issues)) and add support for the currently missing operators
 * Optional: Implement support for numerical comparison operators with more than two parameters by compiling them as an `and` expression
 * Compile `cond` as Wasm block structure and conditional branch instructions instead of the current nested if expressions.

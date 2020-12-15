@@ -36,6 +36,8 @@
          (compile-if exp program lexical-env compile))
         ((and? exp)
          (compile-and exp program lexical-env compile))
+        ((or? exp)
+         (compile-or exp program lexical-env compile))
         ((lambda? exp)
          (compile-lambda exp program lexical-env '() compile))
         ((let? exp)
@@ -245,6 +247,50 @@
               end
               ,@(compiled-program-value-code (compile #f blocks-prog lexical-env))
             end)))))))
+
+(define (compile-or exp program lexical-env compile)
+  (let ((exps (or-expressions exp)))
+    (cond
+      ((null? exps)
+       (compile #f program lexical-env))
+      ((null? (cdr exps))
+       (compile (car exps) program lexical-env))
+      (else
+       (let*
+           ((env (add-new-local-temporaries-frame lexical-env 1))
+            (temp-var-index (env-var-index-offset env))
+            (blocks-prog
+             (let generate ((exps exps)
+                            (prog program))
+               (let*
+                   ((value-prog (compile (car exps) prog env))
+                    (value-code (compiled-program-value-code value-prog)))
+                 (cond
+                   ((null? (cdr exps))
+                    (compiled-program-with-value-code
+                     value-prog
+                     `(,@value-code
+                       local.set ,temp-var-index)))
+                   (else
+                    (let
+                        ((block-prog
+                          (compiled-program-with-value-code
+                           value-prog
+                           `(block
+                               ,@value-code
+                               local.tee ,temp-var-index
+                               br_if 1
+                             end))))
+                      (compiled-program-append-value-codes
+                       block-prog
+                       (generate (cdr exps) block-prog)))))))))
+         (compiled-program-with-value-code
+          blocks-prog
+          `((local i32)
+            block
+              ,@(compiled-program-value-code blocks-prog)
+            end
+            local.get ,temp-var-index)))))))
 
 ;;; sequences
 

@@ -259,25 +259,25 @@
        (let*
            ((env (add-new-local-temporaries-frame lexical-env 1))
             (temp-var-index (env-var-index-offset env))
-            (blocks-prog
+            (exps-prog
              (let generate ((exps exps)
                             (prog program))
                (let*
-                   ((value-prog (compile (car exps) prog env))
-                    (value-code (compiled-program-value-code value-prog)))
+                   ((exp-prog (compile (car exps) prog env))
+                    (exp-code (compiled-program-value-code exp-prog)))
                  (cond
                    ((null? (cdr exps))
                     (compiled-program-with-value-code
-                     value-prog
-                     `(,@value-code
+                     exp-prog
+                     `(,@exp-code
                        local.set ,temp-var-index)))
                    (else
                     (let
                         ((block-prog
                           (compiled-program-with-value-code
-                           value-prog
+                           exp-prog
                            `(block
-                               ,@value-code
+                               ,@exp-code
                                local.tee ,temp-var-index
                                br_if 1
                              end))))
@@ -285,10 +285,10 @@
                        block-prog
                        (generate (cdr exps) block-prog)))))))))
          (compiled-program-with-value-code
-          blocks-prog
+          exps-prog
           `((local i32)
             block
-              ,@(compiled-program-value-code blocks-prog)
+              ,@(compiled-program-value-code exps-prog)
             end
             local.get ,temp-var-index)))))))
 

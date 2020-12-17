@@ -203,7 +203,7 @@
        (compile (car exps) program lexical-env))
       (else
        (let
-           ((blocks-prog
+           ((exps-prog
              (let generate ((exps exps)
                             (prog program))
                (cond
@@ -211,12 +211,12 @@
                   (let*
                       ((env (add-new-local-temporaries-frame lexical-env 1))
                        (temp-var-index (env-var-index-offset env))
-                       (value-prog (compile (car exps) prog env))
-                       (value-code (compiled-program-value-code value-prog)))
+                       (exp-prog (compile (car exps) prog env))
+                       (exp-code (compiled-program-value-code exp-prog)))
                     (compiled-program-with-value-code
-                     value-prog
+                     exp-prog
                      `(block
-                         ,@value-code
+                         ,@exp-code
                          (local i32)
                          local.tee ,temp-var-index
                          br_if 0
@@ -226,13 +226,13 @@
                        br 1))))
                  (else
                   (let*
-                      ((value-prog (compile (car exps) prog lexical-env))
-                       (value-code (compiled-program-value-code value-prog))
+                      ((exp-prog (compile (car exps) prog lexical-env))
+                       (exp-code (compiled-program-value-code exp-prog))
                        (block-prog
                         (compiled-program-with-value-code
-                         value-prog
+                         exp-prog
                          `(block
-                             ,@value-code
+                             ,@exp-code
                              br_if 0
                              br 1
                            end))))
@@ -240,12 +240,12 @@
                      block-prog
                      (generate (cdr exps) block-prog))))))))
          (compiled-program-with-value-code
-          blocks-prog
+          exps-prog
           `(block (result i32)
               block
-                ,@(compiled-program-value-code blocks-prog)
+                ,@(compiled-program-value-code exps-prog)
               end
-              ,@(compiled-program-value-code (compile #f blocks-prog lexical-env))
+              ,@(compiled-program-value-code (compile #f exps-prog lexical-env))
             end)))))))
 
 (define (compile-or exp program lexical-env compile)

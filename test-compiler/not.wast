@@ -1,0 +1,6 @@
+(assert_return (invoke "not-true-is-false") (i32.const 0))
+(assert_return (invoke "not-false-is-true") (i32.const 1))
+(assert_return (invoke "not-non-false-value-is-false") (i32.const 0))
+(assert_return (invoke "not-true-expression-is-false") (i32.const 0))
+(assert_return (invoke "not-non-false-expression-is-false") (i32.const 0))
+(assert_return (invoke "not-false-expression-is-true") (i32.const 1))

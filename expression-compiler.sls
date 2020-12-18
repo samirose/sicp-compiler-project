@@ -189,9 +189,9 @@
      a-prog
      `(,@(compiled-program-value-code t-prog)
        if (result i32)
-       ,@(compiled-program-value-code c-prog)
+         ,@(compiled-program-value-code c-prog)
        else
-       ,@(compiled-program-value-code a-prog)
+         ,@(compiled-program-value-code a-prog)
        end))))
 
 (define (compile-and exp program lexical-env compile)

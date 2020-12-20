@@ -26,7 +26,7 @@
 
 (assert-expression-raises-compilation-error
  3.14
- "Unsupported value" 3.14
+ "Unsupported number" 3.14
  "Floating-point values are not yet supported")
 
 ;; quote

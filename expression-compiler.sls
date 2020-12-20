@@ -22,7 +22,9 @@
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 
 (define (compile exp program lexical-env)
-  (cond ((self-evaluating? exp)
+  (cond ((number? exp)
+         (compile-number exp program))
+        ((self-evaluating? exp)
          (compile-self-evaluating exp program))
         ((quoted? exp)
          (compile-quoted exp program))
@@ -66,12 +68,18 @@
 
 ;;;simple expressions
 
-(define (compile-self-evaluating exp program)
+(define (compile-number exp program)
   (compiled-program-with-value-code
    program
    (cond ((integer? exp)
           `(i32.const ,exp))
-         ((boolean? exp)
+         (else
+          (raise-compilation-error "Unsupported number" exp)))))
+
+(define (compile-self-evaluating exp program)
+  (compiled-program-with-value-code
+   program
+   (cond ((boolean? exp)
           `(i32.const ,(if exp 1 0)))
          (else
           (raise-compilation-error "Unsupported value" exp)))))

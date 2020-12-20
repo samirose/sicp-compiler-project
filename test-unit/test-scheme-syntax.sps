@@ -7,37 +7,6 @@
 
 (install-test-compilation-error-handler!)
 
-;; quoted
-(assert-equal
- #t
- (quoted? '(quote x))
- "Quote with single value is valid")
-
-(assert-equal
- #t
- (quoted? '(quote (a b)))
- "Quote with single list is valid")
-
-(assert-equal
- 'x
- (text-of-quotation '(quote x))
- "text-of-quotation returns a single value")
-
-(assert-equal
- '(a b)
- (text-of-quotation '(quote (a b)))
- "text-of-quotation returns a single list value")
-
-(assert-raises-compilation-error
- (lambda () (quoted? '(quote)))
- "Too few operands" '(quote)
- "Quote without values raises an error")
-
-(assert-raises-compilation-error
- (lambda () (quoted? '(quote x y)))
- "Too many operands" '(quote x y)
- "Quote with multiple values raises an error")
-
 ;; assignment
 (assert-equal
  #t

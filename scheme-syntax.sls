@@ -5,7 +5,6 @@
  (scheme-syntax)
 
  (export
-         quoted? text-of-quotation
          variable?
          assignment? assignment-variable assignment-value
          definition? definition-variable definition-value
@@ -14,7 +13,8 @@
          if? if-test if-consequent if-alternate
          not? not-expression and? and-expressions or? or-expressions
          begin? begin-actions last-exp? first-exp rest-exps
-         application? operator operands)
+         application? operator operands
+         check-syntax-errors)
 
  (import (rnrs base)
          (rnrs lists)
@@ -26,19 +26,17 @@
       (raise-compilation-error message object)
       #f))
 
-;; quote
-(define (quoted? exp)
-  (cond ((not (pattern-match? `(quote ,??*) exp)) #f)
-        ((pattern-match? `(quote ,??) exp))
-        ((raise-error-on-match '(quote) exp "Too few operands" exp))
-        ((raise-error-on-match `(quote ,?? ,?? ,??*) exp "Too many operands" exp))
-        (else (error "Internal compiler error: unexhaustive quote syntax check" exp))))
-
-(define (text-of-quotation exp) (cadr exp))
-
 ;; assignment
 (define (variable? exp) (symbol? exp))
 (define (not-variable? exp) (not (variable? exp)))
+
+;; syntax errors
+(define (check-syntax-errors exp)
+  ;; quote
+  (raise-error-on-match
+   '(quote) exp "Too few operands" exp)
+  (raise-error-on-match
+   `(quote ,?? ,?? ,??*) exp "Too many operands" exp))
 
 (define (assignment? exp)
   (cond ((not (pattern-match? `(set! ,??*) exp)) #f)

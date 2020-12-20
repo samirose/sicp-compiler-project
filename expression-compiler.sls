@@ -11,6 +11,7 @@
          (rnrs lists)
          (lists)
          (scheme-syntax)
+         (pattern-match)
          (lexical-env)
          (compiled-program)
          (compilation-error)
@@ -28,8 +29,8 @@
          (compile-boolean exp program))
         ((string? exp)
          (compile-string exp program))
-        ((quoted? exp)
-         (compile-quoted exp program))
+        ((pattern-match? `(quote ,??) exp)
+         (compile-quoted exp (cadr exp) program))
         ((variable? exp)
          (compile-variable exp program lexical-env))
         ((assignment? exp)
@@ -54,10 +55,11 @@
          (compile-sequence (begin-actions exp) program lexical-env compile))
         ((open-coded-primitive-application? exp)
          (compile-open-coded-primitive exp program lexical-env compile))
+        ((check-syntax-errors exp))
         ((application? exp)
          (compile-application exp program lexical-env compile))
         (else
-         (raise-compilation-error "Unknown expression type -- COMPILE" exp))))
+         (raise-compilation-error "Unknown expression type" exp))))
 
 ;;;special values
 
@@ -86,7 +88,7 @@
 (define (compile-string exp program)
   (raise-compilation-error "Strings not supported yet" exp))
 
-(define (compile-quoted exp program)
+(define (compile-quoted exp value program)
   (raise-compilation-error "Quote not supported yet" exp))
 
 (define (compile-variable exp program lexical-env)

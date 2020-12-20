@@ -33,8 +33,8 @@
          (compile-quoted exp (cadr exp) program))
         ((variable? exp)
          (compile-variable exp program lexical-env))
-        ((assignment? exp)
-         (compile-assignment exp program lexical-env compile))
+        ((pattern-match? `(set! ,variable? ,??) exp)
+         (compile-assignment exp (cadr exp) (caddr exp) program lexical-env compile))
         ((definition? exp)
          (compile-definition exp program lexical-env compile))
         ((if? exp)
@@ -105,11 +105,11 @@
      program
      `(,get-instr ,(var-index lexical-address)))))
 
-(define (compile-assignment exp program lexical-env compile)
+(define (compile-assignment exp variable value program lexical-env compile)
   (let* ((lexical-address
-          (find-variable (assignment-variable exp) lexical-env))
+          (find-variable variable lexical-env))
          (program-with-value-computing-code
-          (compile (assignment-value exp) program lexical-env))
+          (compile value program lexical-env))
          (set-instr
           (cond
             ((not lexical-address)

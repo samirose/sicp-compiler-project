@@ -6,7 +6,6 @@
 
  (export
          variable?
-         assignment? assignment-variable assignment-value
          definition? definition-variable definition-value
          let? let*? let-bindings binding-variable binding-value let-body
          lambda? lambda-formals lambda-body
@@ -36,24 +35,16 @@
   (raise-error-on-match
    '(quote) exp "Too few operands" exp)
   (raise-error-on-match
-   `(quote ,?? ,?? ,??*) exp "Too many operands" exp))
-
-(define (assignment? exp)
-  (cond ((not (pattern-match? `(set! ,??*) exp)) #f)
-        ((pattern-match? `(set! ,variable? ,??) exp))
-        ((raise-error-on-match
-          '(set!) exp "Variable and value missing from assignment" exp))
-        ((raise-error-on-match
-          `(set! ,??) exp "Variable or value missing from assignment" exp))
-        ((raise-error-on-match
-          `(set! ,?? ,?? ,?? ,??*) exp "Too many operands to assignment" exp))
-       ((raise-error-on-match
-         `(set! ,not-variable? ,??) exp
-         "Not an identifier" (assignment-variable exp)))
-       (else (error "Internal compiler error: unexhaustive assignment syntax check" exp))))
-
-(define (assignment-variable exp) (cadr exp))
-(define (assignment-value exp) (caddr exp))
+   `(quote ,?? ,?? ,??*) exp "Too many operands" exp)
+  ;; assignment
+  (raise-error-on-match
+   '(set!) exp "Variable and value missing from assignment" exp)
+  (raise-error-on-match
+   `(set! ,??) exp "Variable or value missing from assignment" exp)
+  (raise-error-on-match
+   `(set! ,?? ,?? ,?? ,??*) exp "Too many operands to assignment" exp)
+  (raise-error-on-match
+   `(set! ,not-variable? ,??) exp "Invalid variable in assignment" exp))
 
 ;; definition
 (define (variable-definition? exp)

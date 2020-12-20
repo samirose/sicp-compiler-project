@@ -26,8 +26,8 @@
          (compile-number exp program))
         ((boolean? exp)
          (compile-boolean exp program))
-        ((self-evaluating? exp)
-         (compile-self-evaluating exp program))
+        ((string? exp)
+         (compile-string exp program))
         ((quoted? exp)
          (compile-quoted exp program))
         ((variable? exp)
@@ -83,13 +83,8 @@
    program
    `(i32.const ,(if exp 1 0))))
 
-(define (compile-self-evaluating exp program)
-  (compiled-program-with-value-code
-   program
-   (cond ((boolean? exp)
-          `(i32.const ,(if exp 1 0)))
-         (else
-          (raise-compilation-error "Unsupported value" exp)))))
+(define (compile-string exp program)
+  (raise-compilation-error "Strings not supported yet" exp))
 
 (define (compile-quoted exp program)
   (raise-compilation-error "Quote not supported yet" exp))

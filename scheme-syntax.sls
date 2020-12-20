@@ -4,7 +4,7 @@
 (library
  (scheme-syntax)
 
- (export self-evaluating?
+ (export
          quoted? text-of-quotation
          variable?
          assignment? assignment-variable assignment-value
@@ -20,12 +20,6 @@
          (rnrs lists)
          (pattern-match)
          (compilation-error))
-
-(define (self-evaluating? exp)
-  (cond ((number? exp) #t)
-        ((boolean? exp) #t)
-        ((string? exp) #t)
-        (else #f)))
 
 (define (raise-error-on-match pat exp message object)
   (if (pattern-match? pat exp)

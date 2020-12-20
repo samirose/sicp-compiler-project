@@ -21,7 +21,7 @@
 ;; self-evaluating expressions
 (assert-expression-raises-compilation-error
  "a string"
- "Unsupported value" "a string"
+ "Strings not supported yet" "a string"
  "String values are not yet supported")
 
 (assert-expression-raises-compilation-error

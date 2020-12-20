@@ -3,12 +3,13 @@
  (lexical-env)
 
  (export make-empty-lexical-env global-lexical-env?
-         add-new-lexical-frame add-new-local-frame
+         add-new-lexical-frame add-new-local-frame add-new-local-temporaries-frame
          find-variable frame-index var-index additional-info global-address?
          env-get-additional-info env-var-index-offset)
 
  (import (rnrs base)
-         (rnrs lists))
+         (rnrs lists)
+         (lists))
 
  (define (make-empty-lexical-env) '())
 
@@ -64,6 +65,10 @@
        (error "Internal compiler error: cannot add new local frame to an empty environment" variables)
        (cons (make-local-frame lexical-env variables additional-info-map)
              lexical-env)))
+
+ (define (add-new-local-temporaries-frame lexical-env n)
+   (cons (make-local-frame lexical-env (make-list '() n) '())
+         lexical-env))
 
  (define (make-lexical-address frame-index var-index lexical-env additional-info)
    (list frame-index var-index lexical-env additional-info))

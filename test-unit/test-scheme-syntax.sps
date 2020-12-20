@@ -631,6 +631,22 @@
  "Too many subexpressions in if expression" '(if (= x 0) 1 2 3 4)
  "If expression must not contain more subexpressions than test, consequent and alternative")
 
+;; not expression
+(assert-equal
+ (not? '(not x))
+ #t
+ "Not with single simple expression is valid")
+
+(assert-equal
+ (not? '(not (and x y)))
+ #t
+ "Not with single composite expression is valid")
+
+(assert-raises-compilation-error
+ (lambda () (not? '(not x y)))
+ "Too many arguments in not expression" '(not x y)
+ "Not expression must have single argument")
+
 ;; sequence
 (let ((exp '(begin 42)))
   (assert-equal

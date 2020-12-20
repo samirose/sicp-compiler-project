@@ -34,6 +34,12 @@
          (compile-definition exp program lexical-env compile))
         ((if? exp)
          (compile-if exp program lexical-env compile))
+        ((not? exp)
+         (compile-not exp program lexical-env compile))
+        ((and? exp)
+         (compile-and exp program lexical-env compile))
+        ((or? exp)
+         (compile-or exp program lexical-env compile))
         ((lambda? exp)
          (compile-lambda exp program lexical-env '() compile))
         ((let? exp)
@@ -185,10 +191,119 @@
      a-prog
      `(,@(compiled-program-value-code t-prog)
        if (result i32)
-       ,@(compiled-program-value-code c-prog)
+         ,@(compiled-program-value-code c-prog)
        else
-       ,@(compiled-program-value-code a-prog)
+         ,@(compiled-program-value-code a-prog)
        end))))
+
+(define (compile-not exp program lexical-env compile)
+  (let ((exp-prog (compile (not-expression exp) program lexical-env)))
+    (compiled-program-with-value-code
+     exp-prog
+     `(,@(compiled-program-value-code exp-prog)
+       if (result i32)
+         ,@(compiled-program-value-code (compile #f exp-prog lexical-env))
+       else
+         ,@(compiled-program-value-code (compile #t exp-prog lexical-env))
+       end))))
+
+(define (compile-and exp program lexical-env compile)
+  (let ((exps (and-expressions exp)))
+    (cond
+      ((null? exps)
+       (compile #t program lexical-env))
+      ((null? (cdr exps))
+       (compile (car exps) program lexical-env))
+      (else
+       (let
+           ((exps-prog
+             (let generate ((exps exps)
+                            (prog program))
+               (cond
+                 ((null? (cdr exps))
+                  (let*
+                      ((env (add-new-local-temporaries-frame lexical-env 1))
+                       (temp-var-index (env-var-index-offset env))
+                       (exp-prog (compile (car exps) prog env))
+                       (exp-code (compiled-program-value-code exp-prog)))
+                    (compiled-program-with-value-code
+                     exp-prog
+                     `(block
+                         ,@exp-code
+                         (local i32)
+                         local.tee ,temp-var-index
+                         br_if 0
+                         br 1
+                       end
+                       local.get ,temp-var-index
+                       br 1))))
+                 (else
+                  (let*
+                      ((exp-prog (compile (car exps) prog lexical-env))
+                       (exp-code (compiled-program-value-code exp-prog))
+                       (block-prog
+                        (compiled-program-with-value-code
+                         exp-prog
+                         `(block
+                             ,@exp-code
+                             br_if 0
+                             br 1
+                           end))))
+                    (compiled-program-append-value-codes
+                     block-prog
+                     (generate (cdr exps) block-prog))))))))
+         (compiled-program-with-value-code
+          exps-prog
+          `(block (result i32)
+              block
+                ,@(compiled-program-value-code exps-prog)
+              end
+              ,@(compiled-program-value-code (compile #f exps-prog lexical-env))
+            end)))))))
+
+(define (compile-or exp program lexical-env compile)
+  (let ((exps (or-expressions exp)))
+    (cond
+      ((null? exps)
+       (compile #f program lexical-env))
+      ((null? (cdr exps))
+       (compile (car exps) program lexical-env))
+      (else
+       (let*
+           ((env (add-new-local-temporaries-frame lexical-env 1))
+            (temp-var-index (env-var-index-offset env))
+            (exps-prog
+             (let generate ((exps exps)
+                            (prog program))
+               (let*
+                   ((exp-prog (compile (car exps) prog env))
+                    (exp-code (compiled-program-value-code exp-prog)))
+                 (cond
+                   ((null? (cdr exps))
+                    (compiled-program-with-value-code
+                     exp-prog
+                     `(,@exp-code
+                       local.set ,temp-var-index)))
+                   (else
+                    (let
+                        ((block-prog
+                          (compiled-program-with-value-code
+                           exp-prog
+                           `(block
+                               ,@exp-code
+                               local.tee ,temp-var-index
+                               br_if 1
+                             end))))
+                      (compiled-program-append-value-codes
+                       block-prog
+                       (generate (cdr exps) block-prog)))))))))
+         (compiled-program-with-value-code
+          exps-prog
+          `((local i32)
+            block
+              ,@(compiled-program-value-code exps-prog)
+            end
+            local.get ,temp-var-index)))))))
 
 ;;; sequences
 

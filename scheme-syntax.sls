@@ -12,6 +12,7 @@
          let? let*? let-bindings binding-variable binding-value let-body
          lambda? lambda-formals lambda-body
          if? if-test if-consequent if-alternate
+         not? not-expression and? and-expressions or? or-expressions
          begin? begin-actions last-exp? first-exp rest-exps
          application? operator operands)
 
@@ -184,6 +185,30 @@
   (if (pattern-match? `(if ,?? ,?? ,??) exp)
       (cadddr exp)
       #f))
+
+;; not expression
+(define (not? exp)
+  (cond ((not (pattern-match? `(not ,??*) exp)) #f)
+        ((pattern-match? `(not ,??) exp))
+        ((raise-error-on-match
+          `(not ,?? ,??*) exp "Too many arguments in not expression" exp))))
+
+(define (not-expression exp)
+  (cadr exp))
+
+;; and expression
+(define (and? exp)
+  (pattern-match? `(and ,??*) exp))
+
+(define (and-expressions exp)
+  (cdr exp))
+
+;; or expression
+(define (or? exp)
+  (pattern-match? `(or ,??*) exp))
+
+(define (or-expressions exp)
+  (cdr exp))
 
 ;; sequence
 (define (begin? exp)

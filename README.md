@@ -61,6 +61,8 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Support for exported top-level procedure definitions with R7RS libary syntax
 * Basic syntax and semantic error detection and tests for error handling
 * Implement `let` and `let*` with Wasm locals instead of `lambda`, if possible. (Using the bindings in closures will need further work)
+* `and` and `or` expressions with short circuit using Wasm block structure and conditional branch instructions
+* `not` expression
 
 ## Features currently under work
 
@@ -72,8 +74,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 
 ## Backlog
 * Come up with a name for this project
-* Add support for allocating local temporary variables. They will be needed in the implementation of `and` and `or` expressions for retaining the expression's value. See also [#1102 dup instruction](https://github.com/WebAssembly/design/issues/1102).
-* Add compilation of `and` and `or` expressions. They can be implemented with Wasm block structure and conditional branch instructions.
 * Restrict numerical comparison operators to two parameters (see [Known issues](#known-issues)) and add support for the currently missing operators
 * Optional: Implement support for numerical comparison operators with more than two parameters by compiling them as an `and` expression
 * Compile `cond` as Wasm block structure and conditional branch instructions instead of the current nested if expressions.

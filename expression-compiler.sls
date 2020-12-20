@@ -24,6 +24,8 @@
 (define (compile exp program lexical-env)
   (cond ((number? exp)
          (compile-number exp program))
+        ((boolean? exp)
+         (compile-boolean exp program))
         ((self-evaluating? exp)
          (compile-self-evaluating exp program))
         ((quoted? exp)
@@ -75,6 +77,11 @@
           `(i32.const ,exp))
          (else
           (raise-compilation-error "Unsupported number" exp)))))
+
+(define (compile-boolean exp program)
+  (compiled-program-with-value-code
+   program
+   `(i32.const ,(if exp 1 0))))
 
 (define (compile-self-evaluating exp program)
   (compiled-program-with-value-code

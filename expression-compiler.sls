@@ -197,17 +197,14 @@
        end))))
 
 (define (compile-not exp program lexical-env compile)
-  (let* ((exp-prog (compile (not-expression exp) program lexical-env))
-         (exp-code (compiled-program-value-code exp-prog))
-         (true-code (compiled-program-value-code (compile #t exp-prog lexical-env)))
-         (false-code (compiled-program-value-code (compile #f exp-prog lexical-env))))
+  (let ((exp-prog (compile (not-expression exp) program lexical-env)))
     (compiled-program-with-value-code
      exp-prog
-     `(,@exp-code
+     `(,@(compiled-program-value-code exp-prog)
        if (result i32)
-         ,@false-code
+         ,@(compiled-program-value-code (compile #f exp-prog lexical-env))
        else
-         ,@true-code
+         ,@(compiled-program-value-code (compile #t exp-prog lexical-env))
        end))))
 
 (define (compile-and exp program lexical-env compile)

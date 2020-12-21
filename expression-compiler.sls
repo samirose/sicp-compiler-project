@@ -45,8 +45,8 @@
          (compile-and exp program lexical-env compile))
         ((or? exp)
          (compile-or exp program lexical-env compile))
-        ((lambda? exp)
-         (compile-lambda exp program lexical-env '() compile))
+        ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
+         (compile-lambda exp (cadr exp) (cddr exp) program lexical-env '() compile))
         ((let? exp)
          (compile-let exp program lexical-env compile))
         ((let*? exp)
@@ -137,7 +137,14 @@
        (value (definition-value exp))
        (program-with-value-computing-code
         (if (lambda? value)
-            (compile-lambda value program lexical-env variable compile)
+            (compile-lambda
+             value
+             (lambda-formals value)
+             (lambda-body value)
+             program
+             lexical-env
+             variable
+             compile)
             (compile value program lexical-env)))
        (value-code
         (compiled-program-value-code program-with-value-computing-code))
@@ -393,17 +400,17 @@
           `(export ,exported-name (func ,func-index)))
          func-program)))
 
-(define (compile-lambda exp program lexical-env current-binding compile)
+(define (compile-lambda exp formals body program lexical-env current-binding compile)
+  (check-all-identifiers formals)
   (let*
-      ((formals (lambda-formals exp))
-       (exported-name
+      ((exported-name
         (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
               (else #f)))
        (func-program
         (compile-proc-to-func
          exp
          formals
-         (lambda-body exp)
+         body
          program
          lexical-env
          exported-name

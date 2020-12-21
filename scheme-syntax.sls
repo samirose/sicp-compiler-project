@@ -13,7 +13,7 @@
          not? not-expression and? and-expressions or? or-expressions
          begin? begin-actions last-exp? first-exp rest-exps
          application? operator operands
-         check-syntax-errors)
+         check-all-identifiers check-syntax-errors)
 
  (import (rnrs base)
          (rnrs lists)
@@ -44,7 +44,14 @@
   (raise-error-on-match
    `(set! ,?? ,?? ,?? ,??*) exp "Too many operands to assignment" exp)
   (raise-error-on-match
-   `(set! ,not-variable? ,??) exp "Invalid variable in assignment" exp))
+   `(set! ,not-variable? ,??) exp "Invalid variable in assignment" exp)
+  ;: lambda expression
+  (raise-error-on-match
+   `(lambda) exp "Arguments and body missing from lambda expression" exp)
+  (raise-error-on-match
+   `(lambda ,??) exp "Body missing from lambda expression" exp)
+  (raise-error-on-match
+   `(lambda ,?? ,??) exp "Arguments list missing from lambda expression" exp))
 
 ;; definition
 (define (variable-definition? exp)

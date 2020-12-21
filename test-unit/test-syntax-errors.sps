@@ -16,6 +16,7 @@
    (lambda () (compile exp (make-empty-compiled-program) empty-global-env))
    expected-message expected-object description))
 
+;; quotation
 (assert-expression-raises-compilation-error
  '(quote)
  "Too few operands" '(quote)
@@ -26,6 +27,7 @@
  "Too many operands" '(quote x y)
  "Quote with multiple values raises an error")
 
+;; assignment
 (assert-expression-raises-compilation-error
  '(set!)
  "Variable and value missing from assignment" '(set!)
@@ -45,3 +47,29 @@
  '(set! x 1 2)
  "Too many operands to assignment" '(set! x 1 2)
  "Assignment with too many operands raises an error")
+
+;; lambda expression
+(assert-expression-raises-compilation-error
+ '(lambda ())
+ "Body missing from lambda expression" '(lambda ())
+ "Lambda expression must define a body")
+
+(assert-expression-raises-compilation-error
+ '(lambda (x))
+ "Body missing from lambda expression" '(lambda (x))
+ "Lambda expression must define a body")
+
+(assert-expression-raises-compilation-error
+ '(lambda x)
+ "Body missing from lambda expression" '(lambda x)
+ "Lambda expression must define a body")
+
+(assert-expression-raises-compilation-error
+ '(lambda a a)
+ "Arguments list missing from lambda expression" '(lambda a a)
+ "Lambda expressions must define an argument list (list argument forms are not yet supported)")
+
+(assert-expression-raises-compilation-error
+ '(lambda (x 1) (+ x 1))
+ "Not an identifier" 1
+ "Lambda arguments must be identifiers")

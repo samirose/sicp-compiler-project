@@ -2,7 +2,7 @@
 (library
  (lists)
 
- (export partition-list index-of-equal first-duplicate make-list flatten-n
+ (export partition-list index-of-equal first-duplicate make-list flatten-n all?
          make-counted-set counted-set-add counted-set-count counted-set-unique-keys)
 
  (import (rnrs base)
@@ -47,6 +47,11 @@
                  (flatten-n n (cdr x)))
                 (cons head (flatten-n n (cdr x))))))
          (else x)))
+
+ (define (all? p? l)
+   (cond ((null? l))
+         ((p? (car l)) (all? p? (cdr l)))
+         (else #f)))
 
  (define (make-counted-set) '())
 

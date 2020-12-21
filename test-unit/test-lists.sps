@@ -120,6 +120,18 @@
  "flatten-n of a 2-nested list with n=2 results in a flat list")
 
 (assert-equal
+ #t (all? number? '())
+ "all is true for an empty list")
+
+(assert-equal
+ #t (all? number? '(1 2 3))
+ "all is true for a list where the predicate is true for all items")
+
+(assert-equal
+ #f (all? number? '(1 2 'foo 3))
+ "all is false for a list where the predicate is false for any item")
+
+(assert-equal
  0
  (let ((s (make-counted-set)))
    (counted-set-count s 'x))

@@ -8,7 +8,6 @@
          variable?
          definition? definition-variable
          let? let*? let-bindings binding-variable binding-value let-body
-         or? or-expressions
          begin? begin-actions last-exp? first-exp rest-exps
          application? operator operands
          check-all-identifiers check-syntax-errors)
@@ -138,13 +137,6 @@
 (define (binding-variable b) (car b))
 (define (binding-value b) (cadr b))
 (define (let-body exp) (cddr exp))
-
-;; or expression
-(define (or? exp)
-  (pattern-match? `(or ,??*) exp))
-
-(define (or-expressions exp)
-  (cdr exp))
 
 ;; sequence
 (define (begin? exp)

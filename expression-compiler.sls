@@ -125,7 +125,7 @@
      program-with-value-computing-code
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
-(define (compile-variable-definition exp variable value program lexical-env compile)
+(define (add-global-definition exp variable value-program lexical-env)
   (let*
       ((global-index
         (begin
@@ -137,10 +137,8 @@
                  "Internal compiler error: global binding missing from global lexical env"
                  (list variable lexical-env)))
             (var-index address))))
-       (program-with-value-computing-code
-        (compile value program lexical-env))
        (value-code
-        (compiled-program-value-code program-with-value-computing-code))
+        (compiled-program-value-code value-program))
        (init-instr
         (if (wasm-const-value? value-code)
             value-code
@@ -152,42 +150,22 @@
             '()
             `(,@value-code global.set ,global-index))))
     (compiled-program-with-definition-and-value-code
-     program-with-value-computing-code
+     value-program
      global-definition
      init-code)))
 
+(define (compile-variable-definition exp variable value program lexical-env compile)
+  (add-global-definition
+   exp variable
+   (compile value program lexical-env)
+   lexical-env))
+
 (define (compile-procedure-definition exp variable formals body program lexical-env compile)
   (check-all-identifiers formals)
-  (let*
-      ((global-index
-        (begin
-          (if (not (global-lexical-env? lexical-env))
-              (raise-compilation-error "Only top-level define is supported" exp))
-          (let ((address (find-variable variable lexical-env)))
-            (if (not address)
-                (raise-compilation-error
-                 "Internal compiler error: global binding missing from global lexical env"
-                 (list variable lexical-env)))
-            (var-index address))))
-       (program-with-value-computing-code
-        (compile-lambda
-         exp formals body program lexical-env variable compile))
-       (value-code
-        (compiled-program-value-code program-with-value-computing-code))
-       (init-instr
-        (if (wasm-const-value? value-code)
-            value-code
-            uninitialized-value))
-       (global-definition
-        `(global (mut i32) ,init-instr))
-       (init-code
-        (if (wasm-const-value? value-code)
-            '()
-            `(,@value-code global.set ,global-index))))
-    (compiled-program-with-definition-and-value-code
-     program-with-value-computing-code
-     global-definition
-     init-code)))
+  (add-global-definition
+   exp variable
+   (compile-lambda exp formals body program lexical-env variable compile)
+   lexical-env))
 
 ;;;open-coded primitives
 

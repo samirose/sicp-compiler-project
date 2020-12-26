@@ -40,8 +40,10 @@
         ((pattern-match? `(define (,variable? ,??*) ,?? ,??*) exp)
          (compile-procedure-definition
           exp (caadr exp) (cdadr exp) (cddr exp) program lexical-env compile))
-        ((if? exp)
-         (compile-if exp program lexical-env compile))
+        ((pattern-match? `(if ,?? ,??, ??) exp)
+         (compile-if exp (cadr exp) (caddr exp) (cadddr exp) program lexical-env compile))
+        ((pattern-match? `(if ,?? ,??) exp)
+         (compile-if exp (cadr exp) (caddr exp) #f program lexical-env compile))
         ((not? exp)
          (compile-not exp program lexical-env compile))
         ((and? exp)
@@ -201,12 +203,12 @@
 
 ;;;conditional expressions
 
-(define (compile-if exp program lexical-env compile)
-  (let* ((t-prog (compile (if-test exp) program lexical-env))
-         (c-prog (compile (if-consequent exp) t-prog lexical-env))
+(define (compile-if exp test consequent alternate program lexical-env compile)
+  (let* ((t-prog (compile test program lexical-env))
+         (c-prog (compile consequent t-prog lexical-env))
          (a-prog
-          (if (if-alternate exp)
-              (compile (if-alternate exp) c-prog lexical-env)
+          (if alternate
+              (compile alternate c-prog lexical-env)
               (compiled-program-with-value-code c-prog unspecified-value))))
     (compiled-program-with-value-code
      a-prog

@@ -129,3 +129,24 @@
  '(define 1 2 3)
  "Not a variable or procedure definition" '(define 1 2 3)
  "Definition's first operand should be an identifier or an identifier list")
+
+;; if expression
+(assert-expression-raises-compilation-error
+ '(if)
+ "Test and consequent missing from if expression" '(if)
+ "If expression must contain at least test and consequent subexpressions")
+
+(assert-expression-raises-compilation-error
+ '(if (= x 0))
+ "Consequent missing from if expression" '(if (= x 0))
+ "If expression must contain at least test and consequent subexpressions")
+
+(assert-expression-raises-compilation-error
+ '(if (= x 0) 1 2 3)
+ "Too many subexpressions in if expression" '(if (= x 0) 1 2 3)
+ "If expression must not contain more subexpressions than test, consequent and alternative")
+
+(assert-expression-raises-compilation-error
+ '(if (= x 0) 1 2 3 4)
+ "Too many subexpressions in if expression" '(if (= x 0) 1 2 3 4)
+ "If expression must not contain more subexpressions than test, consequent and alternative")

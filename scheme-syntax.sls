@@ -8,7 +8,6 @@
          variable?
          definition? definition-variable
          let? let*? let-bindings binding-variable binding-value let-body
-         if? if-test if-consequent if-alternate
          not? not-expression and? and-expressions or? or-expressions
          begin? begin-actions last-exp? first-exp rest-exps
          application? operator operands
@@ -67,7 +66,14 @@
   (raise-error-on-match
    `(define ,?? ,??) exp "Not an identifier in variable position" exp)
   (raise-error-on-match
-   `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp))
+   `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp)
+  ;; if expression
+  (raise-error-on-match
+    '(if) exp "Test and consequent missing from if expression" exp)
+  (raise-error-on-match
+   `(if ,??) exp "Consequent missing from if expression" exp)
+  (raise-error-on-match
+   `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp))
 
 (define (check-all-identifiers exps)
   (cond ((null? exps))
@@ -126,26 +132,6 @@
 (define (binding-variable b) (car b))
 (define (binding-value b) (cadr b))
 (define (let-body exp) (cddr exp))
-
-;; if expression
-(define (if? exp)
-  (cond ((not (pattern-match? `(if ,??*) exp)) #f)
-        ((pattern-match? `(if ,?? ,?? ,??) exp))
-        ((pattern-match? `(if ,?? ,??) exp))
-        ((raise-error-on-match
-          '(if) exp "Test and consequent missing from if expression" exp))
-        ((raise-error-on-match
-          `(if ,??) exp "Consequent missing from if expression" exp))
-        ((raise-error-on-match
-          `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp))
-        (else (error "Internal compiler error: unexhaustive if expression syntax check" exp))))
-
-(define (if-test exp) (cadr exp))
-(define (if-consequent exp) (caddr exp))
-(define (if-alternate exp)
-  (if (pattern-match? `(if ,?? ,?? ,??) exp)
-      (cadddr exp)
-      #f))
 
 ;; not expression
 (define (not? exp)

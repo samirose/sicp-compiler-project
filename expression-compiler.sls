@@ -128,15 +128,13 @@
 (define (add-global-definition exp variable value-program lexical-env)
   (let*
       ((global-index
-        (begin
-          (if (not (global-lexical-env? lexical-env))
-              (raise-compilation-error "Only top-level define is supported" exp))
-          (let ((address (find-variable variable lexical-env)))
-            (if (not address)
-                (raise-compilation-error
-                 "Internal compiler error: global binding missing from global lexical env"
-                 (list variable lexical-env)))
-            (var-index address))))
+        (cond ((not (global-lexical-env? lexical-env))
+               (raise-compilation-error "Only top-level define is supported" exp))
+              ((find-variable variable lexical-env) => var-index)
+              (else
+               (raise-compilation-error
+                "Internal compiler error: global binding missing from global lexical env"
+                (list variable lexical-env)))))
        (value-code
         (compiled-program-value-code value-program))
        (init-instr

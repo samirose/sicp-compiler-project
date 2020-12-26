@@ -8,7 +8,6 @@
          variable?
          definition? definition-variable
          let? let*? let-bindings binding-variable binding-value let-body
-         lambda? lambda-formals lambda-body
          if? if-test if-consequent if-alternate
          not? not-expression and? and-expressions or? or-expressions
          begin? begin-actions last-exp? first-exp rest-exps
@@ -127,25 +126,6 @@
 (define (binding-variable b) (car b))
 (define (binding-value b) (cadr b))
 (define (let-body exp) (cddr exp))
-
-;; lambda expression
-(define (lambda? exp)
-  (cond ((not (pattern-match? `(lambda ,??*) exp)) #f)
-        ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
-         (check-all-identifiers (lambda-formals exp)))
-        ((raise-error-on-match
-          `(lambda) exp "Arguments and body missing from lambda expression" exp))
-        ((raise-error-on-match
-          `(lambda ,??) exp "Body missing from lambda expression" exp))
-        ((raise-error-on-match
-          `(lambda ,?? ,??) exp "Arguments list missing from lambda expression" exp))
-        (else (error "Internal compiler error: unexhaustive lambda syntax check" exp))))
-
-(define (lambda-formals exp) (cadr exp))
-(define (lambda-body exp) (cddr exp))
-
-(define (make-lambda parameters body)
-  (cons 'lambda (cons parameters body)))
 
 ;; if expression
 (define (if? exp)

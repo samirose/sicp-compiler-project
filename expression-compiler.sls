@@ -46,8 +46,8 @@
          (compile-if exp (cadr exp) (caddr exp) #f program lexical-env compile))
         ((pattern-match? `(not ,??) exp)
          (compile-not exp (cadr exp) program lexical-env compile))
-        ((and? exp)
-         (compile-and exp program lexical-env compile))
+        ((pattern-match? `(and ,??*) exp)
+         (compile-and exp (cdr exp) program lexical-env compile))
         ((or? exp)
          (compile-or exp program lexical-env compile))
         ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
@@ -230,59 +230,58 @@
          ,@(compiled-program-value-code (compile #t test-prog lexical-env))
        end))))
 
-(define (compile-and exp program lexical-env compile)
-  (let ((exps (and-expressions exp)))
-    (cond
-      ((null? exps)
-       (compile #t program lexical-env))
-      ((null? (cdr exps))
-       (compile (car exps) program lexical-env))
-      (else
-       (let
-           ((exps-prog
-             (let generate ((exps exps)
-                            (prog program))
-               (cond
-                 ((null? (cdr exps))
-                  (let*
-                      ((env (add-new-local-temporaries-frame lexical-env 1))
-                       (temp-var-index (env-var-index-offset env))
-                       (exp-prog (compile (car exps) prog env))
-                       (exp-code (compiled-program-value-code exp-prog)))
-                    (compiled-program-with-value-code
-                     exp-prog
-                     `(block
-                         ,@exp-code
-                         (local i32)
-                         local.tee ,temp-var-index
-                         br_if 0
-                         br 1
-                       end
-                       local.get ,temp-var-index
-                       br 1))))
-                 (else
-                  (let*
-                      ((exp-prog (compile (car exps) prog lexical-env))
-                       (exp-code (compiled-program-value-code exp-prog))
-                       (block-prog
-                        (compiled-program-with-value-code
-                         exp-prog
-                         `(block
-                             ,@exp-code
-                             br_if 0
-                             br 1
-                           end))))
-                    (compiled-program-append-value-codes
-                     block-prog
-                     (generate (cdr exps) block-prog))))))))
-         (compiled-program-with-value-code
-          exps-prog
-          `(block (result i32)
-              block
-                ,@(compiled-program-value-code exps-prog)
-              end
-              ,@(compiled-program-value-code (compile #f exps-prog lexical-env))
-            end)))))))
+(define (compile-and exp tests program lexical-env compile)
+  (cond
+    ((null? tests)
+     (compile #t program lexical-env))
+    ((null? (cdr tests))
+     (compile (car tests) program lexical-env))
+    (else
+     (let
+         ((tests-prog
+           (let generate ((tests tests)
+                          (prog program))
+             (cond
+               ((null? (cdr tests))
+                (let*
+                    ((env (add-new-local-temporaries-frame lexical-env 1))
+                     (temp-var-index (env-var-index-offset env))
+                     (test-prog (compile (car tests) prog env))
+                     (test-code (compiled-program-value-code test-prog)))
+                  (compiled-program-with-value-code
+                   test-prog
+                   `(block
+                       ,@test-code
+                       (local i32)
+                       local.tee ,temp-var-index
+                       br_if 0
+                       br 1
+                     end
+                     local.get ,temp-var-index
+                     br 1))))
+               (else
+                (let*
+                    ((test-prog (compile (car tests) prog lexical-env))
+                     (test-code (compiled-program-value-code test-prog))
+                     (block-prog
+                      (compiled-program-with-value-code
+                       test-prog
+                       `(block
+                           ,@test-code
+                           br_if 0
+                           br 1
+                         end))))
+                  (compiled-program-append-value-codes
+                   block-prog
+                   (generate (cdr tests) block-prog))))))))
+       (compiled-program-with-value-code
+        tests-prog
+        `(block (result i32)
+            block
+              ,@(compiled-program-value-code tests-prog)
+            end
+            ,@(compiled-program-value-code (compile #f tests-prog lexical-env))
+          end))))))
 
 (define (compile-or exp program lexical-env compile)
   (let ((exps (or-expressions exp)))

@@ -26,7 +26,7 @@
    (memq instr wasm-const-instructions))
 
  (define (wasm-const-value? instr)
-   (pattern-match? '(,wasm-const-instruction? ,??) instr))
+   (pattern-match? `(,wasm-const-instruction? ,??) instr))
 
  (define (wasm-define-locals type n)
    (cons 'local (make-list type n)))

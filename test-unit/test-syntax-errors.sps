@@ -150,3 +150,14 @@
  '(if (= x 0) 1 2 3 4)
  "Too many subexpressions in if expression" '(if (= x 0) 1 2 3 4)
  "If expression must not contain more subexpressions than test, consequent and alternative")
+
+;; not expression
+(assert-expression-raises-compilation-error
+ '(not)
+ "Argument missing from not expression" '(not)
+ "Not expression must have single argument")
+
+(assert-expression-raises-compilation-error
+ '(not x y)
+ "Too many arguments in not expression" '(not x y)
+ "Not expression must have single argument")

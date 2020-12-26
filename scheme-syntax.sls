@@ -8,7 +8,7 @@
          variable?
          definition? definition-variable
          let? let*? let-bindings binding-variable binding-value let-body
-         not? not-expression and? and-expressions or? or-expressions
+         and? and-expressions or? or-expressions
          begin? begin-actions last-exp? first-exp rest-exps
          application? operator operands
          check-all-identifiers check-syntax-errors)
@@ -73,7 +73,13 @@
   (raise-error-on-match
    `(if ,??) exp "Consequent missing from if expression" exp)
   (raise-error-on-match
-   `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp))
+   `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp)
+  ;; not expression
+  (raise-error-on-match
+   `(not) exp "Argument missing from not expression" exp)
+  (raise-error-on-match
+   `(not ,?? ,??*) exp "Too many arguments in not expression" exp))
+
 
 (define (check-all-identifiers exps)
   (cond ((null? exps))
@@ -132,16 +138,6 @@
 (define (binding-variable b) (car b))
 (define (binding-value b) (cadr b))
 (define (let-body exp) (cddr exp))
-
-;; not expression
-(define (not? exp)
-  (cond ((not (pattern-match? `(not ,??*) exp)) #f)
-        ((pattern-match? `(not ,??) exp))
-        ((raise-error-on-match
-          `(not ,?? ,??*) exp "Too many arguments in not expression" exp))))
-
-(define (not-expression exp)
-  (cadr exp))
 
 ;; and expression
 (define (and? exp)

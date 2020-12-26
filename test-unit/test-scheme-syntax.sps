@@ -242,22 +242,6 @@
 (test-let 'let let?)
 (test-let 'let* let*?)
 
-;; not expression
-(assert-equal
- (not? '(not x))
- #t
- "Not with single simple expression is valid")
-
-(assert-equal
- (not? '(not (and x y)))
- #t
- "Not with single composite expression is valid")
-
-(assert-raises-compilation-error
- (lambda () (not? '(not x y)))
- "Too many arguments in not expression" '(not x y)
- "Not expression must have single argument")
-
 ;; sequence
 (let ((exp '(begin 42)))
   (assert-equal

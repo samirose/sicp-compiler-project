@@ -44,8 +44,8 @@
          (compile-if exp (cadr exp) (caddr exp) (cadddr exp) program lexical-env compile))
         ((pattern-match? `(if ,?? ,??) exp)
          (compile-if exp (cadr exp) (caddr exp) #f program lexical-env compile))
-        ((not? exp)
-         (compile-not exp program lexical-env compile))
+        ((pattern-match? `(not ,??) exp)
+         (compile-not exp (cadr exp) program lexical-env compile))
         ((and? exp)
          (compile-and exp program lexical-env compile))
         ((or? exp)
@@ -219,15 +219,15 @@
          ,@(compiled-program-value-code a-prog)
        end))))
 
-(define (compile-not exp program lexical-env compile)
-  (let ((exp-prog (compile (not-expression exp) program lexical-env)))
+(define (compile-not exp test program lexical-env compile)
+  (let ((test-prog (compile test program lexical-env)))
     (compiled-program-with-value-code
-     exp-prog
-     `(,@(compiled-program-value-code exp-prog)
+     test-prog
+     `(,@(compiled-program-value-code test-prog)
        if (result i32)
-         ,@(compiled-program-value-code (compile #f exp-prog lexical-env))
+         ,@(compiled-program-value-code (compile #f test-prog lexical-env))
        else
-         ,@(compiled-program-value-code (compile #t exp-prog lexical-env))
+         ,@(compiled-program-value-code (compile #t test-prog lexical-env))
        end))))
 
 (define (compile-and exp program lexical-env compile)

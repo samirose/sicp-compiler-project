@@ -73,3 +73,59 @@
  '(lambda (x 1) (+ x 1))
  "Not an identifier" 1
  "Lambda arguments must be identifiers")
+
+;; definition
+(assert-expression-raises-compilation-error
+ '(define)
+ "Variable and value missing from definition" '(define)
+ "Definition without variable and value raises an error")
+
+(assert-expression-raises-compilation-error
+ '(define x)
+ "Variable or value missing from definition" '(define x)
+ "Definition only one operand raises an error")
+
+(assert-expression-raises-compilation-error
+ '(define 1 42)
+ "Not an identifier in variable position" '(define 1 42)
+ "Variable definition's first operand must be an identifier")
+
+(assert-expression-raises-compilation-error
+ '(define x 1 2)
+ "Too many operands to variable definition" '(define x 1 2)
+ "Variable definition should have only variable and value operands")
+
+(assert-expression-raises-compilation-error
+ '(define x '(a b) 1)
+ "Too many operands to variable definition" '(define x '(a b) 1)
+ "Variable definition should have only variable and value operands")
+
+(assert-expression-raises-compilation-error
+ '(define () 42)
+ "Variable missing from procedure definition" '(define () 42)
+ "Procedure definition should specify variable for the procedure")
+
+(assert-expression-raises-compilation-error
+ '(define () 42)
+ "Variable missing from procedure definition" '(define () 42)
+ "Procedure definition should specify variable for the procedure")
+
+(assert-expression-raises-compilation-error
+ '(define (x))
+ "Empty body in procedure definition" '(define (x))
+ "Procedure definition should specify a body for the procedure")
+
+(assert-expression-raises-compilation-error
+ '(define (1) 42)
+ "Not an identifier in variable position" '(define (1) 42)
+ "Procedure variable should be an identifier")
+
+(assert-expression-raises-compilation-error
+ '(define (x y 2) (+ x y 2))
+ "Not an identifier" 2
+ "Procedure formal parameters should be identifiers")
+
+(assert-expression-raises-compilation-error
+ '(define 1 2 3)
+ "Not a variable or procedure definition" '(define 1 2 3)
+ "Definition's first operand should be an identifier or an identifier list")

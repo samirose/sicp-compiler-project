@@ -17,12 +17,7 @@
   (assert-equal
    'x
    (definition-variable exp)
-   "definition-variable returns the variable of variable definition")
-
-  (assert-equal
-   42
-   (definition-value exp)
-   "definition-value returns the value of variable definition"))
+   "definition-variable returns the variable of variable definition"))
 
 (let ((exp '(define x (+ 1 2))))
   (assert-equal
@@ -33,12 +28,7 @@
   (assert-equal
    'x
    (definition-variable exp)
-   "definition-variable returns the variable of variable definition")
-
-  (assert-equal
-   '(+ 1 2)
-   (definition-value exp)
-   "definition-value returns the value of variable definition"))
+   "definition-variable returns the variable of variable definition"))
 
 (let ((exp '(define (zero) 0)))
   (assert-equal
@@ -49,12 +39,7 @@
   (assert-equal
    'zero
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition")
-
-  (assert-equal
-   '(lambda () 0)
-   (definition-value exp)
-   "definition-value returns a lambda of procedure definition body"))
+   "definition-variable returns the variable for procedure definition"))
 
 (let ((exp '(define (one) (+ 0 1))))
   (assert-equal
@@ -65,12 +50,7 @@
   (assert-equal
    'one
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition")
-
-  (assert-equal
-   '(lambda () (+ 0 1))
-   (definition-value exp)
-   "definition-value returns a lambda of procedure definition body"))
+   "definition-variable returns the variable for procedure definition"))
 
 (let ((exp '(define (one) (display "one:") (+ 0 1))))
   (assert-equal
@@ -81,12 +61,7 @@
   (assert-equal
    'one
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition")
-
-  (assert-equal
-   '(lambda () (display "one:") (+ 0 1))
-   (definition-value exp)
-   "definition-value returns a lambda of procedure definition body"))
+   "definition-variable returns the variable for procedure definition"))
 
 (let ((exp '(define (square x) (* x x))))
   (assert-equal
@@ -97,12 +72,7 @@
   (assert-equal
    'square
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition")
-
-  (assert-equal
-   '(lambda (x) (* x x))
-   (definition-value exp)
-   "definition-value returns a lambda of procedure definition body"))
+   "definition-variable returns the variable for procedure definition"))
 
 (let ((exp '(define (sum-of-squares x y) (+ (* x x) (* y y)))))
   (assert-equal
@@ -113,67 +83,7 @@
   (assert-equal
    'sum-of-squares
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition")
-
-  (assert-equal
-   '(lambda (x y) (+ (* x x) (* y y)))
-   (definition-value exp)
-   "definition-value returns a lambda of procedure definition body"))
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define)))
- "Variable and value missing from definition" '(define)
- "Definition without variable and value raises an error")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define x)))
- "Variable or value missing from definition" '(define x)
- "Definition only one operand raises an error")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define 1 42)))
- "Not an identifier" 1
- "Variable definition's first operand must be an identifier")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define x 1 2)))
- "Too many operands to variable definition" '(define x 1 2)
- "Variable definition should have only variable and value operands")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define x '(a b) 1)))
- "Too many operands to variable definition" '(define x '(a b) 1)
- "Variable definition should have only variable and value operands")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define () 42)))
- "Variable missing from procedure definition" '(define () 42)
- "Procedure definition should specify variable for the procedure")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define () 42)))
- "Variable missing from procedure definition" '(define () 42)
- "Procedure definition should specify variable for the procedure")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define (x))))
- "Empty body in procedure definition" '(define (x))
- "Procedure definition should specify a body for the procedure")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define (1) 42)))
- "Not an identifier" 1
- "Procedure variable should be an identifier")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define (x y 2) (+ x y 2))))
- "Not an identifier" 2
- "Procedure formal parameters should be identifiers")
-
-(assert-raises-compilation-error
- (lambda () (definition? '(define 1 2 3)))
- "Not a variable or procedure definition" '(define 1 2 3)
- "Definition's first operand should be an identifier or an identifier list")
+   "definition-variable returns the variable for procedure definition"))
 
 ;; let expression
 (define (test-let keyword predicate)

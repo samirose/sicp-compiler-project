@@ -35,8 +35,11 @@
          (compile-variable exp program lexical-env))
         ((pattern-match? `(set! ,variable? ,??) exp)
          (compile-assignment exp (cadr exp) (caddr exp) program lexical-env compile))
-        ((definition? exp)
-         (compile-definition exp program lexical-env compile))
+        ((pattern-match? `(define ,variable? ,??) exp)
+         (compile-variable-definition exp (cadr exp) (caddr exp) program lexical-env compile))
+        ((pattern-match? `(define (,variable? ,??*) ,?? ,??*) exp)
+         (compile-procedure-definition
+          exp (caadr exp) (cdadr exp) (cddr exp) program lexical-env compile))
         ((if? exp)
          (compile-if exp program lexical-env compile))
         ((not? exp)
@@ -122,30 +125,53 @@
      program-with-value-computing-code
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
-(define (compile-definition exp program lexical-env compile)
+(define (compile-variable-definition exp variable value program lexical-env compile)
   (let*
-      ((variable (definition-variable exp))
-       (global-index
+      ((global-index
         (begin
           (if (not (global-lexical-env? lexical-env))
               (raise-compilation-error "Only top-level define is supported" exp))
           (let ((address (find-variable variable lexical-env)))
             (if (not address)
-                (raise-compilation-error "Internal compiler error: global binding missing from global lexical env"
-                       (list variable lexical-env)))
+                (raise-compilation-error
+                 "Internal compiler error: global binding missing from global lexical env"
+                 (list variable lexical-env)))
             (var-index address))))
-       (value (definition-value exp))
        (program-with-value-computing-code
-        (if (lambda? value)
-            (compile-lambda
-             value
-             (lambda-formals value)
-             (lambda-body value)
-             program
-             lexical-env
-             variable
-             compile)
-            (compile value program lexical-env)))
+        (compile value program lexical-env))
+       (value-code
+        (compiled-program-value-code program-with-value-computing-code))
+       (init-instr
+        (if (wasm-const-value? value-code)
+            value-code
+            uninitialized-value))
+       (global-definition
+        `(global (mut i32) ,init-instr))
+       (init-code
+        (if (wasm-const-value? value-code)
+            '()
+            `(,@value-code global.set ,global-index))))
+    (compiled-program-with-definition-and-value-code
+     program-with-value-computing-code
+     global-definition
+     init-code)))
+
+(define (compile-procedure-definition exp variable formals body program lexical-env compile)
+  (check-all-identifiers formals)
+  (let*
+      ((global-index
+        (begin
+          (if (not (global-lexical-env? lexical-env))
+              (raise-compilation-error "Only top-level define is supported" exp))
+          (let ((address (find-variable variable lexical-env)))
+            (if (not address)
+                (raise-compilation-error
+                 "Internal compiler error: global binding missing from global lexical env"
+                 (list variable lexical-env)))
+            (var-index address))))
+       (program-with-value-computing-code
+        (compile-lambda
+         exp formals body program lexical-env variable compile))
        (value-code
         (compiled-program-value-code program-with-value-computing-code))
        (init-instr

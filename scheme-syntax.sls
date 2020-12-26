@@ -6,7 +6,7 @@
 
  (export
          variable?
-         definition? definition-variable definition-value
+         definition? definition-variable
          let? let*? let-bindings binding-variable binding-value let-body
          lambda? lambda-formals lambda-body
          if? if-test if-consequent if-alternate
@@ -51,48 +51,39 @@
   (raise-error-on-match
    `(lambda ,??) exp "Body missing from lambda expression" exp)
   (raise-error-on-match
-   `(lambda ,?? ,??) exp "Arguments list missing from lambda expression" exp))
-
-;; definition
-(define (variable-definition? exp)
-  (pattern-match? `(define ,variable? ,??) exp))
+   `(lambda ,?? ,??) exp "Arguments list missing from lambda expression" exp)
+  ;: definition
+  (raise-error-on-match
+   '(define) exp "Variable and value missing from definition" exp)
+  (raise-error-on-match
+   `(define (,?? ,??*)) exp "Empty body in procedure definition" exp)
+  (raise-error-on-match
+   `(define ,??) exp "Variable or value missing from definition" exp)
+  (raise-error-on-match
+   `(define ,variable? ,?? ,?? ,??*) exp "Too many operands to variable definition" exp)
+  (raise-error-on-match
+   `(define () ,??*) exp "Variable missing from procedure definition" exp)
+  (raise-error-on-match
+   `(define (,?? ,??*) ,??*) exp "Not an identifier in variable position" exp)
+  (raise-error-on-match
+   `(define ,?? ,??) exp "Not an identifier in variable position" exp)
+  (raise-error-on-match
+   `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp))
 
 (define (check-all-identifiers exps)
   (cond ((null? exps))
         ((variable? (car exps)) (check-all-identifiers (cdr exps)))
         (else (raise-compilation-error "Not an identifier" (car exps)))))
 
+;; definition
 (define (definition? exp)
-  (cond ((not (pattern-match? `(define ,??*) exp)) #f)
-        ((variable-definition? exp))
-        ((pattern-match? `(define (,?? ,??*) ,?? ,??*) exp)
-         (check-all-identifiers (cadr exp)))
-        ((raise-error-on-match
-          '(define) exp "Variable and value missing from definition" exp))
-        ((raise-error-on-match
-          `(define (,?? ,??*)) exp "Empty body in procedure definition" exp))
-        ((raise-error-on-match
-          `(define ,??) exp "Variable or value missing from definition" exp))
-        ((raise-error-on-match
-          `(define ,variable? ,?? ,?? ,??*) exp "Too many operands to variable definition" exp))
-        ((raise-error-on-match
-          `(define () ,??*) exp "Variable missing from procedure definition" exp))
-        ((raise-error-on-match
-          `(define ,?? ,??) exp "Not an identifier" (cadr exp)))
-        ((raise-error-on-match
-          `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp))
-        (else (error "Internal compiler error: unexhaustive definition syntax check" exp))))
+  (or (pattern-match? `(define ,variable? ,??*) exp)
+      (pattern-match? `(define (,variable? ,??*) ,??*) exp)))
 
 (define (definition-variable exp)
-  (if (variable-definition? exp)
+  (if (pattern-match? `(define ,variable? ,??) exp)
       (cadr exp)
       (caadr exp)))
-
-(define (definition-value exp)
-  (if (variable-definition? exp)
-      (caddr exp)
-      (make-lambda (cdadr exp)
-                   (cddr exp))))
 
 ;; let expression
 (define (check-binding exp)

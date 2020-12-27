@@ -52,10 +52,12 @@
          (compile-or exp (cdr exp) program lexical-env compile))
         ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
          (compile-lambda exp (cadr exp) (cddr exp) program lexical-env '() compile))
-        ((let? exp)
-         (compile-let exp program lexical-env compile))
-        ((let*? exp)
-         (compile-let* exp program lexical-env compile))
+        ((pattern-match? `(let (,?? ,??*) ,?? ,??*) exp)
+         (for-all check-binding (cadr exp))
+         (compile-let exp (cadr exp) (cddr exp) program lexical-env compile))
+        ((pattern-match? `(let* (,?? ,??*) ,?? ,??*) exp)
+         (for-all check-binding (cadr exp))
+         (compile-let* exp (cadr exp) (cddr exp) program lexical-env compile))
         ((begin? exp)
          (compile-sequence (begin-actions exp) program lexical-env compile))
         ((open-coded-primitive-application? exp)
@@ -446,17 +448,15 @@
                 (compile (car es) p lexical-env)
                 (assign-code n)))))))
 
-(define (compile-let exp program lexical-env compile)
+(define (compile-let exp bindings body program lexical-env compile)
   (let*
-      ((bindings (let-bindings exp))
-       (variables
-        (let* ((vars (map binding-variable bindings))
+      ((variables
+        (let* ((vars (map car bindings))
                (duplicate-var (first-duplicate vars)))
           (if (null? duplicate-var)
               vars
               (raise-compilation-error "Duplicate variable in let expression" exp))))
-       (values (map binding-value bindings))
-       (body (let-body exp))
+       (values (map cadr bindings))
        (local-defs-program
         (compiled-program-with-value-code
          program
@@ -478,11 +478,10 @@
      compute-and-assign-values-program
      body-program)))
 
-(define (compile-let* exp program lexical-env compile)
+(define (compile-let* exp bindings body program lexical-env compile)
   (let*
-      ((bindings (let-bindings exp))
-       (variables (map binding-variable bindings))
-       (values (map binding-value bindings))
+      ((variables (map car bindings))
+       (values (map cadr bindings))
        (local-defs-program
         (compiled-program-with-value-code
          program
@@ -495,7 +494,7 @@
       (if (null? vars)
           (compiled-program-append-value-codes
            program
-           (compile-sequence (let-body exp) program env compile))
+           (compile-sequence body program env compile))
           (let*
               ((value-prog
                 (compiled-program-append-value-codes

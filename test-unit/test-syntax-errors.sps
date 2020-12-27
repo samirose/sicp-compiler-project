@@ -161,3 +161,78 @@
  '(not x y)
  "Too many arguments in not expression" '(not x y)
  "Not expression must have single argument")
+
+;; let expressions
+(assert-expression-raises-compilation-error
+ '(let () 42)
+ "Empty bindings in let expression" '(let () 42)
+ "let expression must define bindings")
+
+(assert-expression-raises-compilation-error
+ '(let* () 42)
+ "Empty bindings in let* expression" '(let* () 42)
+ "let* expression must define bindings")
+
+(assert-expression-raises-compilation-error
+ '(let ((a 1)))
+ "Bindings or body missing from let expression" '(let ((a 1)))
+ "let expression must have a body")
+
+(assert-expression-raises-compilation-error
+ '(let* ((a 1)))
+ "Bindings or body missing from let* expression" '(let* ((a 1)))
+ "let* expression must have a body")
+
+(assert-expression-raises-compilation-error
+ '(let)
+ "Bindings and body missing from let expression" '(let)
+ "let expression must have bindings and body")
+
+(assert-expression-raises-compilation-error
+ '(let*)
+ "Bindings and body missing from let* expression" '(let*)
+ "let* expression must have bindings and body")
+
+(assert-expression-raises-compilation-error
+ '(let a 42)
+ "Bindings missing from let expression" '(let a 42)
+ "Bindings should be a list")
+
+(assert-expression-raises-compilation-error
+ '(let* a 42)
+ "Bindings missing from let* expression" '(let* a 42)
+ "Bindings should be a list")
+
+(define (test-let-bindings keyword)
+  (assert-expression-raises-compilation-error
+   `(,keyword (a) a)
+   "Not a binding" 'a
+   "Bindings must define a variable and value")
+
+  (assert-expression-raises-compilation-error
+   `(,keyword (1) 42)
+   "Not a binding" 1
+   "Bindings must define a variable and value")
+
+  (assert-expression-raises-compilation-error
+   `(,keyword (b 1) b)
+   "Not a binding" 'b
+   "Bindings is a list of variable-value pairs")
+
+  (assert-expression-raises-compilation-error
+   `(,keyword ((a)) a)
+   "Value missing from binding" '(a)
+   "Bindings must define a variable and value")
+
+  (assert-expression-raises-compilation-error
+   `(,keyword ((1 2)) 42)
+   "Not an identifier" 1
+   "Bindings must define a variable and value")
+
+  (assert-expression-raises-compilation-error
+   `(,keyword ((a 1 2)) a)
+   "Too many operands in binding" '(a 1 2)
+   "Bindings must define a variable and single value"))
+
+(test-let-bindings 'let)
+(test-let-bindings 'let*)

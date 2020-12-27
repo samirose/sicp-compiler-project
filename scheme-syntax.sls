@@ -7,7 +7,7 @@
  (export
          variable?
          definition? definition-variable
-         let? let*? let-bindings binding-variable binding-value let-body
+         check-binding
          begin? begin-actions last-exp? first-exp rest-exps
          application? operator operands
          check-all-identifiers check-syntax-errors)
@@ -77,8 +77,24 @@
   (raise-error-on-match
    `(not) exp "Argument missing from not expression" exp)
   (raise-error-on-match
-   `(not ,?? ,??*) exp "Too many arguments in not expression" exp))
-
+   `(not ,?? ,??*) exp "Too many arguments in not expression" exp)
+  ;; let expressions
+  (raise-error-on-match
+   `(let () ,?? ,??*) exp "Empty bindings in let expression" exp)
+  (raise-error-on-match
+   `(let ,?? ,?? ,??*) exp "Bindings missing from let expression" exp)
+  (raise-error-on-match
+   `(let ,??) exp "Bindings or body missing from let expression" exp)
+  (raise-error-on-match
+   `(let) exp "Bindings and body missing from let expression" exp)
+  (raise-error-on-match
+   `(let* () ,?? ,??*) exp "Empty bindings in let* expression" exp)
+  (raise-error-on-match
+   `(let* ,?? ,?? ,??*) exp "Bindings missing from let* expression" exp)
+  (raise-error-on-match
+   `(let* ,??) exp "Bindings or body missing from let* expression" exp)
+  (raise-error-on-match
+   `(let*) exp "Bindings and body missing from let* expression" exp))
 
 (define (check-all-identifiers exps)
   (cond ((null? exps))
@@ -109,34 +125,6 @@
         ((raise-error-on-match
           '() exp "Empty binding" exp))
         (else (raise-compilation-error "Not a binding" exp))))
-
-(define (let-form? keyword exp)
-  (if (not (pattern-match? `(,keyword ,??*) exp))
-      #f
-      (let ((args (cdr exp)))
-        (cond
-          ((pattern-match? `((,?? ,??*) ,?? ,??*) args)
-           (for-all check-binding (car args)))
-          ((raise-error-on-match
-            `(() ,?? ,??*) args "Empty bindings in let expression" exp))
-          ((raise-error-on-match
-            `(,?? ,?? ,??*) args "Bindings missing from let expression" exp))
-          ((raise-error-on-match
-            `(,??) args "Bindings or body missing from let expression" exp))
-          ((raise-error-on-match
-            `() args "Bindings and body missing from let expression" exp))
-          (else (error "Internal compiler error: unexhaustive let syntax check" exp))))))
-
-(define (let? exp)
-  (let-form? 'let exp))
-
-(define (let*? exp)
-  (let-form? 'let* exp))
-
-(define (let-bindings exp) (cadr exp))
-(define (binding-variable b) (car b))
-(define (binding-value b) (cadr b))
-(define (let-body exp) (cddr exp))
 
 ;; sequence
 (define (begin? exp)

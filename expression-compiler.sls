@@ -58,8 +58,8 @@
         ((pattern-match? `(let* (,?? ,??*) ,?? ,??*) exp)
          (for-all check-binding (cadr exp))
          (compile-let* exp (cadr exp) (cddr exp) program lexical-env compile))
-        ((begin? exp)
-         (compile-sequence (begin-actions exp) program lexical-env compile))
+        ((pattern-match? `(begin ,?? ,??*) exp)
+         (compile-sequence (cdr exp) program lexical-env compile))
         ((open-coded-primitive-application? exp)
          (compile-open-coded-primitive exp program lexical-env compile))
         ((check-syntax-errors exp))
@@ -332,8 +332,8 @@
 
 (define (compile-sequence seq program lexical-env compile)
   (let ((program-with-next-exp
-         (compile (first-exp seq) program lexical-env)))
-    (if (last-exp? seq)
+         (compile (car seq) program lexical-env)))
+    (if (null? (cdr seq))
         program-with-next-exp
         (let ((program-with-next-exp-result-discarded
                (compiled-program-append-value-code
@@ -342,7 +342,7 @@
           (compiled-program-append-value-codes
            program-with-next-exp-result-discarded
            (compile-sequence
-            (rest-exps seq)
+            (cdr seq)
             program-with-next-exp-result-discarded
             lexical-env
             compile))))))

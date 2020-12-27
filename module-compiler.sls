@@ -14,6 +14,7 @@
          (lexical-env)
          (compiled-program)
          (wasm-syntax)
+         (pattern-match)
          (expression-compiler))
 
  ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
@@ -30,7 +31,7 @@
    (let ((library
           (if (r7rs-library? exp)
               exp
-              (let ((sequence (if (begin? exp) exp `(begin ,exp))))
+              (let ((sequence (if (pattern-match? `(begin ,??*) exp) exp `(begin ,exp))))
                 `(define-library ,sequence)))))
      (compile-r7rs-library-to-wasm-module library)))
 
@@ -41,7 +42,7 @@
              ((exps
                (cond ((library-declaration 'begin library))
                      (else (raise-compilation-error "No begin declaration in library" library))))
-              (actions (begin-actions exps)))
+              (actions (cdr exps)))
            (if (null? actions)
                (raise-compilation-error "Empty begin declaration in library" library)
                actions)))

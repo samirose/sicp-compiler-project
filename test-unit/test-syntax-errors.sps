@@ -236,3 +236,9 @@
 
 (test-let-bindings 'let)
 (test-let-bindings 'let*)
+
+;; sequence
+(assert-expression-raises-compilation-error
+ '(begin)
+ "Empty sequence" '(begin)
+ "Sequence without expressions is invalid")

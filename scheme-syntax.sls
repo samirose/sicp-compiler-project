@@ -8,7 +8,6 @@
          variable?
          definition? definition-variable
          check-binding
-         begin? begin-actions last-exp? first-exp rest-exps
          application? operator operands
          check-all-identifiers check-syntax-errors)
 
@@ -94,7 +93,10 @@
   (raise-error-on-match
    `(let* ,??) exp "Bindings or body missing from let* expression" exp)
   (raise-error-on-match
-   `(let*) exp "Bindings and body missing from let* expression" exp))
+   `(let*) exp "Bindings and body missing from let* expression" exp)
+  ;; sequence
+  (raise-error-on-match
+   '(begin) exp "Empty sequence" exp))
 
 (define (check-all-identifiers exps)
   (cond ((null? exps))
@@ -125,19 +127,6 @@
         ((raise-error-on-match
           '() exp "Empty binding" exp))
         (else (raise-compilation-error "Not a binding" exp))))
-
-;; sequence
-(define (begin? exp)
-  (cond ((not (pattern-match? `(begin ,??*) exp)) #f)
-        ((pattern-match? `(begin ,?? ,??*) exp))
-        ((raise-error-on-match
-          '(begin) exp "Empty sequence" exp))
-        (else (error "Internal compiler error: unexhaustive sequence syntax check" exp))))
-
-(define (begin-actions exp) (cdr exp))
-(define (last-exp? seq) (null? (cdr seq)))
-(define (first-exp seq) (car seq))
-(define (rest-exps seq) (cdr seq))
 
 ;; application
 (define (application? exp)

@@ -26,77 +26,53 @@
 (define (not-variable? exp) (not (variable? exp)))
 
 ;; syntax errors
+(define syntax-error-patterns
+  (list
+   ;; quote
+   (list '(quote) "Too few operands")
+   (list `(quote ,?? ,?? ,??*) "Too many operands")
+   ;; assignment
+   (list '(set!) "Variable and value missing from assignment")
+   (list `(set! ,??) "Variable or value missing from assignment")
+   (list `(set! ,?? ,?? ,?? ,??*) "Too many operands to assignment")
+   (list `(set! ,not-variable? ,??) "Invalid variable in assignment")
+   ;: lambda expression
+   (list `(lambda) "Arguments and body missing from lambda expression")
+   (list `(lambda ,??) "Body missing from lambda expression")
+   (list `(lambda ,?? ,??) "Arguments list missing from lambda expression")
+   ;: definition
+   (list '(define) "Variable and value missing from definition")
+   (list `(define (,?? ,??*)) "Empty body in procedure definition")
+   (list `(define ,??) "Variable or value missing from definition")
+   (list `(define ,variable? ,?? ,?? ,??*) "Too many operands to variable definition")
+   (list `(define () ,??*) "Variable missing from procedure definition")
+   (list `(define (,not-variable? ,??*) ,??*) "Not an identifier in variable position")
+   (list `(define ,not-variable? ,??) "Not an identifier in variable position")
+   (list `(define ,?? ,?? ,?? ,??*) "Not a variable or procedure definition")
+   ;; if expression
+   (list '(if) "Test and consequent missing from if expression")
+   (list `(if ,??) "Consequent missing from if expression")
+   (list `(if ,?? ,?? ,?? ,??*) "Too many subexpressions in if expression")
+   ;; not expression
+   (list `(not) "Argument missing from not expression")
+   (list `(not ,?? ,??*) "Too many arguments in not expression")
+   ;; let expressions
+   (list `(let () ,?? ,??*) "Empty bindings in let expression")
+   (list `(let ,?? ,?? ,??*) "Bindings missing from let expression")
+   (list `(let ,??) "Bindings or body missing from let expression")
+   (list `(let) "Bindings and body missing from let expression")
+   (list `(let* () ,?? ,??*) "Empty bindings in let* expression")
+   (list `(let* ,?? ,?? ,??*) "Bindings missing from let* expression")
+   (list `(let* ,??) "Bindings or body missing from let* expression")
+   (list `(let*) "Bindings and body missing from let* expression")
+   (list '(begin) "Empty sequence")))
+
 (define (check-syntax-errors exp)
-  ;; quote
-  (raise-error-on-match
-   '(quote) exp "Too few operands" exp)
-  (raise-error-on-match
-   `(quote ,?? ,?? ,??*) exp "Too many operands" exp)
-  ;; assignment
-  (raise-error-on-match
-   '(set!) exp "Variable and value missing from assignment" exp)
-  (raise-error-on-match
-   `(set! ,??) exp "Variable or value missing from assignment" exp)
-  (raise-error-on-match
-   `(set! ,?? ,?? ,?? ,??*) exp "Too many operands to assignment" exp)
-  (raise-error-on-match
-   `(set! ,not-variable? ,??) exp "Invalid variable in assignment" exp)
-  ;: lambda expression
-  (raise-error-on-match
-   `(lambda) exp "Arguments and body missing from lambda expression" exp)
-  (raise-error-on-match
-   `(lambda ,??) exp "Body missing from lambda expression" exp)
-  (raise-error-on-match
-   `(lambda ,?? ,??) exp "Arguments list missing from lambda expression" exp)
-  ;: definition
-  (raise-error-on-match
-   '(define) exp "Variable and value missing from definition" exp)
-  (raise-error-on-match
-   `(define (,?? ,??*)) exp "Empty body in procedure definition" exp)
-  (raise-error-on-match
-   `(define ,??) exp "Variable or value missing from definition" exp)
-  (raise-error-on-match
-   `(define ,variable? ,?? ,?? ,??*) exp "Too many operands to variable definition" exp)
-  (raise-error-on-match
-   `(define () ,??*) exp "Variable missing from procedure definition" exp)
-  (raise-error-on-match
-   `(define (,?? ,??*) ,??*) exp "Not an identifier in variable position" exp)
-  (raise-error-on-match
-   `(define ,?? ,??) exp "Not an identifier in variable position" exp)
-  (raise-error-on-match
-   `(define ,?? ,?? ,?? ,??*) exp "Not a variable or procedure definition" exp)
-  ;; if expression
-  (raise-error-on-match
-    '(if) exp "Test and consequent missing from if expression" exp)
-  (raise-error-on-match
-   `(if ,??) exp "Consequent missing from if expression" exp)
-  (raise-error-on-match
-   `(if ,?? ,?? ,?? ,??*) exp "Too many subexpressions in if expression" exp)
-  ;; not expression
-  (raise-error-on-match
-   `(not) exp "Argument missing from not expression" exp)
-  (raise-error-on-match
-   `(not ,?? ,??*) exp "Too many arguments in not expression" exp)
-  ;; let expressions
-  (raise-error-on-match
-   `(let () ,?? ,??*) exp "Empty bindings in let expression" exp)
-  (raise-error-on-match
-   `(let ,?? ,?? ,??*) exp "Bindings missing from let expression" exp)
-  (raise-error-on-match
-   `(let ,??) exp "Bindings or body missing from let expression" exp)
-  (raise-error-on-match
-   `(let) exp "Bindings and body missing from let expression" exp)
-  (raise-error-on-match
-   `(let* () ,?? ,??*) exp "Empty bindings in let* expression" exp)
-  (raise-error-on-match
-   `(let* ,?? ,?? ,??*) exp "Bindings missing from let* expression" exp)
-  (raise-error-on-match
-   `(let* ,??) exp "Bindings or body missing from let* expression" exp)
-  (raise-error-on-match
-   `(let*) exp "Bindings and body missing from let* expression" exp)
-  ;; sequence
-  (raise-error-on-match
-   '(begin) exp "Empty sequence" exp))
+  (for-each
+   (lambda (pattern-and-message)
+     (raise-error-on-match (car pattern-and-message) exp (cadr pattern-and-message) exp))
+   syntax-error-patterns)
+  #f)
 
 (define (check-all-identifiers exps)
   (cond ((null? exps))

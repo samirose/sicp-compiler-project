@@ -4,8 +4,7 @@
 (library
  (scheme-syntax)
 
- (export
-         variable?
+ (export variable?
          definition? definition-variable
          check-binding
          application? operator operands

@@ -60,6 +60,7 @@ lib/module-compiler : \
 	lib/lexical-env \
 	lib/compiled-program \
 	lib/wasm-syntax \
+	lib/pattern-match \
 	lib/expression-compiler
 
 .PHONY : compile

@@ -21,12 +21,12 @@
 ;; self-evaluating expressions
 (assert-expression-raises-compilation-error
  "a string"
- "Unsupported value" "a string"
+ "Strings not supported yet" "a string"
  "String values are not yet supported")
 
 (assert-expression-raises-compilation-error
  3.14
- "Unsupported value" 3.14
+ "Unsupported number" 3.14
  "Floating-point values are not yet supported")
 
 ;; quote

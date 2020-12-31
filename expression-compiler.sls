@@ -11,6 +11,7 @@
          (rnrs lists)
          (lists)
          (scheme-syntax)
+         (pattern-match)
          (lexical-env)
          (compiled-program)
          (compilation-error)
@@ -22,38 +23,50 @@
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 
 (define (compile exp program lexical-env)
-  (cond ((self-evaluating? exp)
-         (compile-self-evaluating exp program))
-        ((quoted? exp)
-         (compile-quoted exp program))
+  (cond ((number? exp)
+         (compile-number exp program))
+        ((boolean? exp)
+         (compile-boolean exp program))
+        ((string? exp)
+         (compile-string exp program))
+        ((pattern-match? `(quote ,??) exp)
+         (compile-quoted exp (cadr exp) program))
         ((variable? exp)
          (compile-variable exp program lexical-env))
-        ((assignment? exp)
-         (compile-assignment exp program lexical-env compile))
-        ((definition? exp)
-         (compile-definition exp program lexical-env compile))
-        ((if? exp)
-         (compile-if exp program lexical-env compile))
-        ((not? exp)
-         (compile-not exp program lexical-env compile))
-        ((and? exp)
-         (compile-and exp program lexical-env compile))
-        ((or? exp)
-         (compile-or exp program lexical-env compile))
-        ((lambda? exp)
-         (compile-lambda exp program lexical-env '() compile))
-        ((let? exp)
-         (compile-let exp program lexical-env compile))
-        ((let*? exp)
-         (compile-let* exp program lexical-env compile))
-        ((begin? exp)
-         (compile-sequence (begin-actions exp) program lexical-env compile))
+        ((pattern-match? `(set! ,variable? ,??) exp)
+         (compile-assignment exp (cadr exp) (caddr exp) program lexical-env compile))
+        ((pattern-match? `(define ,variable? ,??) exp)
+         (compile-variable-definition exp (cadr exp) (caddr exp) program lexical-env compile))
+        ((pattern-match? `(define (,variable? ,??*) ,?? ,??*) exp)
+         (compile-procedure-definition
+          exp (caadr exp) (cdadr exp) (cddr exp) program lexical-env compile))
+        ((pattern-match? `(if ,?? ,??, ??) exp)
+         (compile-if exp (cadr exp) (caddr exp) (cadddr exp) program lexical-env compile))
+        ((pattern-match? `(if ,?? ,??) exp)
+         (compile-if exp (cadr exp) (caddr exp) #f program lexical-env compile))
+        ((pattern-match? `(not ,??) exp)
+         (compile-not exp (cadr exp) program lexical-env compile))
+        ((pattern-match? `(and ,??*) exp)
+         (compile-and exp (cdr exp) program lexical-env compile))
+        ((pattern-match? `(or ,??*) exp)
+         (compile-or exp (cdr exp) program lexical-env compile))
+        ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
+         (compile-lambda exp (cadr exp) (cddr exp) program lexical-env '() compile))
+        ((pattern-match? `(let (,?? ,??*) ,?? ,??*) exp)
+         (for-all check-binding (cadr exp))
+         (compile-let exp (cadr exp) (cddr exp) program lexical-env compile))
+        ((pattern-match? `(let* (,?? ,??*) ,?? ,??*) exp)
+         (for-all check-binding (cadr exp))
+         (compile-let* exp (cadr exp) (cddr exp) program lexical-env compile))
+        ((pattern-match? `(begin ,?? ,??*) exp)
+         (compile-sequence (cdr exp) program lexical-env compile))
         ((open-coded-primitive-application? exp)
          (compile-open-coded-primitive exp program lexical-env compile))
+        ((check-syntax-errors exp))
         ((application? exp)
          (compile-application exp program lexical-env compile))
         (else
-         (raise-compilation-error "Unknown expression type -- COMPILE" exp))))
+         (raise-compilation-error "Unknown expression type" exp))))
 
 ;;;special values
 
@@ -66,17 +79,23 @@
 
 ;;;simple expressions
 
-(define (compile-self-evaluating exp program)
+(define (compile-number exp program)
   (compiled-program-with-value-code
    program
    (cond ((integer? exp)
           `(i32.const ,exp))
-         ((boolean? exp)
-          `(i32.const ,(if exp 1 0)))
          (else
-          (raise-compilation-error "Unsupported value" exp)))))
+          (raise-compilation-error "Unsupported number" exp)))))
 
-(define (compile-quoted exp program)
+(define (compile-boolean exp program)
+  (compiled-program-with-value-code
+   program
+   `(i32.const ,(if exp 1 0))))
+
+(define (compile-string exp program)
+  (raise-compilation-error "Strings not supported yet" exp))
+
+(define (compile-quoted exp value program)
   (raise-compilation-error "Quote not supported yet" exp))
 
 (define (compile-variable exp program lexical-env)
@@ -93,11 +112,11 @@
      program
      `(,get-instr ,(var-index lexical-address)))))
 
-(define (compile-assignment exp program lexical-env compile)
+(define (compile-assignment exp variable value program lexical-env compile)
   (let* ((lexical-address
-          (find-variable (assignment-variable exp) lexical-env))
+          (find-variable variable lexical-env))
          (program-with-value-computing-code
-          (compile (assignment-value exp) program lexical-env))
+          (compile value program lexical-env))
          (set-instr
           (cond
             ((not lexical-address)
@@ -110,25 +129,18 @@
      program-with-value-computing-code
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
-(define (compile-definition exp program lexical-env compile)
+(define (add-global-definition exp variable value-program lexical-env)
   (let*
-      ((variable (definition-variable exp))
-       (global-index
-        (begin
-          (if (not (global-lexical-env? lexical-env))
-              (raise-compilation-error "Only top-level define is supported" exp))
-          (let ((address (find-variable variable lexical-env)))
-            (if (not address)
-                (raise-compilation-error "Internal compiler error: global binding missing from global lexical env"
-                       (list variable lexical-env)))
-            (var-index address))))
-       (value (definition-value exp))
-       (program-with-value-computing-code
-        (if (lambda? value)
-            (compile-lambda value program lexical-env variable compile)
-            (compile value program lexical-env)))
+      ((global-index
+        (cond ((not (global-lexical-env? lexical-env))
+               (raise-compilation-error "Only top-level define is supported" exp))
+              ((find-variable variable lexical-env) => var-index)
+              (else
+               (raise-compilation-error
+                "Internal compiler error: global binding missing from global lexical env"
+                (list variable lexical-env)))))
        (value-code
-        (compiled-program-value-code program-with-value-computing-code))
+        (compiled-program-value-code value-program))
        (init-instr
         (if (wasm-const-value? value-code)
             value-code
@@ -140,9 +152,22 @@
             '()
             `(,@value-code global.set ,global-index))))
     (compiled-program-with-definition-and-value-code
-     program-with-value-computing-code
+     value-program
      global-definition
      init-code)))
+
+(define (compile-variable-definition exp variable value program lexical-env compile)
+  (add-global-definition
+   exp variable
+   (compile value program lexical-env)
+   lexical-env))
+
+(define (compile-procedure-definition exp variable formals body program lexical-env compile)
+  (check-all-identifiers formals)
+  (add-global-definition
+   exp variable
+   (compile-lambda exp formals body program lexical-env variable compile)
+   lexical-env))
 
 ;;;open-coded primitives
 
@@ -180,12 +205,12 @@
 
 ;;;conditional expressions
 
-(define (compile-if exp program lexical-env compile)
-  (let* ((t-prog (compile (if-test exp) program lexical-env))
-         (c-prog (compile (if-consequent exp) t-prog lexical-env))
+(define (compile-if exp test consequent alternate program lexical-env compile)
+  (let* ((t-prog (compile test program lexical-env))
+         (c-prog (compile consequent t-prog lexical-env))
          (a-prog
-          (if (if-alternate exp)
-              (compile (if-alternate exp) c-prog lexical-env)
+          (if alternate
+              (compile alternate c-prog lexical-env)
               (compiled-program-with-value-code c-prog unspecified-value))))
     (compiled-program-with-value-code
      a-prog
@@ -196,121 +221,119 @@
          ,@(compiled-program-value-code a-prog)
        end))))
 
-(define (compile-not exp program lexical-env compile)
-  (let ((exp-prog (compile (not-expression exp) program lexical-env)))
+(define (compile-not exp test program lexical-env compile)
+  (let ((test-prog (compile test program lexical-env)))
     (compiled-program-with-value-code
-     exp-prog
-     `(,@(compiled-program-value-code exp-prog)
+     test-prog
+     `(,@(compiled-program-value-code test-prog)
        if (result i32)
-         ,@(compiled-program-value-code (compile #f exp-prog lexical-env))
+         ,@(compiled-program-value-code (compile #f test-prog lexical-env))
        else
-         ,@(compiled-program-value-code (compile #t exp-prog lexical-env))
+         ,@(compiled-program-value-code (compile #t test-prog lexical-env))
        end))))
 
-(define (compile-and exp program lexical-env compile)
-  (let ((exps (and-expressions exp)))
-    (cond
-      ((null? exps)
-       (compile #t program lexical-env))
-      ((null? (cdr exps))
-       (compile (car exps) program lexical-env))
-      (else
-       (let
-           ((exps-prog
-             (let generate ((exps exps)
-                            (prog program))
+(define (compile-and exp tests program lexical-env compile)
+  (cond
+    ((null? tests)
+     (compile #t program lexical-env))
+    ((null? (cdr tests))
+     (compile (car tests) program lexical-env))
+    (else
+     (let
+         ((tests-prog
+           (let generate ((tests tests)
+                          (prog program))
+             (cond
+               ((null? (cdr tests))
+                (let*
+                    ((env (add-new-local-temporaries-frame lexical-env 1))
+                     (temp-var-index (env-var-index-offset env))
+                     (test-prog (compile (car tests) prog env))
+                     (test-code (compiled-program-value-code test-prog)))
+                  (compiled-program-with-value-code
+                   test-prog
+                   `(block
+                       ,@test-code
+                       (local i32)
+                       local.tee ,temp-var-index
+                       br_if 0
+                       br 1
+                     end
+                     local.get ,temp-var-index
+                     br 1))))
+               (else
+                (let*
+                    ((test-prog (compile (car tests) prog lexical-env))
+                     (test-code (compiled-program-value-code test-prog))
+                     (block-prog
+                      (compiled-program-with-value-code
+                       test-prog
+                       `(block
+                           ,@test-code
+                           br_if 0
+                           br 1
+                         end))))
+                  (compiled-program-append-value-codes
+                   block-prog
+                   (generate (cdr tests) block-prog))))))))
+       (compiled-program-with-value-code
+        tests-prog
+        `(block (result i32)
+            block
+              ,@(compiled-program-value-code tests-prog)
+            end
+            ,@(compiled-program-value-code (compile #f tests-prog lexical-env))
+          end))))))
+
+(define (compile-or exp tests program lexical-env compile)
+  (cond
+    ((null? tests)
+     (compile #f program lexical-env))
+    ((null? (cdr tests))
+     (compile (car tests) program lexical-env))
+    (else
+     (let*
+         ((env (add-new-local-temporaries-frame lexical-env 1))
+          (temp-var-index (env-var-index-offset env))
+          (tests-prog
+           (let generate ((tests tests)
+                          (prog program))
+             (let*
+                 ((test-prog (compile (car tests) prog env))
+                  (test-code (compiled-program-value-code test-prog)))
                (cond
-                 ((null? (cdr exps))
-                  (let*
-                      ((env (add-new-local-temporaries-frame lexical-env 1))
-                       (temp-var-index (env-var-index-offset env))
-                       (exp-prog (compile (car exps) prog env))
-                       (exp-code (compiled-program-value-code exp-prog)))
-                    (compiled-program-with-value-code
-                     exp-prog
-                     `(block
-                         ,@exp-code
-                         (local i32)
-                         local.tee ,temp-var-index
-                         br_if 0
-                         br 1
-                       end
-                       local.get ,temp-var-index
-                       br 1))))
+                 ((null? (cdr tests))
+                  (compiled-program-with-value-code
+                   test-prog
+                   `(,@test-code
+                     local.set ,temp-var-index)))
                  (else
-                  (let*
-                      ((exp-prog (compile (car exps) prog lexical-env))
-                       (exp-code (compiled-program-value-code exp-prog))
-                       (block-prog
+                  (let
+                      ((block-prog
                         (compiled-program-with-value-code
-                         exp-prog
+                         test-prog
                          `(block
-                             ,@exp-code
-                             br_if 0
-                             br 1
+                             ,@test-code
+                             local.tee ,temp-var-index
+                             br_if 1
                            end))))
                     (compiled-program-append-value-codes
                      block-prog
-                     (generate (cdr exps) block-prog))))))))
-         (compiled-program-with-value-code
-          exps-prog
-          `(block (result i32)
-              block
-                ,@(compiled-program-value-code exps-prog)
-              end
-              ,@(compiled-program-value-code (compile #f exps-prog lexical-env))
-            end)))))))
-
-(define (compile-or exp program lexical-env compile)
-  (let ((exps (or-expressions exp)))
-    (cond
-      ((null? exps)
-       (compile #f program lexical-env))
-      ((null? (cdr exps))
-       (compile (car exps) program lexical-env))
-      (else
-       (let*
-           ((env (add-new-local-temporaries-frame lexical-env 1))
-            (temp-var-index (env-var-index-offset env))
-            (exps-prog
-             (let generate ((exps exps)
-                            (prog program))
-               (let*
-                   ((exp-prog (compile (car exps) prog env))
-                    (exp-code (compiled-program-value-code exp-prog)))
-                 (cond
-                   ((null? (cdr exps))
-                    (compiled-program-with-value-code
-                     exp-prog
-                     `(,@exp-code
-                       local.set ,temp-var-index)))
-                   (else
-                    (let
-                        ((block-prog
-                          (compiled-program-with-value-code
-                           exp-prog
-                           `(block
-                               ,@exp-code
-                               local.tee ,temp-var-index
-                               br_if 1
-                             end))))
-                      (compiled-program-append-value-codes
-                       block-prog
-                       (generate (cdr exps) block-prog)))))))))
-         (compiled-program-with-value-code
-          exps-prog
-          `((local i32)
-            block
-              ,@(compiled-program-value-code exps-prog)
-            end
-            local.get ,temp-var-index)))))))
+                     (generate (cdr tests) block-prog)))))))))
+       (compiled-program-with-value-code
+        tests-prog
+        `((local i32)
+          block
+            ,@(compiled-program-value-code tests-prog)
+          end
+          local.get ,temp-var-index))))))
 
 ;;; sequences
 
 (define (compile-sequence seq program lexical-env compile)
   (let ((program-with-next-exp
-         (compile (first-exp seq) program lexical-env)))
-    (if (last-exp? seq)
+         (compile (car seq) program lexical-env)))
+    (if (null? (cdr seq))
         program-with-next-exp
         (let ((program-with-next-exp-result-discarded
                (compiled-program-append-value-code
@@ -319,7 +342,7 @@
           (compiled-program-append-value-codes
            program-with-next-exp-result-discarded
            (compile-sequence
-            (rest-exps seq)
+            (cdr seq)
             program-with-next-exp-result-discarded
             lexical-env
             compile))))))
@@ -381,17 +404,17 @@
           `(export ,exported-name (func ,func-index)))
          func-program)))
 
-(define (compile-lambda exp program lexical-env current-binding compile)
+(define (compile-lambda exp formals body program lexical-env current-binding compile)
+  (check-all-identifiers formals)
   (let*
-      ((formals (lambda-formals exp))
-       (exported-name
+      ((exported-name
         (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
               (else #f)))
        (func-program
         (compile-proc-to-func
          exp
          formals
-         (lambda-body exp)
+         body
          program
          lexical-env
          exported-name
@@ -425,17 +448,15 @@
                 (compile (car es) p lexical-env)
                 (assign-code n)))))))
 
-(define (compile-let exp program lexical-env compile)
+(define (compile-let exp bindings body program lexical-env compile)
   (let*
-      ((bindings (let-bindings exp))
-       (variables
-        (let* ((vars (map binding-variable bindings))
+      ((variables
+        (let* ((vars (map car bindings))
                (duplicate-var (first-duplicate vars)))
           (if (null? duplicate-var)
               vars
               (raise-compilation-error "Duplicate variable in let expression" exp))))
-       (values (map binding-value bindings))
-       (body (let-body exp))
+       (values (map cadr bindings))
        (local-defs-program
         (compiled-program-with-value-code
          program
@@ -457,11 +478,10 @@
      compute-and-assign-values-program
      body-program)))
 
-(define (compile-let* exp program lexical-env compile)
+(define (compile-let* exp bindings body program lexical-env compile)
   (let*
-      ((bindings (let-bindings exp))
-       (variables (map binding-variable bindings))
-       (values (map binding-value bindings))
+      ((variables (map car bindings))
+       (values (map cadr bindings))
        (local-defs-program
         (compiled-program-with-value-code
          program
@@ -474,7 +494,7 @@
       (if (null? vars)
           (compiled-program-append-value-codes
            program
-           (compile-sequence (let-body exp) program env compile))
+           (compile-sequence body program env compile))
           (let*
               ((value-prog
                 (compiled-program-append-value-codes

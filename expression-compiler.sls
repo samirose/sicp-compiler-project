@@ -185,23 +185,24 @@
        (assoc (operator exp) open-coded-primitives-to-machine-ops)))
 
 (define (compile-open-coded-primitive exp program lexical-env compile)
-  (let ((op-code (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops))))
-    (define (compile-rest-arguments program operands)
-      (let ((program-with-next-value-computing-code
-             (compiled-program-append-value-code
-              (compile (car operands) program lexical-env)
-              op-code)))
+  (let* ((operands (operands exp))
+         (op-code (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops)))
+         (program-with-next-value-computing-code
+          (compile (car operands) program lexical-env)))
+    (compiled-program-append-value-codes
+     program-with-next-value-computing-code
+     (let compile-rest-arguments
+       ((program program-with-next-value-computing-code)
+        (operands (cdr operands)))
+       (let ((program-with-next-value-computing-code
+              (compiled-program-append-value-code
+               (compile (car operands) program lexical-env)
+               op-code)))
          (if (null? (cdr operands))
              program-with-next-value-computing-code
              (compiled-program-append-value-codes
               program-with-next-value-computing-code
-              (compile-rest-arguments program-with-next-value-computing-code (cdr operands))))))
-    (let* ((operands (operands exp))
-           (program-with-next-value-computing-code
-            (compile (car operands) program lexical-env)))
-      (compiled-program-append-value-codes
-       program-with-next-value-computing-code
-       (compile-rest-arguments program-with-next-value-computing-code (cdr operands))))))
+              (compile-rest-arguments program-with-next-value-computing-code (cdr operands)))))))))
 
 ;;;conditional expressions
 

@@ -187,12 +187,12 @@
 (define (compile-open-coded-primitive exp program lexical-env compile)
   (let* ((operands (operands exp))
          (op-code (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops)))
-         (program-with-next-value-computing-code
+         (program-with-first-value-computing-code
           (compile (car operands) program lexical-env)))
     (compiled-program-append-value-codes
-     program-with-next-value-computing-code
+     program-with-first-value-computing-code
      (let compile-rest-arguments
-       ((program program-with-next-value-computing-code)
+       ((program program-with-first-value-computing-code)
         (operands (cdr operands)))
        (let ((program-with-next-value-computing-code
               (compiled-program-append-value-code

@@ -60,8 +60,10 @@
          (compile-let* exp (cadr exp) (cddr exp) program lexical-env compile))
         ((pattern-match? `(begin ,?? ,??*) exp)
          (compile-sequence (cdr exp) program lexical-env compile))
-        ((open-coded-primitive-application? exp)
-         (compile-open-coded-primitive exp program lexical-env compile))
+        ((open-coded-arithmetic-exp? exp)
+         (compile-open-coded-arithmetic-exp exp program lexical-env compile))
+        ((open-coded-comparison-exp? exp)
+         (compile-open-coded-comparison-exp exp program lexical-env compile))
         ((check-syntax-errors exp))
         ((application? exp)
          (compile-application exp program lexical-env compile))
@@ -171,22 +173,19 @@
 
 ;;;open-coded primitives
 
-(define open-coded-primitives-to-machine-ops
+(define arithmetic-operator-to-wasm-instr
   '((+ (i32.add))
     (- (i32.sub))
     (* (i32.mul))
-    (/ (i32.div_s))
-    (= (i32.eq))
-    (< (i32.lt_s))
-    (> (i32.gt_s))))
+    (/ (i32.div_s))))
 
-(define (open-coded-primitive-application? exp)
+(define (open-coded-arithmetic-exp? exp)
   (and (application? exp)
-       (assoc (operator exp) open-coded-primitives-to-machine-ops)))
+       (assq (operator exp) arithmetic-operator-to-wasm-instr)))
 
-(define (compile-open-coded-primitive exp program lexical-env compile)
+(define (compile-open-coded-arithmetic-exp exp program lexical-env compile)
   (let* ((operands (operands exp))
-         (op-code (cadr (assoc (operator exp) open-coded-primitives-to-machine-ops)))
+         (instr (cadr (assq (operator exp) arithmetic-operator-to-wasm-instr)))
          (program-with-first-value-computing-code
           (compile (car operands) program lexical-env)))
     (compiled-program-append-value-codes
@@ -197,12 +196,54 @@
        (let ((program-with-next-value-computing-code
               (compiled-program-append-value-code
                (compile (car operands) program lexical-env)
-               op-code)))
+               instr)))
          (if (null? (cdr operands))
              program-with-next-value-computing-code
              (compiled-program-append-value-codes
               program-with-next-value-computing-code
               (compile-rest-arguments program-with-next-value-computing-code (cdr operands)))))))))
+
+(define comparison-operator-to-wasm-instr
+  '((= (i32.eq))
+    (< (i32.lt_s))
+    (> (i32.gt_s))))
+
+(define (open-coded-comparison-exp? exp)
+  (and (application? exp)
+       (assq (operator exp) comparison-operator-to-wasm-instr)))
+
+(define (compile-binary-operator instr operand1 operand2 program lexical-env compile)
+  (let* ((operand1-program
+          (compile operand1 program lexical-env))
+         (operands-program
+          (compiled-program-append-value-codes
+           operand1-program
+           (compile operand2 operand1-program lexical-env))))
+    (compiled-program-append-value-code
+     operands-program
+     instr)))
+
+(define (compile-open-coded-comparison-exp exp program lexical-env compile)
+  (let ((operator (operator exp))
+        (operands (operands exp)))
+    (cond ((null? operands)
+           (raise-compilation-error "Comparison operator needs at least one argument" exp))
+          ((null? (cdr operands))
+           (compile #t program lexical-env))
+          ((null? (cddr operands))
+           (compile-binary-operator
+            (cadr (assq operator comparison-operator-to-wasm-instr))
+            (car operands) (cadr operands)
+            program lexical-env compile))
+          (else
+           (compile
+            `(and
+              ,@(let generate ((operands operands))
+                  (if (null? (cdr operands))
+                      '()
+                      `((,operator ,(car operands) ,(cadr operands))
+                        ,@(generate (cdr operands))))))
+            program lexical-env)))))
 
 ;;;conditional expressions
 

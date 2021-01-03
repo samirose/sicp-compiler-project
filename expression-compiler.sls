@@ -206,7 +206,9 @@
 (define comparison-operator-to-wasm-instr
   '((= (i32.eq))
     (< (i32.lt_s))
-    (> (i32.gt_s))))
+    (> (i32.gt_s))
+    (<= (i32.le_s))
+    (>= (i32.ge_s))))
 
 (define (open-coded-comparison-exp? exp)
   (and (application? exp)

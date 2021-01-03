@@ -60,10 +60,12 @@
          (compile-let* exp (cadr exp) (cddr exp) program lexical-env compile))
         ((pattern-match? `(begin ,?? ,??*) exp)
          (compile-sequence (cdr exp) program lexical-env compile))
-        ((open-coded-arithmetic-exp? exp)
+        ((pattern-match? `(,arithmetic-operator? ,??*) exp)
          (compile-open-coded-arithmetic-exp exp program lexical-env compile))
-        ((open-coded-comparison-exp? exp)
+        ((pattern-match? `(,comparison-operator? ,?? ,??*) exp)
          (compile-open-coded-comparison-exp exp program lexical-env compile))
+        ((pattern-match? `(,comparison-operator?) exp)
+         (raise-compilation-error "Expected at least one argument" exp))
         ((check-syntax-errors exp))
         ((application? exp)
          (compile-application exp program lexical-env compile))
@@ -179,9 +181,11 @@
     (* (i32.mul))
     (/ (i32.div_s))))
 
-(define (open-coded-arithmetic-exp? exp)
-  (and (application? exp)
-       (assq (operator exp) arithmetic-operator-to-wasm-instr)))
+(define arithmetic-operators
+  (map car arithmetic-operator-to-wasm-instr))
+
+(define (arithmetic-operator? sym)
+  (memq sym arithmetic-operators))
 
 (define (compile-open-coded-arithmetic-exp exp program lexical-env compile)
   (let* ((operands (operands exp))
@@ -210,9 +214,11 @@
     (<= (i32.le_s))
     (>= (i32.ge_s))))
 
-(define (open-coded-comparison-exp? exp)
-  (and (application? exp)
-       (assq (operator exp) comparison-operator-to-wasm-instr)))
+(define comparison-operators
+  (map car comparison-operator-to-wasm-instr))
+
+(define (comparison-operator? sym)
+  (memq sym comparison-operators))
 
 (define (compile-binary-operator instr operand1 operand2 program lexical-env compile)
   (let* ((operand1-program

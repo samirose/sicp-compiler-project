@@ -242,3 +242,12 @@
  '(begin)
  "Empty sequence" '(begin)
  "Sequence without expressions is invalid")
+
+;; comparison operators
+(for-each
+ (lambda (operator)
+   (assert-expression-raises-compilation-error
+    `(,operator)
+    "Expected at least one argument" `(,operator)
+    "Comparison operators require at least one argument"))
+ '(= < > <= >=))

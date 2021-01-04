@@ -7,7 +7,6 @@
  (export variable?
          definition? definition-variable
          check-binding
-         application? operator operands
          check-all-identifiers check-syntax-errors)
 
  (import (rnrs base)
@@ -64,7 +63,8 @@
     ((let* ,?? ,?? ,??*) "Bindings missing from let* expression")
     ((let* ,??) "Bindings or body missing from let* expression")
     ((let*) "Bindings and body missing from let* expression")
-    ((begin) "Empty sequence")))
+    ((begin) "Empty sequence")
+    (() "No operator in application")))
 
 (define (check-syntax-errors exp)
   (for-each
@@ -102,16 +102,5 @@
         ((raise-error-on-match
           '() exp "Empty binding" exp))
         (else (raise-compilation-error "Not a binding" exp))))
-
-;; application
-(define (application? exp)
-  (cond ((not (pattern-match? `(,??*) exp)) #f)
-        ((pattern-match? `(,?? ,??*) exp))
-        ((raise-error-on-match
-          '() exp "No operator in application" exp))
-        (else (error "Internal compiler error: unexhaustive application syntax check"))))
-
-(define (operator exp) (car exp))
-(define (operands exp) (cdr exp))
 
 )

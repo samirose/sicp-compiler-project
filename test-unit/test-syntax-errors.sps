@@ -251,3 +251,9 @@
     "Expected at least one argument" `(,operator)
     "Comparison operators require at least one argument"))
  '(= < > <= >=))
+
+;; application
+(assert-expression-raises-compilation-error
+ '()
+ "No operator in application" '()
+ "Application must contain at least an operator")

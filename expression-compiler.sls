@@ -67,8 +67,8 @@
         ((pattern-match? `(,comparison-operator?) exp)
          (raise-compilation-error "Expected at least one argument" exp))
         ((check-syntax-errors exp))
-        ((application? exp)
-         (compile-application exp program lexical-env compile))
+        ((pattern-match? `(,?? ,??*) exp)
+         (compile-application exp (car exp) (cdr exp) program lexical-env compile))
         (else
          (raise-compilation-error "Unknown expression type" exp))))
 
@@ -573,10 +573,9 @@
          first-operand-program
          (cdr exps)))))
 
-(define (compile-application exp program lexical-env compile)
+(define (compile-application exp operator operands program lexical-env compile)
   (let*
-      ((operands (operands exp))
-       (func-type (scheme-procedure-type-definition (length operands)))
+      ((func-type (scheme-procedure-type-definition (length operands)))
        (type-program
         (if (compiled-program-contains-definition program func-type)
             program
@@ -588,7 +587,7 @@
        (operands-and-operator-program
         (compiled-program-append-value-codes
          operands-program
-         (compile (operator exp) operands-program lexical-env))))
+         (compile operator operands-program lexical-env))))
     (compiled-program-append-value-code
      operands-and-operator-program
      `(call_indirect (type ,type-index)))))

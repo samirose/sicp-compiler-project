@@ -61,9 +61,9 @@
         ((pattern-match? `(begin ,?? ,??*) exp)
          (compile-sequence (cdr exp) program lexical-env compile))
         ((pattern-match? `(,arithmetic-operator? ,??*) exp)
-         (compile-open-coded-arithmetic-exp exp program lexical-env compile))
+         (compile-open-coded-arithmetic-exp exp (car exp) (cdr exp) program lexical-env compile))
         ((pattern-match? `(,comparison-operator? ,?? ,??*) exp)
-         (compile-open-coded-comparison-exp exp program lexical-env compile))
+         (compile-open-coded-comparison-exp exp (car exp) (cdr exp) program lexical-env compile))
         ((pattern-match? `(,comparison-operator?) exp)
          (raise-compilation-error "Expected at least one argument" exp))
         ((check-syntax-errors exp))
@@ -187,9 +187,8 @@
 (define (arithmetic-operator? sym)
   (memq sym arithmetic-operators))
 
-(define (compile-open-coded-arithmetic-exp exp program lexical-env compile)
-  (let* ((operands (operands exp))
-         (instr (cadr (assq (operator exp) arithmetic-operator-to-wasm-instr)))
+(define (compile-open-coded-arithmetic-exp exp operator operands program lexical-env compile)
+  (let* ((instr (cadr (assq operator arithmetic-operator-to-wasm-instr)))
          (program-with-first-value-computing-code
           (compile (car operands) program lexical-env)))
     (compiled-program-append-value-codes
@@ -231,27 +230,25 @@
      operands-program
      instr)))
 
-(define (compile-open-coded-comparison-exp exp program lexical-env compile)
-  (let ((operator (operator exp))
-        (operands (operands exp)))
-    (cond ((null? operands)
-           (raise-compilation-error "Comparison operator needs at least one argument" exp))
-          ((null? (cdr operands))
-           (compile #t program lexical-env))
-          ((null? (cddr operands))
-           (compile-binary-operator
-            (cadr (assq operator comparison-operator-to-wasm-instr))
-            (car operands) (cadr operands)
-            program lexical-env compile))
-          (else
-           (compile
-            `(and
-              ,@(let generate ((operands operands))
-                  (if (null? (cdr operands))
-                      '()
-                      `((,operator ,(car operands) ,(cadr operands))
-                        ,@(generate (cdr operands))))))
-            program lexical-env)))))
+(define (compile-open-coded-comparison-exp exp operator operands program lexical-env compile)
+  (cond ((null? operands)
+         (raise-compilation-error "Comparison operator needs at least one argument" exp))
+        ((null? (cdr operands))
+         (compile #t program lexical-env))
+        ((null? (cddr operands))
+         (compile-binary-operator
+          (cadr (assq operator comparison-operator-to-wasm-instr))
+          (car operands) (cadr operands)
+          program lexical-env compile))
+        (else
+         (compile
+          `(and
+            ,@(let generate ((operands operands))
+                (if (null? (cdr operands))
+                    '()
+                    `((,operator ,(car operands) ,(cadr operands))
+                      ,@(generate (cdr operands))))))
+          program lexical-env))))
 
 ;;;conditional expressions
 

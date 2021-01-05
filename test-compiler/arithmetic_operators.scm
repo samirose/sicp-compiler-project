@@ -28,6 +28,6 @@
     (define (plus-zero-to-negative) (+ -2 0))
     (define (plus-multiple) (+ 1 2 3))
 
-    (define (complex) (+ (/ (* 2 -6 2) 3 2) (- 10 10 6) 2))
+    (define (complex) (+ (/ (* 2 -6 2) 3 2) (- (+ 1 2 3)) (* (+ (+ 1 1)))))
     )
   )

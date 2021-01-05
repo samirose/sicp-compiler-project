@@ -73,8 +73,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 
 ## Backlog
 * Come up with a name for this project
-* Restrict numerical comparison operators to two parameters (see [Known issues](#known-issues)) and add support for the currently missing operators
-* Optional: Implement support for numerical comparison operators with more than two parameters by compiling them as an `and` expression
 * Compile `cond` as Wasm block structure and conditional branch instructions instead of the current nested if expressions.
 * Add high-level design documentation with guide to the source code of the compiler
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))

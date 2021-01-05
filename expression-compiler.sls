@@ -182,7 +182,7 @@
 (define arithmetic-operator-map
   `((+ (i32.add) 0 ,(lambda (x) x))
     (- (i32.sub) #f
-       ,(lambda (x) `(- 0 ,x))) ; Do not use (- x) to avoid circular definition
+       ,(lambda (x) (if (number? x) (- 0 x) `(- 0 ,x)))) ; Do not use (- x) to avoid circular definition
     (* (i32.mul) 1 ,(lambda (x) x))
     (/ (i32.div_s) #f ,(lambda (x) (raise-compilation-error "No rational number support" `(/ ,x))))))
 

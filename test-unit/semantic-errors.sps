@@ -35,6 +35,22 @@
  "Quote not supported yet" '(quote x)
  "Quoted values are not yet supported")
 
+;; arithmetic expressions
+(assert-expression-raises-compilation-error
+ '(-)
+ "Expected at least one operand" '(-)
+ "Substraction does not have an identity value")
+
+(assert-expression-raises-compilation-error
+ '(/)
+ "Expected at least one operand" '(/)
+ "Division does not have an identity value")
+
+(assert-expression-raises-compilation-error
+ '(/ 5)
+ "No rational number support" '(/ 5)
+ "Cannot represent 1/5 with integers only")
+
 ;; lambda expression
 (assert-expression-raises-compilation-error
  '(lambda (x) (+ y x))

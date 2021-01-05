@@ -67,7 +67,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 ## Features currently under work
 
 ## Known issues
-* Numerical operator special cases `(+)`, `(*)`, `(+ x)`, `(* x)`, `(- x)`, `(/ x)` are not supported
 * The Scheme values are not type checked in the compiled programs: a number can be used as a procedure reference and vice-versa. Using of uninitialized values is not detected.
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 

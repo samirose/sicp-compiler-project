@@ -60,7 +60,11 @@
          (compile-let* exp (cadr exp) (cddr exp) program lexical-env compile))
         ((pattern-match? `(begin ,?? ,??*) exp)
          (compile-sequence (cdr exp) program lexical-env compile))
-        ((pattern-match? `(,arithmetic-operator? ,??*) exp)
+        ((pattern-match? `(,arithmetic-operator?) exp)
+         (compile-open-coded-arithmetic-identity exp (car exp) program lexical-env compile))
+        ((pattern-match? `(,arithmetic-operator? ,??) exp)
+         (compile-open-coded-arithmetic-single-operand exp (car exp) (cadr exp) program lexical-env compile))
+        ((pattern-match? `(,arithmetic-operator? ,?? ,?? ,??*) exp)
          (compile-open-coded-arithmetic-exp exp (car exp) (cdr exp) program lexical-env compile))
         ((pattern-match? `(,comparison-operator? ,?? ,??*) exp)
          (compile-open-coded-comparison-exp exp (car exp) (cdr exp) program lexical-env compile))
@@ -175,20 +179,31 @@
 
 ;;;open-coded primitives
 
-(define arithmetic-operator-to-wasm-instr
-  '((+ (i32.add))
-    (- (i32.sub))
-    (* (i32.mul))
-    (/ (i32.div_s))))
+(define arithmetic-operator-map
+  `((+ (i32.add) 0 ,(lambda (x) x))
+    (- (i32.sub) #f
+       ,(lambda (x) (- 0 x))) ; Do not use (- x) to avoid circular definition
+    (* (i32.mul) 1 ,(lambda (x) x))
+    (/ (i32.div_s) #f ,(lambda (x) (raise-compilation-error "No rational number support" `(/ ,x))))))
 
 (define arithmetic-operators
-  (map car arithmetic-operator-to-wasm-instr))
+  (map car arithmetic-operator-map))
 
 (define (arithmetic-operator? sym)
   (memq sym arithmetic-operators))
 
+(define (compile-open-coded-arithmetic-identity exp operator program lexical-env compile)
+  (let ((identity-value (caddr (assq operator arithmetic-operator-map))))
+    (if identity-value
+        (compile identity-value program lexical-env)
+        (raise-compilation-error "Expected at least one operand" exp))))
+
+(define (compile-open-coded-arithmetic-single-operand exp operator operand program lexical-env compile)
+  (let ((value-converter (cadddr (assq operator arithmetic-operator-map))))
+    (compile (value-converter operand) program lexical-env)))
+
 (define (compile-open-coded-arithmetic-exp exp operator operands program lexical-env compile)
-  (let* ((instr (cadr (assq operator arithmetic-operator-to-wasm-instr)))
+  (let* ((instr (cadr (assq operator arithmetic-operator-map)))
          (program-with-first-value-computing-code
           (compile (car operands) program lexical-env)))
     (compiled-program-append-value-codes

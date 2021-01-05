@@ -1,3 +1,8 @@
+(assert_return (invoke "plus-identity") (i32.const 0))
+(assert_return (invoke "multiply-identity") (i32.const 1))
+(assert_return (invoke "plus-single") (i32.const 2))
+(assert_return (invoke "minus-single") (i32.const -2))
+(assert_return (invoke "multiply-single") (i32.const 2))
 (assert_return (invoke "plus-zero-to-positive") (i32.const 2))
 (assert_return (invoke "plus-positive-result") (i32.const 3))
 (assert_return (invoke "signed-plus-positive-result") (i32.const 1))

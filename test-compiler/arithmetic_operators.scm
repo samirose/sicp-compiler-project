@@ -1,5 +1,10 @@
 (define-library
     (export
+        plus-identity
+        multiply-identity
+        plus-single
+        minus-single
+        multiply-single
         plus-zero-to-positive
         plus-positive-result
         signed-plus-positive-result
@@ -10,6 +15,11 @@
         complex)
 
     (begin
+        (define (plus-identity) (+))
+        (define (multiply-identity) (*))
+        (define (plus-single) (+ 2))
+        (define (minus-single) (- 2))
+        (define (multiply-single) (* 2))
         (define (plus-zero-to-positive) (+ 0 2))
         (define (plus-positive-result) (+ 1 2))
         (define (signed-plus-positive-result) (+ 2 -1))

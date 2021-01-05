@@ -287,12 +287,10 @@
   (let ((test-prog (compile test program lexical-env)))
     (compiled-program-with-value-code
      test-prog
-     `(,@(compiled-program-value-code test-prog)
-       if (result i32)
-         ,@(compiled-program-value-code (compile #f test-prog lexical-env))
-       else
-         ,@(compiled-program-value-code (compile #t test-prog lexical-env))
-       end))))
+     `(,@(compiled-program-value-code (compile #f test-prog lexical-env))
+       ,@(compiled-program-value-code (compile #t test-prog lexical-env))
+       ,@(compiled-program-value-code (compile test program lexical-env))
+       select))))
 
 (define (compile-and exp tests program lexical-env compile)
   (cond

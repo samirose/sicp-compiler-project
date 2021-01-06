@@ -289,7 +289,7 @@
      test-prog
      `(,@(compiled-program-value-code (compile #f test-prog lexical-env))
        ,@(compiled-program-value-code (compile #t test-prog lexical-env))
-       ,@(compiled-program-value-code (compile test program lexical-env))
+       ,@(compiled-program-value-code test-prog)
        select))))
 
 (define (compile-and exp tests program lexical-env compile)

@@ -67,8 +67,7 @@
              lexical-env)))
 
  (define (add-new-local-temporaries-frame lexical-env n)
-   (cons (make-local-frame lexical-env (make-list '() n) '())
-         lexical-env))
+   (add-new-local-frame lexical-env (make-list '() n) '()))
 
  (define (make-lexical-address frame-index var-index lexical-env additional-info)
    (list frame-index var-index lexical-env additional-info))

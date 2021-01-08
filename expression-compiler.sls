@@ -44,6 +44,8 @@
          (compile-if exp (cadr exp) (caddr exp) (cadddr exp) program lexical-env compile))
         ((pattern-match? `(if ,?? ,??) exp)
          (compile-if exp (cadr exp) (caddr exp) #f program lexical-env compile))
+        ((pattern-match? `(cond ,??*) exp)
+         (compile-cond exp (cdr exp) program lexical-env compile))
         ((pattern-match? `(not ,??) exp)
          (compile-not exp (cadr exp) program lexical-env compile))
         ((pattern-match? `(and ,??*) exp)
@@ -282,6 +284,81 @@
        else
          ,@(compiled-program-value-code a-prog)
        end))))
+
+(define (compile-cond exp clauses program lexical-env compile)
+  (cond
+    ((null? clauses)
+     (compiled-program-with-value-code program unspecified-value))
+    (else
+     (let
+         ((clauses-prog
+           (let generate ((clauses clauses)
+                          (program program)
+                          (env lexical-env)
+                          (temp-var-index #f))
+             (cond
+               ((null? clauses)
+                (compiled-program-with-value-code program '()))
+               ((pattern-match? `(,??) (car clauses))
+                (let*
+                    ((env (if temp-var-index
+                              env
+                              (add-new-local-temporaries-frame env 1)))
+                     (temp-var-index (env-var-index-offset env))
+                     (test-prog (compile (caar clauses) program env))
+                     (clause-prog
+                      (compiled-program-with-value-code
+                       test-prog
+                       `(block
+                         ,@(compiled-program-value-code test-prog)
+                         ,@(if temp-var-index '((local i32)) '())
+                         local.tee ,temp-var-index
+                         local.get ,temp-var-index
+                         br_if 2
+                         drop
+                         end))))
+                  (compiled-program-append-value-codes
+                   clause-prog
+                   (generate (cdr clauses) clause-prog env temp-var-index))))
+               ((or (pattern-match? `(else ,?? ,??*) (car clauses))
+                    (pattern-match? `(#t ,?? ,??*) (car clauses)))
+                (let*
+                    ((exp-prog (compile-sequence (cdar clauses) program env compile))
+                     (clause-prog
+                      (compiled-program-with-value-code
+                       exp-prog
+                       `(,@(compiled-program-value-code exp-prog)
+                         br 1))))
+                  (compiled-program-append-value-codes
+                   clause-prog
+                   (generate (cdr clauses) clause-prog env temp-var-index))))
+               ((pattern-match? `(,?? ,?? ,??*) (car clauses))
+                (let*
+                    ((test-prog (compile (caar clauses) program env))
+                     (exp-prog (compile-sequence (cdar clauses) test-prog env compile))
+                     (clause-prog
+                      (compiled-program-with-value-code
+                       exp-prog
+                       `(block
+                         block
+                         ,@(compiled-program-value-code test-prog)
+                         br_if 0
+                         br 1
+                         end
+                         ,@(compiled-program-value-code exp-prog)
+                         br 2
+                         end))))
+                  (compiled-program-append-value-codes
+                   clause-prog
+                   (generate (cdr clauses) clause-prog env temp-var-index))))))))
+       (compiled-program-with-value-code
+        clauses-prog
+        `(block (result i32)
+          block
+          ,@(compiled-program-value-code clauses-prog)
+          end
+          ,unspecified-value
+          end))))))
 
 (define (compile-not exp test program lexical-env compile)
   (let ((test-prog (compile test program lexical-env)))

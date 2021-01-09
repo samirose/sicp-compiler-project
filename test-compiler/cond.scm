@@ -1,14 +1,19 @@
 (define-library
-  (export single-exp
+  (export no-clauses
+          single-exp
           single-exp-else
           test-and-exp
           test-and-exp-else
+          only-else
           nested
           short-circuit
           sequence-exps
           lambda-exps)
 
   (begin
+    (define (no-clauses)
+      (cond))
+
     (define (single-exp x)
       (cond (x)))
 
@@ -22,6 +27,9 @@
     (define (test-and-exp-else x)
       (cond ((< x 10) (+ x 1))
             (else (- x 1))))
+
+    (define (only-else)
+      (cond (else 42)))
 
     (define (nested x)
       (cond ((< x 10)

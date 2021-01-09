@@ -151,6 +151,21 @@
  "Too many subexpressions in if expression" '(if (= x 0) 1 2 3 4)
  "If expression must not contain more subexpressions than test, consequent and alternative")
 
+(assert-expression-raises-compilation-error
+ '(cond (1) 2 (else 3))
+ "Invalid cond clause" 2
+ "cond clauses must be lists")
+
+(assert-expression-raises-compilation-error
+ '(cond (1) (else 2) (3))
+ "else or #t clause must be last in cond clauses" '(cond (1) (else 2) (3))
+ "else clause must be last in cond clauses")
+
+(assert-expression-raises-compilation-error
+ '(cond (1) (#t 2) (3))
+ "else or #t clause must be last in cond clauses" '(cond (1) (#t 2) (3))
+ "#t clause must be last in cond clauses")
+
 ;; not expression
 (assert-expression-raises-compilation-error
  '(not)

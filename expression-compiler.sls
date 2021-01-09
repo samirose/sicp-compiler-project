@@ -298,7 +298,10 @@
                           (temp-var-index #f))
              (cond
                ((null? clauses)
-                (compiled-program-with-value-code program '()))
+                (compiled-program-with-value-code
+                 program
+                 `(end
+                   ,unspecified-value)))
                ((pattern-match? `(,??) (car clauses))
                 (let*
                     ((env (if temp-var-index
@@ -322,16 +325,14 @@
                    (generate (cdr clauses) clause-prog env temp-var-index))))
                ((or (pattern-match? `(else ,?? ,??*) (car clauses))
                     (pattern-match? `(#t ,?? ,??*) (car clauses)))
-                (let*
-                    ((exp-prog (compile-sequence (cdar clauses) program env compile))
-                     (clause-prog
-                      (compiled-program-with-value-code
-                       exp-prog
-                       `(,@(compiled-program-value-code exp-prog)
-                         br 1))))
-                  (compiled-program-append-value-codes
-                   clause-prog
-                   (generate (cdr clauses) clause-prog env temp-var-index))))
+                (if (not (null? (cdr clauses)))
+                    (raise-compilation-error
+                     "else or #t clause must be last in cond clauses" exp))
+                (let ((exp-prog (compile-sequence (cdar clauses) program env compile)))
+                  (compiled-program-with-value-code
+                   exp-prog
+                   `(end
+                     ,@(compiled-program-value-code exp-prog)))))
                ((pattern-match? `(,?? ,?? ,??*) (car clauses))
                 (let*
                     ((test-prog (compile (caar clauses) program env))
@@ -350,14 +351,14 @@
                          end))))
                   (compiled-program-append-value-codes
                    clause-prog
-                   (generate (cdr clauses) clause-prog env temp-var-index))))))))
+                   (generate (cdr clauses) clause-prog env temp-var-index))))
+               (else
+                (raise-compilation-error "Invalid cond clause" (car clauses)))))))
        (compiled-program-with-value-code
         clauses-prog
         `(block (result i32)
           block
           ,@(compiled-program-value-code clauses-prog)
-          end
-          ,unspecified-value
           end))))))
 
 (define (compile-not exp test program lexical-env compile)

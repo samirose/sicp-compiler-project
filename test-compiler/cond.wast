@@ -1,3 +1,4 @@
+(assert_return (invoke "no-clauses") (i32.const 0))
 (assert_return (invoke "single-exp" (i32.const 1)) (i32.const 1))
 (assert_return (invoke "single-exp" (i32.const 0)) (i32.const 0))
 (assert_return (invoke "single-exp-else" (i32.const 1)) (i32.const 1))
@@ -6,6 +7,7 @@
 (assert_return (invoke "test-and-exp" (i32.const 1)) (i32.const 2))
 (assert_return (invoke "test-and-exp-else" (i32.const 9)) (i32.const 10))
 (assert_return (invoke "test-and-exp-else" (i32.const 10)) (i32.const 9))
+(assert_return (invoke "only-else") (i32.const 42))
 (assert_return (invoke "nested" (i32.const 1)) (i32.const 2))
 (assert_return (invoke "nested" (i32.const 9)) (i32.const 10))
 (assert_return (invoke "nested" (i32.const 10)) (i32.const 9))

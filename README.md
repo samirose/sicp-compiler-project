@@ -64,6 +64,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Implement `let` and `let*` with Wasm locals instead of `lambda`, if possible. (Using the bindings in closures will need further work)
 * `and` and `or` expressions with short circuit using Wasm block structure and conditional branch instructions
 * `not` expression
+* Compile `cond` to Wasm block structure and conditional branch instructions
 
 ## Features currently under work
 
@@ -73,7 +74,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 
 ## Backlog
 * Come up with a name for this project
-* Compile `cond` as Wasm block structure and conditional branch instructions instead of the current nested if expressions.
 * Add high-level design documentation with guide to the source code of the compiler
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))
 * Add support for read-only symbols and strings

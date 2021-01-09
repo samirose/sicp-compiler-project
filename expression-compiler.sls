@@ -313,12 +313,12 @@
                       (compiled-program-with-value-code
                        test-prog
                        `(block
-                         ,@(compiled-program-value-code test-prog)
-                         ,@(if temp-var-index '((local i32)) '())
-                         local.tee ,temp-var-index
-                         local.get ,temp-var-index
-                         br_if 2
-                         drop
+                           ,@(compiled-program-value-code test-prog)
+                           ,@(if temp-var-index '((local i32)) '())
+                           local.tee ,temp-var-index
+                           local.get ,temp-var-index
+                           br_if 2
+                           drop
                          end))))
                   (compiled-program-append-value-codes
                    clause-prog
@@ -341,13 +341,13 @@
                       (compiled-program-with-value-code
                        exp-prog
                        `(block
-                         block
-                         ,@(compiled-program-value-code test-prog)
-                         br_if 0
-                         br 1
-                         end
-                         ,@(compiled-program-value-code exp-prog)
-                         br 2
+                           block
+                             ,@(compiled-program-value-code test-prog)
+                             br_if 0
+                             br 1
+                           end
+                           ,@(compiled-program-value-code exp-prog)
+                           br 2
                          end))))
                   (compiled-program-append-value-codes
                    clause-prog
@@ -357,8 +357,8 @@
        (compiled-program-with-value-code
         clauses-prog
         `(block (result i32)
-          block
-          ,@(compiled-program-value-code clauses-prog)
+            block
+              ,@(compiled-program-value-code clauses-prog)
           end))))))
 
 (define (compile-not exp test program lexical-env compile)

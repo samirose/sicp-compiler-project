@@ -73,8 +73,8 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Backlog
-* Come up with a name for this project
-* Add high-level design documentation with guide to the source code of the compiler
+* Allow overriding of special form symbols and inlined procedures with local bindings
+* Add a way to raise errors from compiled code. Needed for halting the program when a type error is detected.
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))
 * Add support for read-only symbols and strings
 * Add run-time support for rudimentary heap-based values: vectors, pairs
@@ -82,6 +82,8 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Implement lexical [closures](https://en.wikipedia.org/wiki/Closure_(computer_programming)) with function activation records as vector lists on the heap
 * Implement `letrec` form. It does not make sense to implement it before closure support to enable common use case of recursion and procedures calling each other.
 * _Scan out_ (see [SICP chapter 4.16](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1.6)) internal definitions and implement the bindings with `letrec*`
+* Come up with a name for this project
+* Add high-level design documentation with guide to the source code of the compiler
 * More R7RS-small features, prioritisation TBD.
 
 ## References

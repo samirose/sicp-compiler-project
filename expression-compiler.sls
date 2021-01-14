@@ -29,6 +29,8 @@
          (compile-boolean exp program))
         ((string? exp)
          (compile-string exp program))
+        ((pattern-match? `(,(lambda (x) (find-variable x lexical-env)) ,??*) exp)
+         (compile-application exp (car exp) (cdr exp) program lexical-env compile))
         ((pattern-match? `(quote ,??) exp)
          (compile-quoted exp (cadr exp) program))
         ((variable? exp)

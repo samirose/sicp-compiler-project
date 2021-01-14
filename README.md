@@ -65,6 +65,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * `and` and `or` expressions with short circuit using Wasm block structure and conditional branch instructions
 * `not` expression
 * Compile `cond` to Wasm block structure and conditional branch instructions
+* Special form symbols and inlined procedures can be overridden with local bindings
 
 ## Features currently under work
 
@@ -73,7 +74,6 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Backlog
-* Allow overriding of special form symbols and inlined procedures with local bindings
 * Add a way to raise errors from compiled code. Needed for halting the program when a type error is detected.
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))
 * Add support for read-only symbols and strings

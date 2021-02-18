@@ -67,6 +67,20 @@ lib/module-compiler : \
 compile : $(COMPILED_COMPILER)
 	$(RUN_DRIVER) $<
 
+.PHONY : test-runtime
+test-runtime : runtime/test/test-runtime.log
+
+runtime/test/test-runtime.log : runtime/test/test-runtime.json
+	spectest-interp $< | tee $@.tmp \
+	  && mv -f $@.tmp $@
+
+runtime/test/test-runtime.json : runtime/test/test-runtime.wast
+	wast2json $< -o $@
+
+runtime/test/test-runtime.wast : runtime/runtime.wat runtime/runtime.wast
+	mkdir -p runtime/test
+	cat $^ > $@
+
 TEST_COMPILER_DIR := test-compiler
 COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)/*.scm)
 COMPILER_TEST_LOGS = $(patsubst $(TEST_COMPILER_DIR)/%.scm,$(TEST_COMPILER_DIR)/log/%.log,$(COMPILER_TEST_PROGRAMS))
@@ -112,7 +126,7 @@ $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)/log/%.log : $(TEST_UNIT_DIR)/%.sps $(LIBDIR
 	  && mv -f $@.tmp $@
 
 .PHONY : test
-test : test-unit test-compiler
+test : test-runtime test-unit test-compiler
 
 .PHONY : cleanall
 cleanall : cleantest cleancompiler cleanlibs
@@ -127,4 +141,4 @@ cleanlibs :
 
 .PHONY : cleantest
 cleantest :
-	-rm -rf $(TEST_UNIT_DIR)/log $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log $(UNIT_TEST_LIBS)
+	-rm -rf runtime/test $(TEST_UNIT_DIR)/log $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log $(UNIT_TEST_LIBS)

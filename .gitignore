@@ -5,3 +5,4 @@ compiled/
 lib/
 build/
 log/
+test/

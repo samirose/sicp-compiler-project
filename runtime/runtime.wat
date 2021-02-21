@@ -1,9 +1,12 @@
 (module
   (global $error-code (mut i32) (i32.const 0))
+  (global $error-no-error (export "error-no-error") i32 (i32.const 0))
   (global $error-expected-number (export "error-expected-number") i32 (i32.const 1))
 
   (func (export "get-error-code") (result i32)
-    global.get $error-code)
+    global.get $error-code
+    global.get $error-no-error
+    global.set $error-code)
 
   (global $fixnum-mask    i32 (i32.const 0x00000001))
   (global $boolean-tag    i32 (i32.const 0x00000006))

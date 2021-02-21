@@ -13,6 +13,7 @@
 (assert_return (invoke "number?" (i32.const 0x00000016)) (i32.const 0x00000006))
 
 ;; error-code is initially zero
+(assert_return (get "error-no-error") (i32.const 0))
 (assert_return (invoke "get-error-code") (i32.const 0))
 
 ;; Converting a non-fixnum with fixnum->i32 causes a trap and error-code being set
@@ -20,6 +21,8 @@
 (assert_trap (invoke "fixnum->i32" (i32.const 0)) "unreachable")
 (assert_return (invoke "get-error-code") (i32.const 1))
 
+;; Error code is reset after reading it with get-error-code
+(assert_return (invoke "get-error-code") (i32.const 0))
 
 ;; Calling zero? on non-fixum causes a trap and error-code being set
 (assert_trap (invoke "zero?" (i32.const 0)) "unreachable")

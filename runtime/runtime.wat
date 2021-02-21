@@ -18,19 +18,23 @@
     global.get $fixnum-mask
     i32.or)
 
-  (func (export "fixnum->i32") (param $fixnum i32) (result i32)
-    local.get $fixnum
+  (func $check-fixnum (param $obj i32) (result i32)
+    local.get $obj
     global.get $fixnum-mask
     i32.and
     if (result i32)
-      local.get $fixnum
-      i32.const 1
-      i32.shr_s
+      local.get $obj
     else
       global.get $error-expected-number
       global.set $error-code
       unreachable
     end)
+
+  (func $fixnum->i32 (export "fixnum->i32") (param $obj i32) (result i32)
+    local.get $obj
+    call $check-fixnum
+    i32.const 1
+    i32.shr_s)
 
   (func $i32->boolean  (export "i32->boolean") (param $value i32) (result i32)
     global.get $true-value
@@ -58,5 +62,11 @@
     local.get $obj
     global.get $fixnum-mask
     i32.and
+    call $i32->boolean)
+
+  (func (export "zero?") (param $obj i32) (result i32)
+    local.get $obj
+    call $fixnum->i32
+    i32.eqz
     call $i32->boolean)
 )

@@ -25,7 +25,9 @@
    (if (not (r7rs-library? exp))
        (raise-compilation-error "Invalid R7RS library" exp))
    (raise-if-error (check-library-declarations exp))
-   (compile-program-to-module (compile-library-to-program exp)))
+   (let* ((initial-program (make-empty-compiled-program))
+          (library-program (compile-library-to-program exp initial-program)))
+     (compile-program-to-module library-program)))
 
  (define (compile-single-exp-to-wasm-module exp)
    (let ((library
@@ -35,7 +37,7 @@
                 `(define-library ,sequence)))))
      (compile-r7rs-library-to-wasm-module library)))
 
- (define (compile-library-to-program library)
+ (define (compile-library-to-program library program)
    (let*
        ((exp-sequence
          (let*
@@ -58,8 +60,6 @@
          (library-declarations 'export library))
         (lexical-env
          (make-global-lexical-env definition-names exports))
-        (program
-         (make-empty-compiled-program))
         (program
          (if (null? definitions)
              program

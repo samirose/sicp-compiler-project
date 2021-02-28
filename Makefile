@@ -77,9 +77,11 @@ runtime/test/test-runtime.log : runtime/test/test-runtime.json
 runtime/test/test-runtime.json : runtime/test/test-runtime.wast
 	wast2json $< -o $@
 
-runtime/test/test-runtime.wast : runtime/runtime.wat runtime/runtime.wast
+runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/runtime.wast
 	mkdir -p runtime/test
-	cat $^ > $@
+	cat runtime/scheme-base.wat > $@
+	echo '(register "scheme base")' >> $@
+	cat runtime/runtime.wast >> $@
 
 TEST_COMPILER_DIR := test-compiler
 COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)/*.scm)

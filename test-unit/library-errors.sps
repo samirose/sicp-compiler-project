@@ -47,16 +47,6 @@
  "Library declarations must be ones defined in R7RS")
 
 (assert-library-raises-compilation-error
- '(define-library (begin 1) (begin 2))
- "Duplicated R7RS library declarations" '((begin 2))
- "Library declarations must not be duplicated")
-
-(assert-library-raises-compilation-error
- '(define-library (begin (define (x) 1) 2) (export x))
- "Unexpected R7RS library declaration" '(begin (define (x) 1) 2)
- "Library declarations must be in the order specified in R7RS")
-
-(assert-library-raises-compilation-error
  '(define-library (begin))
  "Empty begin declaration in library" '(define-library (begin))
  "Library begin declaration must not be empty")

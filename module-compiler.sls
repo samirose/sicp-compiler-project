@@ -24,7 +24,7 @@
  (define (compile-r7rs-library-to-wasm-module exp)
    (if (not (r7rs-library? exp))
        (raise-compilation-error "Invalid R7RS library" exp))
-   (raise-if-error (check-library-declarations exp))
+   (check-library-declarations exp)
    (let* ((initial-program (make-empty-compiled-program))
           (library-program (compile-library-to-program exp initial-program)))
      (compile-program-to-module library-program)))

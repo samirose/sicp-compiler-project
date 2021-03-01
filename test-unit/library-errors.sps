@@ -42,6 +42,11 @@
  "Library declarations must be ones defined in R7RS")
 
 (assert-library-raises-compilation-error
+ '(define-library (begin 1) (foo bar))
+ "Unsupported R7RS library declaration" '(foo bar)
+ "Library declarations must be ones defined in R7RS")
+
+(assert-library-raises-compilation-error
  '(define-library (begin 1) (begin 2))
  "Duplicated R7RS library declarations" '((begin 2))
  "Library declarations must not be duplicated")

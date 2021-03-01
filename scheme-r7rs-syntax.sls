@@ -24,34 +24,27 @@
    (letrec*
     ((check-declaration
       (lambda (decl)
-        (cond ((pattern-match? `(,library-decltype? ,??*) decl) 'ok)
+        (cond ((pattern-match? `(,library-decltype? ,??*) decl))
               ((pattern-match? `(,(lambda (d) (not (library-decltype? d))) ,??*) decl)
-               (make-compilation-error "Unsupported R7RS library declaration" decl))
+               (raise-compilation-error "Unsupported R7RS library declaration" decl))
               ((not (pattern-match? `(,?? ,??*) decl))
-               (make-compilation-error "Illegal R7RS library declaration" decl)))))
-     (check-all-lists-and-types
-      (lambda (decls)
-        (cond ((null? decls) 'ok)
-              ((check-declaration (car decls)))
-              (else (check-all-lists-and-types (cdr decls))))))
+               (raise-compilation-error "Illegal R7RS library declaration" decl)))))
      (check-decl-ordering
       (lambda (types decls)
-        (cond ((null? decls) 'ok)
+        (cond ((null? decls))
               ((null? types)
                (or (null? decls)
-                   (make-compilation-error "Duplicated R7RS library declarations" decls)))
+                   (raise-compilation-error "Duplicated R7RS library declarations" decls)))
               ((not (eq? (caar decls) (car types)))
-               (make-compilation-error "Unexpected R7RS library declaration" (car decls)))
+               (raise-compilation-error "Unexpected R7RS library declaration" (car decls)))
               (else (check-decl-ordering (cdr types) (cdr decls))))))
-     (library-declarations (cdr library-def))
-     (first-result (check-all-lists-and-types library-declarations)))
-    (if (compilation-error? first-result)
-        first-result
-        (check-decl-ordering
-         (filter
-          (lambda (type) (assq type library-declarations))
-          library-decltypes)
-         library-declarations))))
+     (library-declarations (cdr library-def)))
+    (for-each check-declaration library-declarations)
+    (check-decl-ordering
+     (filter
+      (lambda (type) (assq type library-declarations))
+      library-decltypes)
+     library-declarations)))
 
  (define (library-declaration type library-def)
    (assq type (cdr library-def)))

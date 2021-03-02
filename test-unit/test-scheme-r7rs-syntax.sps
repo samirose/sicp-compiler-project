@@ -27,27 +27,29 @@
 
 (define test-library
   '(define-library
+     (import lib1)
      (export square)
+     (import lib2)
      (begin
        (define (square x) (* x x))
        (square 5))))
 
 (assert-equal
- '(export square)
- (library-declaration 'export test-library)
- "library-declaration returns the whole matching declaration in a library")
+ #t
+ (library-has-declaration? 'export test-library)
+ "library-has-declaration? returns true when matching declaration is in a library")
 
 (assert-equal
  #f
- (library-declaration 'import test-library)
- "library-declaration returns #f when no matching declaration is found in a library")
+ (library-has-declaration? 'include test-library)
+ "library-has-declaration? returns false when no matching declaration is found in a library")
 
 (assert-equal
  '((define (square x) (* x x)) (square 5))
  (library-declarations 'begin test-library)
- "library-declarations returns the contents of a matching declaration in a library")
+ "library-declarations returns the contents of a single matching declaration in a library")
 
 (assert-equal
- '()
+ '(lib1 lib2)
  (library-declarations 'import test-library)
- "library-declarations returns an empty list when no matching declaration is found in a library")
+ "library-declarations returns the contents of multiple matching declarations in a library in declaration order")

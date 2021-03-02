@@ -40,14 +40,12 @@
  (define (compile-library-to-program library program)
    (let*
        ((exp-sequence
-         (let*
-             ((exps
-               (cond ((library-declaration 'begin library))
-                     (else (raise-compilation-error "No begin declaration in library" library))))
-              (actions (cdr exps)))
-           (if (null? actions)
-               (raise-compilation-error "Empty begin declaration in library" library)
-               actions)))
+         (if (library-has-declaration? 'begin library)
+             (let ((actions (library-declarations 'begin library)))
+               (if (null? actions)
+                   (raise-compilation-error "Empty begin declaration in library" library)
+                   actions))
+             (raise-compilation-error "No begin declaration in library" library)))
         (definitions-and-non-definitions
           (partition-list definition? exp-sequence))
         (definitions

@@ -4,7 +4,7 @@
  (scheme-r7rs-syntax)
  (export r7rs-library?
          check-library-declarations
-         library-declaration
+         library-has-declaration?
          library-declarations)
  (import (rnrs base)
          (rnrs lists)
@@ -30,10 +30,16 @@
  (define (check-library-declarations library-def)
    (for-each check-declaration (cdr library-def)))
 
- (define (library-declaration type library-def)
-   (assq type (cdr library-def)))
+ (define (library-has-declaration? type library-def)
+   (and (assq type (cdr library-def)) #t))
 
  (define (library-declarations type library-def)
-   (let ((decl (library-declaration type library-def)))
-     (if decl (cdr decl) '())))
-)
+   (let collect ((decls (cdr library-def))
+                 (decl '())
+                 (result '()))
+     (cond ((null? decl)
+            (cond ((null? decls) (reverse result))
+                  ((eq? (caar decls) type) (collect (cdr decls) (cdar decls) result))
+                  (else (collect (cdr decls) '() result))))
+           (else (collect decls (cdr decl) (cons (car decl) result))))))
+ )

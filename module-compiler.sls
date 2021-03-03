@@ -130,16 +130,18 @@
       (if (not (memq export variables))
           (raise-compilation-error "No top-level definition for export" export)))
     exports)
-   (add-new-lexical-frame
-    (make-empty-lexical-env)
-    variables
-    (fold-left
-     (lambda (additional-info var)
-       (if (memq var exports)
-           (cons `(,var (export ,(symbol->string var)))
-                 additional-info)
-           additional-info))
-     '()
-     variables)))
-
+   (let
+       ((additional-info
+         (fold-left
+          (lambda (info var)
+            (if (memq var exports)
+                (cons `(,var (export ,(symbol->string var)))
+                      info)
+                info))
+          '()
+          variables)))
+     (add-new-lexical-frame
+      (make-empty-lexical-env)
+      variables
+      additional-info)))
  )

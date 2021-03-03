@@ -6,6 +6,7 @@ LIBS := \
 	pattern-match \
 	scheme-syntax \
 	scheme-r7rs-syntax \
+	scheme-libraries \
 	lexical-env \
 	wasm-syntax \
 	wasm-module-definitions \
@@ -42,6 +43,9 @@ lib/scheme-r7rs-syntax: \
 lib/scheme-syntax: \
 	lib/pattern-match \
 	lib/compilation-error
+lib/scheme-libraries: \
+	lib/compiled-program \
+	lib/compilation-error
 lib/lexical-env: \
 	lib/lists
 lib/expression-compiler : \
@@ -56,6 +60,7 @@ lib/module-compiler : \
 	lib/lists \
 	lib/scheme-syntax \
 	lib/scheme-r7rs-syntax \
+	lib/scheme-libraries \
 	lib/compilation-error \
 	lib/lexical-env \
 	lib/compiled-program \

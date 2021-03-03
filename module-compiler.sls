@@ -10,6 +10,7 @@
          (lists)
          (scheme-syntax)
          (scheme-r7rs-syntax)
+         (scheme-libraries)
          (compilation-error)
          (lexical-env)
          (compiled-program)
@@ -39,12 +40,13 @@
 
  (define (compile-library-to-program library program)
    (let*
-       ((exp-sequence
+       ((imports
+         (library-declarations 'import library))
+        (program
+         (add-import-definitions imports program))
+        (exp-sequence
          (if (library-has-declaration? 'begin library)
-             (let ((actions (library-declarations 'begin library)))
-               (if (null? actions)
-                   (raise-compilation-error "Empty begin declaration in library" library)
-                   actions))
+             (library-declarations 'begin library)
              (raise-compilation-error "No begin declaration in library" library)))
         (definitions-and-non-definitions
           (partition-list definition? exp-sequence))

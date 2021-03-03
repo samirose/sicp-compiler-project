@@ -2,10 +2,12 @@
 
 (library
  (scheme-r7rs-syntax)
+
  (export r7rs-library?
          check-library-declarations
          library-has-declaration?
          library-declarations)
+
  (import (rnrs base)
          (rnrs lists)
          (pattern-match)
@@ -14,15 +16,17 @@
  (define (r7rs-library? exp)
    (pattern-match? `(define-library ,??*) exp))
 
- (define library-decltypes
-   '(export begin))
-
- (define (library-decltype? type)
-   (and (memq type library-decltypes) #t))
-
  (define (check-declaration decl)
-   (cond ((pattern-match? `(,library-decltype? ,??*) decl))
-         ((pattern-match? `(,(lambda (d) (not (library-decltype? d))) ,??*) decl)
+   (cond ((pattern-match? `(export ,?? ,??*) decl))
+         ((pattern-match? '(export) decl)
+          (raise-compilation-error "Empty export library declaration" decl))
+         ((pattern-match? `(import ,?? ,??*) decl))
+         ((pattern-match? '(import) decl)
+          (raise-compilation-error "Empty import library declaration" decl))
+         ((pattern-match? `(begin ,?? ,??*) decl))
+         ((pattern-match? '(begin) decl)
+          (raise-compilation-error "Empty begin library declaration" decl))
+         ((pattern-match? `(,?? ,??*) decl)
           (raise-compilation-error "Unsupported R7RS library declaration" decl))
          ((not (pattern-match? `(,?? ,??*) decl))
           (raise-compilation-error "Illegal R7RS library declaration" decl))))

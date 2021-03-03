@@ -47,8 +47,18 @@
  "Library declarations must be ones defined in R7RS")
 
 (assert-library-raises-compilation-error
+ '(define-library (import))
+ "Empty import library declaration" '(import)
+ "Library import declaration must not be empty")
+
+(assert-library-raises-compilation-error
+ '(define-library (export))
+ "Empty export library declaration" '(export)
+ "Library export declaration must not be empty")
+
+(assert-library-raises-compilation-error
  '(define-library (begin))
- "Empty begin declaration in library" '(define-library (begin))
+ "Empty begin library declaration" '(begin)
  "Library begin declaration must not be empty")
 
 (assert-library-raises-compilation-error

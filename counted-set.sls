@@ -9,11 +9,11 @@
 
  (define (make-counted-set) '())
 
- (define (counted-set-add s key)
+ (define (counted-set-add s key amount)
    (let* ((existing (assq key s))
           (count (if existing
-                     (+ (cdr existing) 1)
-                     1))
+                     (+ (cdr existing) amount)
+                     amount))
           (new-head (cons key count))
           (rest (filter (lambda (entry) (not (eq? key (car entry)))) s)))
      (cons new-head rest)))

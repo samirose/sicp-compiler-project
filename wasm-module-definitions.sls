@@ -35,7 +35,7 @@
  (define (wasm-module-add-definition defs def)
    (make-wasm-module-definitions
     (cons def (definitions defs))
-    (counted-set-add (definition-counts defs) (car def))))
+    (counted-set-add (definition-counts defs) (car def) 1)))
 
  (define (wasm-module-contains-definition defs def)
    (if (member def (definitions defs)) #t #f))

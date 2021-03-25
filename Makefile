@@ -3,6 +3,7 @@ SHELL = /bin/bash
 LIBDIR := lib/
 LIBS := \
 	lists \
+	counted-set \
 	pattern-match \
 	scheme-syntax \
 	scheme-r7rs-syntax \
@@ -34,6 +35,7 @@ RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.sps
 
 lib/wasm-module-definitions : \
 	lib/lists \
+	lib/counted-set \
 	lib/wasm-syntax
 lib/compiled-program : \
 	lib/wasm-module-definitions

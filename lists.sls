@@ -2,8 +2,7 @@
 (library
  (lists)
 
- (export partition-list index-of-equal first-duplicate make-list flatten-n all?
-         make-counted-set counted-set-add counted-set-count counted-set-unique-keys)
+ (export partition-list index-of-equal first-duplicate make-list flatten-n all?)
 
  (import (rnrs base)
          (rnrs lists))
@@ -53,21 +52,4 @@
          ((p? (car l)) (all? p? (cdr l)))
          (else #f)))
 
- (define (make-counted-set) '())
-
- (define (counted-set-add s key)
-   (let* ((existing (assq key s))
-          (count (if existing
-                     (+ (cdr existing) 1)
-                     1))
-          (new-head (cons key count))
-          (rest (filter (lambda (entry) (not (eq? key (car entry)))) s)))
-     (cons new-head rest)))
-
- (define (counted-set-count s key)
-   (let ((existing (assq key s)))
-         (if existing (cdr existing) 0)))
-
- (define (counted-set-unique-keys s)
-   (length s))
  )

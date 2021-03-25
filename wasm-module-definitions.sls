@@ -9,8 +9,9 @@
          wasm-module-definition-index
          wasm-module-get-definitions)
 
- (import (rnrs)
-         (lists)
+ (import (rnrs base)
+         (rnrs lists)
+         (counted-set)
          (wasm-syntax))
 
  (define (make-wasm-module-definitions defs def-counts)

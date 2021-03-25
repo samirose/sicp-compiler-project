@@ -40,17 +40,22 @@
  (define (wasm-module-contains-definition defs def)
    (if (member def (definitions defs)) #t #f))
 
+  (define (lookup-definition defs type predicate)
+    (let loop ((ds (definitions defs))
+               (count (wasm-module-definitions-count defs type)))
+      (cond ((null? ds) #f)
+            ((wasm-definition-type? type (car ds))
+             (if (predicate (car ds))
+                 (- count 1)
+                 (loop (cdr ds) (- count 1))))
+            (else
+             (loop (cdr ds) count)))))
+
  (define (wasm-module-definition-index defs def)
-   (let ((definition-type (wasm-definition-type def)))
-     (let loop ((ds (definitions defs))
-                (index (wasm-module-definitions-count defs definition-type)))
-       (cond ((null? ds) #f)
-             ((wasm-definition-type? definition-type (car ds))
-              (if (equal? (car ds) def)
-                  (- index 1)
-                  (loop (cdr ds) (- index 1))))
-             (else
-              (loop (cdr ds) index))))))
+   (lookup-definition
+    defs
+    (def-type def)
+    (lambda (d) (equal? def d))))
 
  (define (wasm-module-get-definitions defs type)
    (let collect ((ds (definitions defs))

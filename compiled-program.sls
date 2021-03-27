@@ -18,7 +18,7 @@
 
  (import (rnrs base)
          (rnrs lists)
-         (wasm-module-definitions))
+         (definitions-table))
 
  (define (make-compiled-program module-definitions value-code)
    (list module-definitions value-code))
@@ -31,7 +31,7 @@
 
  (define (make-empty-compiled-program)
    (make-compiled-program
-    (make-empty-wasm-module-definitions)
+    (make-empty-definitions-table)
     '()))
 
  (define (compiled-program-with-value-code cp code)
@@ -53,34 +53,34 @@
 
   (define (compiled-program-add-definition cp definition)
     (make-compiled-program
-     (wasm-module-add-definition
+     (add-definition
       (compiled-program-module-definitions cp)
       definition)
      (compiled-program-value-code cp)))
 
   (define (compiled-program-get-definitions cp type)
-    (wasm-module-get-definitions
+    (get-definitions
      (compiled-program-module-definitions cp)
      type))
 
   (define (compiled-program-contains-definition cp definition)
-    (wasm-module-contains-definition
+    (contains-definition
      (compiled-program-module-definitions cp)
      definition))
 
   (define (compiled-program-definition-index cp definition)
-    (wasm-module-definition-index
+    (definition-index
      (compiled-program-module-definitions cp)
      definition))
 
   (define (compiled-program-definitions-count cp type)
-    (wasm-module-definitions-count
+    (definitions-count
      (compiled-program-module-definitions cp)
      type))
 
   (define (compiled-program-with-definition-and-value-code cp definition code)
     (make-compiled-program
-     (wasm-module-add-definition
+     (add-definition
       (compiled-program-module-definitions cp)
       definition)
      code))

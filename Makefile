@@ -10,7 +10,7 @@ LIBS := \
 	scheme-libraries \
 	lexical-env \
 	wasm-syntax \
-	wasm-module-definitions \
+	definitions-table \
 	compiled-program \
 	compilation-error \
 	expression-compiler \
@@ -33,12 +33,12 @@ $(LIBDIR)% : %.sls
 
 RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.sps
 
-lib/wasm-module-definitions : \
+lib/definitions-table : \
 	lib/lists \
 	lib/counted-set \
 	lib/wasm-syntax
 lib/compiled-program : \
-	lib/wasm-module-definitions
+	lib/definitions-table
 lib/scheme-r7rs-syntax: \
 	lib/pattern-match \
 	lib/compilation-error
@@ -56,8 +56,7 @@ lib/expression-compiler : \
 	lib/lexical-env \
 	lib/compiled-program \
 	lib/compilation-error \
-	lib/wasm-syntax \
-	lib/wasm-module-definitions
+	lib/wasm-syntax
 lib/module-compiler : \
 	lib/lists \
 	lib/scheme-syntax \

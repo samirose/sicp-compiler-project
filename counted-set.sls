@@ -20,7 +20,7 @@
 
  (define (counted-set-count s key)
    (let ((existing (assq key s)))
-         (if existing (cdr existing) 0)))
+     (if existing (cdr existing) 0)))
 
  (define (counted-set-unique-keys s)
    (length s))

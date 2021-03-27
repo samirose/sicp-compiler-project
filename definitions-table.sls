@@ -29,9 +29,6 @@
  (define (definitions-count defs type)
    (counted-set-count (definition-counts defs) type))
 
- (define (def-type def)
-   (car def))
-
  (define (add-definition defs def)
    (make-definitions-table
     (cons def (definitions defs))
@@ -54,7 +51,7 @@
  (define (definition-index defs def)
    (lookup-definition
     defs
-    (def-type def)
+    (wasm-definition-type def)
     (lambda (d) (equal? def d))))
 
  (define (get-definitions defs type)

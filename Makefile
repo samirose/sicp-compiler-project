@@ -89,47 +89,46 @@ runtime/test/test-runtime.json : runtime/test/test-runtime.wast|  runtime/test/
 runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/runtime.wast | runtime/test/
 	cat $^ > $@
 
-TEST_COMPILER_DIR := test-compiler
-COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)/*.scm)
-COMPILER_TEST_LOGS = $(patsubst $(TEST_COMPILER_DIR)/%.scm,$(TEST_COMPILER_DIR)/log/%.log,$(COMPILER_TEST_PROGRAMS))
+TEST_COMPILER_DIR := test-compiler/
+COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)*.scm)
+COMPILER_TEST_LOGS = $(patsubst $(TEST_COMPILER_DIR)%.scm,$(TEST_COMPILER_DIR)log/%.log,$(COMPILER_TEST_PROGRAMS))
 
 .PHONY : test-compiler-dirs test-compiler
 test-compiler : test-compiler-dirs $(COMPILER_TEST_LOGS)
 
-test-compiler-dirs : $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log
-$(TEST_COMPILER_DIR)/build :
-	mkdir -p $@
- $(TEST_COMPILER_DIR)/log :
+test-compiler-dirs : $(TEST_COMPILER_DIR)build/ $(TEST_COMPILER_DIR)log/
+
+$(TEST_COMPILER_DIR)build/ $(TEST_COMPILER_DIR)log/ :
 	mkdir -p $@
 
-$(TEST_COMPILER_DIR)/log/%.log : $(TEST_COMPILER_DIR)/build/%.json
+$(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(TEST_COMPILER_DIR)/build/%.json : $(TEST_COMPILER_DIR)/build/%.wast
+$(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/%.wast
 	wast2json $< -o $@
 
-$(TEST_COMPILER_DIR)/build/%.wast : $(TEST_COMPILER_DIR)/build/%.wat $(TEST_COMPILER_DIR)/%.wast
+$(TEST_COMPILER_DIR)build/%.wast : $(TEST_COMPILER_DIR)build/%.wat $(TEST_COMPILER_DIR)%.wast
 	cat $^ > $@
 
-$(TEST_COMPILER_DIR)/build/%.wat : $(TEST_COMPILER_DIR)/%.scm $(COMPILED_COMPILER) $(TEST_COMPILER_DIR)/build
+$(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILED_COMPILER) $(TEST_COMPILER_DIR)build/
 	$(RUN_DRIVER) < $< > $@
 
-.PRECIOUS : $(TEST_COMPILER_DIR)/build/%.json $(TEST_COMPILER_DIR)/build/%.wast $(TEST_COMPILER_DIR)/build/%.wat
+.PRECIOUS : $(TEST_COMPILER_DIR)build/%.json $(TEST_COMPILER_DIR)build/%.wast $(TEST_COMPILER_DIR)build/%.wat
 
-TEST_UNIT_DIR := test-unit
+TEST_UNIT_DIR := test-unit/
 UNIT_TEST_LIBS = lib/assert
-UNIT_TEST_PROGRAMS = $(wildcard $(TEST_UNIT_DIR)/*.sps)
-UNIT_TEST_LOGS = $(patsubst $(TEST_UNIT_DIR)/%.sps,$(TEST_UNIT_DIR)/log/%.log,$(UNIT_TEST_PROGRAMS))
+UNIT_TEST_PROGRAMS = $(wildcard $(TEST_UNIT_DIR)*.sps)
+UNIT_TEST_LOGS = $(patsubst $(TEST_UNIT_DIR)%.sps,$(TEST_UNIT_DIR)log/%.log,$(UNIT_TEST_PROGRAMS))
 
 .PHONY : test-unit-dirs test-unit
 test-unit : test-unit-dirs $(UNIT_TEST_LOGS)
 
-test-unit-dirs : $(TEST_UNIT_DIR)/log
-$(TEST_UNIT_DIR)/log :
+test-unit-dirs : $(TEST_UNIT_DIR)log
+$(TEST_UNIT_DIR)log :
 	mkdir -p $@
 
-$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)/log/%.log : $(TEST_UNIT_DIR)/%.sps $(LIBDIRS) $(UNIT_TEST_LIBS)
+$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.sps $(LIBDIRS) $(UNIT_TEST_LIBS)
 	$(SCHEME_RUN_PROGRAM) $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
@@ -149,4 +148,4 @@ cleanlibs :
 
 .PHONY : cleantest
 cleantest :
-	-rm -rf runtime/test $(TEST_UNIT_DIR)/log $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log $(UNIT_TEST_LIBS)
+	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log $(UNIT_TEST_LIBS)

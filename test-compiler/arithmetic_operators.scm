@@ -14,6 +14,8 @@
    plus-multiple
    complex)
 
+  (import (scheme base))
+
   (begin
     (define (plus-identity) (+))
     (define (multiply-identity) (*))

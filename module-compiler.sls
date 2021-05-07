@@ -116,6 +116,7 @@
            (compiled-program-get-definitions program type))))
      `(module
         ,@(get-module-definitions 'type)
+        ,@(get-module-definitions 'import)
         ,@(get-module-definitions 'func)
         ,@(get-module-definitions 'table)
         ,@(get-module-definitions 'global)

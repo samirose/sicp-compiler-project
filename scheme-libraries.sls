@@ -24,20 +24,20 @@
  (define (import-definitions library)
    (cond ((assoc library library-import-definitions)
           => (lambda (defs)
-               (let ((name (caadr defs)))
+               (let ((library-name (caadr defs)))
                  (map (lambda (def)
-                        `(import ,name ,@def))
+                        (let ((import-name (car def))
+                              (import-type (cadr def)))
+                          `(,(car import-type) (import ,library-name ,import-name)  ,@(cdr import-type))))
                       (cdadr defs)))))
          (else #f)))
 
  (define (add-import-definitions imports program)
-   (cond
-     ((null? imports) program)
-     ((import-definitions (car imports))
-      => (lambda (defs)
-           (add-import-definitions
-            (cdr imports)
-            (compiled-program-with-definitions-and-value-code
-             program defs '()))))
-     (else (raise-compilation-error "Unsupported import" (car imports)))))
+   (fold-left
+    (lambda (program import)
+      (let ((defs (import-definitions import)))
+        (if (not defs) (raise-compilation-error "Unsupported import" import))
+        (compiled-program-with-definitions-and-value-code program defs '())))
+    program
+    imports))
  )

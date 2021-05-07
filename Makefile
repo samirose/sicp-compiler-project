@@ -106,7 +106,7 @@ $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPIL
 $(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/%.wast | $(TEST_COMPILER_DIR)build/
 	wast2json $< -o $@
 
-$(TEST_COMPILER_DIR)build/%.wast : $(TEST_COMPILER_DIR)build/%.wat $(TEST_COMPILER_DIR)%.wast | $(TEST_COMPILER_DIR)build/
+$(TEST_COMPILER_DIR)build/%.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast $(TEST_COMPILER_DIR)build/%.wat $(TEST_COMPILER_DIR)%.wast | $(TEST_COMPILER_DIR)build/
 	cat $^ > $@
 
 $(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILED_COMPILER) $(TEST_COMPILER_DIR)build/ | $(TEST_COMPILER_DIR)build/

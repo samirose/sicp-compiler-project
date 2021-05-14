@@ -119,14 +119,13 @@ UNIT_TEST_LIBS = lib/assert
 UNIT_TEST_PROGRAMS = $(wildcard $(TEST_UNIT_DIR)*.sps)
 UNIT_TEST_LOGS = $(patsubst $(TEST_UNIT_DIR)%.sps,$(TEST_UNIT_DIR)log/%.log,$(UNIT_TEST_PROGRAMS))
 
-.PHONY : test-unit-dirs test-unit
-test-unit : test-unit-dirs $(UNIT_TEST_LOGS)
+.PHONY : test-unit
+test-unit : $(UNIT_TEST_LOGS)
 
-test-unit-dirs : $(TEST_UNIT_DIR)log
 $(TEST_UNIT_DIR)log :
 	mkdir -p $@
 
-$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.sps $(LIBDIRS) $(UNIT_TEST_LIBS)
+$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.sps $(LIBDIRS) $(UNIT_TEST_LIBS) | $(TEST_UNIT_DIR)log
 	$(SCHEME_RUN_PROGRAM) $< > $@.tmp \
 	  && mv -f $@.tmp $@
 

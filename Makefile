@@ -74,22 +74,20 @@ compile : $(COMPILED_COMPILER)
 	$(RUN_DRIVER) $<
 
 .PHONY : test-runtime
-test-runtime : runtime/test/ runtime/test/test-runtime.log
+test-runtime : runtime/test/test-runtime.log
 
 runtime/test/ :
 	mkdir -p runtime/test
 
-runtime/test/test-runtime.log : runtime/test/test-runtime.json runtime/test/
+runtime/test/test-runtime.log : runtime/test/test-runtime.json | runtime/test/
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
-runtime/test/test-runtime.json : runtime/test/test-runtime.wast runtime/test/
+runtime/test/test-runtime.json : runtime/test/test-runtime.wast|  runtime/test/
 	wast2json $< -o $@
 
-runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/runtime.wast runtime/test/
-	cat runtime/scheme-base.wat > $@
-	echo '(register "scheme base")' >> $@
-	cat runtime/runtime.wast >> $@
+runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/runtime.wast | runtime/test/
+	cat $^ > $@
 
 TEST_COMPILER_DIR := test-compiler
 COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)/*.scm)

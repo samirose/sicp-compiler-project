@@ -53,6 +53,7 @@ lib/lexical-env: \
 lib/expression-compiler : \
 	lib/lists \
 	lib/scheme-syntax \
+	lib/pattern-match \
 	lib/lexical-env \
 	lib/compiled-program \
 	lib/compilation-error \

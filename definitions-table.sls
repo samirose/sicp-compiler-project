@@ -6,6 +6,7 @@
          definitions-count
          add-definition
          contains-definition
+         lookup-definition
          definition-index
          get-definitions)
 

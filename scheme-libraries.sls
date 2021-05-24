@@ -2,11 +2,13 @@
 (library
  (scheme-libraries)
 
- (export add-import-definitions)
+ (export add-import-definitions
+         lookup-import)
 
  (import (rnrs base)
          (rnrs lists)
          (compiled-program)
+         (definitions-table)
          (compilation-error))
 
  (define library-import-definitions
@@ -40,4 +42,10 @@
         (compiled-program-with-definitions-and-value-code program defs '())))
     program
     imports))
+
+ (define (lookup-import program type module name)
+   (lookup-definition
+    (compiled-program-module-definitions program)
+    type
+    (lambda (def) (member `(import ,module ,name) def))))
  )

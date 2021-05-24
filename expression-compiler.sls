@@ -11,6 +11,7 @@
          (rnrs lists)
          (lists)
          (scheme-syntax)
+         (scheme-libraries)
          (pattern-match)
          (lexical-env)
          (compiled-program)
@@ -91,12 +92,14 @@
 ;;;simple expressions
 
 (define (compile-number exp program)
-  (compiled-program-with-value-code
-   program
-   (cond ((integer? exp)
-          `(i32.const ,exp))
-         (else
-          (raise-compilation-error "Unsupported number" exp)))))
+  (let* ((i32->fixnum-index (lookup-import program 'func "scheme base" "i32->fixnum"))
+         (fixnum->i32-index (lookup-import program 'func "scheme base" "fixnum->i32")))
+    (compiled-program-with-value-code
+     program
+     (cond ((integer? exp)
+            `((i32.const ,exp) (call ,i32->fixnum-index) (call ,fixnum->i32-index)))
+           (else
+            (raise-compilation-error "Unsupported number" exp))))))
 
 (define (compile-boolean exp program)
   (compiled-program-with-value-code

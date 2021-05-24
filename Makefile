@@ -47,12 +47,14 @@ lib/scheme-syntax: \
 	lib/compilation-error
 lib/scheme-libraries: \
 	lib/compiled-program \
+	lib/definitions-table \
 	lib/compilation-error
 lib/lexical-env: \
 	lib/lists
 lib/expression-compiler : \
 	lib/lists \
 	lib/scheme-syntax \
+	lib/scheme-libraries \
 	lib/pattern-match \
 	lib/lexical-env \
 	lib/compiled-program \

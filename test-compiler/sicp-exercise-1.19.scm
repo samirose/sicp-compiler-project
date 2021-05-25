@@ -13,6 +13,8 @@
 (define-library
   (export fib)
 
+  (import (scheme base))
+
   (begin
     (define (square x) (* x x))
 

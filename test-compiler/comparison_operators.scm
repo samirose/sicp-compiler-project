@@ -9,6 +9,8 @@
     more-than-two-params-true
     more-than-two-params-false)
 
+  (import (scheme base))
+
   (begin
     (define (all-with-single-argument-are-true)
       (and (= 1) (< 2) (> 2) (<= 3) (>= 4)))

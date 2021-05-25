@@ -8,6 +8,8 @@
     not-non-false-expression-is-false
     not-false-expression-is-true)
 
+  (import (scheme base))
+
   (begin
     (define (not-true-is-false)
       (not #t))

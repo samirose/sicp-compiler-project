@@ -1,1 +1,3 @@
-(begin 1 2 3)
+(define-library
+  (import (scheme base))
+  (begin 1 2 3))

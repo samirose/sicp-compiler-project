@@ -1,1 +1,6 @@
-((lambda () (+ 40 2)))
+(define-library
+
+  (import (scheme base))
+
+  (begin
+    ((lambda () (+ 40 2)))))

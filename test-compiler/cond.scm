@@ -10,6 +10,8 @@
           sequence-exps
           lambda-exps)
 
+  (import (scheme base))
+
   (begin
     (define (no-clauses)
       (cond))

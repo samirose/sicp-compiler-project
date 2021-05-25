@@ -1,1 +1,6 @@
-((lambda (x) (* x x)) 2)
+(define-library
+
+  (import (scheme base))
+
+  (begin
+    ((lambda (x) (* x x)) 2)))

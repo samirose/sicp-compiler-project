@@ -12,6 +12,8 @@
           mutate-locals
           get-global-with-let-value)
 
+  (import (scheme base))
+
   (begin
     (define (constant-let)
       (let ((a 2))

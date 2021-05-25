@@ -7,6 +7,8 @@
           override-lambda-arg
           override-special-symbols-let*)
 
+  (import (scheme base))
+
   (begin
     (define (override-quote-let)
       (let ((quote (+ 40 2)))

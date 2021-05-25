@@ -7,6 +7,8 @@
           if-lambda-consquent
           if-lambda-alternative)
 
+  (import (scheme base))
+
   (begin
     (define x 1)
 

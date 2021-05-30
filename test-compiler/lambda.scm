@@ -1,10 +1,12 @@
 (define-library
 
+  (import (scheme base))
+
   (export lambda-application
           lambda-argument
-          lambda-without-parameters)
-
-  (import (scheme base))
+          lambda-without-parameters
+          lambda-parameters-shadow-globals
+          inner-lambda-parameters-shadow-outer)
 
   (begin
     (define (lambda-application)
@@ -17,5 +19,14 @@
        5))
 
     (define (lambda-without-parameters)
-      ((lambda () (+ 40 2)))))
+      ((lambda () (+ 40 2))))
+
+    (define g 2)
+    (define h 3)
+
+    (define (lambda-parameters-shadow-globals)
+      ((lambda (g) (+ g h)) 4))
+
+    (define (inner-lambda-parameters-shadow-outer)
+      ((lambda (x) (+ 2 ((lambda (x) (* x x)) 3))) 4)))
 )

@@ -44,7 +44,7 @@
     imports))
 
  (define (lookup-import program type module name)
-   (lookup-definition
+   (lookup-definition-index
     (compiled-program-module-definitions program)
     type
     (lambda (def) (member `(import ,module ,name) def))))

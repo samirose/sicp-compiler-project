@@ -6,7 +6,7 @@
          definitions-count
          add-definition
          contains-definition
-         lookup-definition
+         lookup-definition-index
          definition-index
          get-definitions)
 
@@ -38,7 +38,7 @@
  (define (contains-definition defs def)
    (if (member def (definitions defs)) #t #f))
 
- (define (lookup-definition defs type predicate)
+ (define (lookup-definition-index defs type predicate)
    (let loop ((ds (definitions defs))
               (count (definitions-count defs type)))
      (cond ((null? ds) #f)
@@ -50,7 +50,7 @@
             (loop (cdr ds) count)))))
 
  (define (definition-index defs def)
-   (lookup-definition
+   (lookup-definition-index
     defs
     (wasm-definition-type def)
     (lambda (d) (equal? def d))))

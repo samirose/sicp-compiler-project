@@ -123,10 +123,13 @@ $(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILED_COMPILER)
 TEST_UNIT_DIR := test-unit/
 UNIT_TEST_LIBS := lib/assert
 UNIT_TEST_PROGRAMS := $(wildcard $(TEST_UNIT_DIR)*.sps)
+UNIT_TEST_TARGETS := $(UNIT_TEST_PROGRAMS:.sps=)
 UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.sps=$(TEST_UNIT_DIR)log/%.log)
 
-.PHONY : test-unit
+.PHONY : test-unit $(UNIT_TEST_TARGETS)
 test-unit : $(UNIT_TEST_LOGS)
+
+$(UNIT_TEST_TARGETS) : $(TEST_UNIT_DIR)% : $(TEST_UNIT_DIR)log/%.log
 
 $(TEST_UNIT_DIR)log :
 	mkdir -p $@

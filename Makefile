@@ -15,7 +15,7 @@ LIBS := \
 	compilation-error \
 	expression-compiler \
 	module-compiler
-LIBDIRS = $(addprefix $(LIBDIR),$(LIBS))
+LIBDIRS := $(addprefix $(LIBDIR),$(LIBS))
 COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
 SCHEME := plt-r6rs
 SCHEME_COMPILE_PROGRAM := plt-r6rs ++path ${LIBDIR} --compile
@@ -93,8 +93,8 @@ runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme
 	cat $^ > $@
 
 TEST_COMPILER_DIR := test-compiler/
-COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)*.scm)
-COMPILER_TEST_LOGS = $(patsubst $(TEST_COMPILER_DIR)%.scm,$(TEST_COMPILER_DIR)log/%.log,$(COMPILER_TEST_PROGRAMS))
+COMPILER_TEST_PROGRAMS := $(wildcard $(TEST_COMPILER_DIR)*.scm)
+COMPILER_TEST_LOGS = $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)log/%.log)
 
 .PHONY : test-compiler
 test-compiler : $(COMPILER_TEST_LOGS)
@@ -118,9 +118,9 @@ $(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILED_COMPILER)
 .PRECIOUS : $(TEST_COMPILER_DIR)build/%.json $(TEST_COMPILER_DIR)build/%.wast $(TEST_COMPILER_DIR)build/%.wat
 
 TEST_UNIT_DIR := test-unit/
-UNIT_TEST_LIBS = lib/assert
-UNIT_TEST_PROGRAMS = $(wildcard $(TEST_UNIT_DIR)*.sps)
-UNIT_TEST_LOGS = $(patsubst $(TEST_UNIT_DIR)%.sps,$(TEST_UNIT_DIR)log/%.log,$(UNIT_TEST_PROGRAMS))
+UNIT_TEST_LIBS := lib/assert
+UNIT_TEST_PROGRAMS := $(wildcard $(TEST_UNIT_DIR)*.sps)
+UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.sps=$(TEST_UNIT_DIR)log/%.log)
 
 .PHONY : test-unit
 test-unit : $(UNIT_TEST_LOGS)

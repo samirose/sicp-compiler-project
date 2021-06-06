@@ -5,6 +5,7 @@
  (lists)
  (assert)
  (lexical-env)
+ (scheme-libraries)
  (compiled-program)
  (expression-compiler))
 
@@ -13,9 +14,14 @@
 (define empty-global-env
   (add-new-lexical-frame (make-empty-lexical-env) '() '()))
 
+(define base-program
+  (add-import-definitions
+   '((scheme base))
+   (make-empty-compiled-program)))
+
 (define (assert-expression-raises-compilation-error exp expected-message expected-object description)
   (assert-raises-compilation-error
-   (lambda () (compile exp (make-empty-compiled-program) empty-global-env))
+   (lambda () (compile exp base-program empty-global-env))
    expected-message expected-object description))
 
 ;; self-evaluating expressions

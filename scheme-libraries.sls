@@ -44,8 +44,13 @@
     imports))
 
  (define (lookup-import program type module name)
-   (lookup-definition-index
-    (compiled-program-module-definitions program)
-    type
-    (lambda (def) (member `(import ,module ,name) def))))
+   (let* ((import-def `(import ,module, name))
+          (index
+           (lookup-definition-index
+            (compiled-program-module-definitions program)
+            type
+            (lambda (def) (member import-def def)))))
+     (if index
+         index
+         (raise-compilation-error "Import not found" import-def))))
  )

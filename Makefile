@@ -94,10 +94,13 @@ runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme
 
 TEST_COMPILER_DIR := test-compiler/
 COMPILER_TEST_PROGRAMS := $(wildcard $(TEST_COMPILER_DIR)*.scm)
+COMPILER_TEST_TARGETS := $(COMPILER_TEST_PROGRAMS:.scm=)
 COMPILER_TEST_LOGS = $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)log/%.log)
 
-.PHONY : test-compiler
+.PHONY : test-compiler $(COMPILER_TEST_TARGETS)
 test-compiler : $(COMPILER_TEST_LOGS)
+
+$(COMPILER_TEST_TARGETS) : $(TEST_COMPILER_DIR)% : $(TEST_COMPILER_DIR)log/%.log
 
 $(TEST_COMPILER_DIR)build/ $(TEST_COMPILER_DIR)log/ :
 	mkdir -p $@

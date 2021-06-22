@@ -2,8 +2,7 @@
 (library
  (module-compiler)
 
- (export compile-r7rs-library-to-wasm-module
-         compile-single-exp-to-wasm-module)
+ (export compile-r7rs-library-to-wasm-module)
 
  (import (rnrs base)
          (rnrs lists)
@@ -29,14 +28,6 @@
    (let* ((initial-program (make-empty-compiled-program))
           (library-program (compile-library-to-program exp initial-program)))
      (compile-program-to-module library-program)))
-
- (define (compile-single-exp-to-wasm-module exp)
-   (let ((library
-          (if (r7rs-library? exp)
-              exp
-              (let ((sequence (if (pattern-match? `(begin ,??*) exp) exp `(begin ,exp))))
-                `(define-library ,sequence)))))
-     (compile-r7rs-library-to-wasm-module library)))
 
  (define (compile-library-to-program library program)
    (let*

@@ -60,8 +60,5 @@
 
     (define (get-global-with-let*-value)
       global-with-let*-value)
-
-    (let* ((a 2) (b 3) (b (+ a b 4)))
-      b)
   )
 )

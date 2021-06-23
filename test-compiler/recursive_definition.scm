@@ -1,5 +1,7 @@
 (define-library
 
+  (export gcd)
+
   (import (scheme base))
 
   (begin
@@ -12,5 +14,5 @@
       (if (< n d)
           n
           (remainder (- n d) d)))
-
-    (gcd 480 28)))
+  )
+)

@@ -61,27 +61,42 @@
         (global-init-code
          (compiled-program-value-code
           program))
+        (global-init-func-index
+         (and (not (null? global-init-code))
+              (compiled-program-definitions-count program 'func)))
         (program
-         (if (null? global-init-code)
-             program
-             (let ((global-init-func-index
-                    (compiled-program-definitions-count program 'func)))
-               (compiled-program-with-definitions-and-value-code
-                program
-                `((func ,@(wasm-local-definitions-to-top global-init-code))
-                  (start ,global-init-func-index))
-                '()))))
+         (if global-init-func-index
+             (compiled-program-with-definitions-and-value-code
+              program
+              `((func ,@(wasm-local-definitions-to-top global-init-code)))
+              '())
+             program))
+        (global-code-func-index
+         (and (not (null? non-definitions))
+              (compiled-program-definitions-count program 'func)))
         (program
-         (if (null? non-definitions)
-             program
+         (if global-code-func-index
              (compile-proc-to-func
               "$main"
               '()
               non-definitions
               program
               lexical-env
-              "main"
-              compile)))
+              #f
+              compile)
+             program))
+        (program
+         (if (or global-init-func-index global-code-func-index)
+             (let ((start-func-index
+                    (compiled-program-definitions-count program 'func)))
+               (compiled-program-with-definitions-and-value-code
+                program
+                `((func
+                   ,@(if global-init-func-index `(call ,global-init-func-index) '())
+                   ,@(if global-code-func-index `(call ,global-code-func-index drop) '()))
+                  (start ,start-func-index))
+                '()))
+             program))
         (elem-defs-count
          (compiled-program-definitions-count program 'elem))
         (program

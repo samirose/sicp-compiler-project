@@ -3,6 +3,8 @@
   (export set!-local-lambda)
   (export set!-local-let)
   (export set!-global)
+  (export get-global)
+  (export increment-global!)
 
   (import (scheme base))
 
@@ -23,5 +25,13 @@
     (define (set!-global)
       (set! a 10)
       (+ a 3))
-    )
+
+    (define b 0)
+    (set! b 5)
+
+    (define (get-global) b)
+
+    (define (increment-global!)
+      (set! b (+ b 1)))
   )
+)

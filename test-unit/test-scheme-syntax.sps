@@ -42,7 +42,12 @@
   (assert-equal
    'x
    (definition-variable exp)
-   "definition-variable returns the variable of variable definition"))
+   "definition-variable returns the variable of variable definition")
+
+  (assert-equal
+   42
+   (definition-value exp)
+   "definition-value returns the value of variable definition"))
 
 (let ((exp '(define x (+ 1 2))))
   (assert-equal
@@ -53,7 +58,12 @@
   (assert-equal
    'x
    (definition-variable exp)
-   "definition-variable returns the variable of variable definition"))
+   "definition-variable returns the variable of variable definition")
+
+  (assert-equal
+   '(+ 1 2)
+   (definition-value exp)
+   "definition-value returns the value expression of variable definition"))
 
 (let ((exp '(define (zero) 0)))
   (assert-equal
@@ -64,7 +74,12 @@
   (assert-equal
    'zero
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition"))
+   "definition-variable returns the variable of procedure definition")
+
+  (assert-equal
+   '(0)
+   (definition-value exp)
+   "definition-value returns the body of procedure definition"))
 
 (let ((exp '(define (one) (+ 0 1))))
   (assert-equal
@@ -75,7 +90,12 @@
   (assert-equal
    'one
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition"))
+   "definition-variable returns the variable of procedure definition")
+
+  (assert-equal
+   '((+ 0 1))
+   (definition-value exp)
+   "definition-value returns the body of procedure definition"))
 
 (let ((exp '(define (one) (display "one:") (+ 0 1))))
   (assert-equal
@@ -86,7 +106,12 @@
   (assert-equal
    'one
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition"))
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '((display "one:") (+ 0 1))
+   (definition-value exp)
+   "definition-value returns the body of procedure definition"))
 
 (let ((exp '(define (square x) (* x x))))
   (assert-equal
@@ -97,7 +122,12 @@
   (assert-equal
    'square
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition"))
+   "definition-variable returns the variable for procedure definition")
+
+  (assert-equal
+   '((* x x))
+   (definition-value exp)
+   "definition-value returns the body of procedure definition"))
 
 (let ((exp '(define (sum-of-squares x y) (+ (* x x) (* y y)))))
   (assert-equal
@@ -108,4 +138,9 @@
   (assert-equal
    'sum-of-squares
    (definition-variable exp)
-   "definition-variable returns the variable for procedure definition"))
+   "definition-variable returns the variable for procedure definition")
+
+    (assert-equal
+   '((+ (* x x) (* y y)))
+   (definition-value exp)
+   "definition-value returns the body of procedure definition"))

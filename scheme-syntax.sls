@@ -5,7 +5,7 @@
  (scheme-syntax)
 
  (export variable?
-         definition? definition-variable
+         definition? definition-variable definition-value
          check-binding
          check-all-identifiers check-syntax-errors)
 
@@ -87,6 +87,11 @@
   (if (pattern-match? `(define ,variable? ,??) exp)
       (cadr exp)
       (caadr exp)))
+
+(define (definition-value exp)
+  (if (pattern-match? `(define ,variable? ,??) exp)
+      (caddr exp)
+      (cddr exp)))
 
 ;; let expression
 (define (check-binding exp)

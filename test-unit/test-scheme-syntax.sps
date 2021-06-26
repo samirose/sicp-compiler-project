@@ -8,6 +8,31 @@
 (install-test-compilation-error-handler!)
 
 ;; definition
+(assert-equal
+ #f
+ (definition? '(+ 1 2))
+ "Non-definition is not a definition")
+
+(assert-equal
+ #f
+ (definition? '(define x))
+ "Variable definition without a value is not a definition")
+
+(assert-equal
+ #f
+ (definition? '(define x))
+ "Variable definition without a value is not a definition")
+
+(assert-equal
+ #f
+ (definition? '(define x 1 1))
+ "Variable definition with multiple values a value is not a definition")
+
+(assert-equal
+ #f
+ (definition? '(define (f x)))
+ "Procedure definition without a body is not a definition")
+
 (let ((exp '(define x 42)))
   (assert-equal
    #t

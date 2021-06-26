@@ -80,8 +80,8 @@
 
 ;; definition
 (define (definition? exp)
-  (or (pattern-match? `(define ,variable? ,??*) exp)
-      (pattern-match? `(define (,variable? ,??*) ,??*) exp)))
+  (or (pattern-match? `(define ,variable? ,??) exp)
+      (pattern-match? `(define (,variable? ,??*) ,?? ,??*) exp)))
 
 (define (definition-variable exp)
   (if (pattern-match? `(define ,variable? ,??) exp)

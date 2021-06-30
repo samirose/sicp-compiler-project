@@ -58,17 +58,17 @@
               definitions
               program
               lexical-env compile)))
-        (global-init-code
+        (globals-init-code
          (compiled-program-value-code
           program))
-        (global-init-func-index
-         (and (not (null? global-init-code))
+        (globals-init-func-index
+         (and (not (null? globals-init-code))
               (compiled-program-definitions-count program 'func)))
         (program
-         (if global-init-func-index
+         (if globals-init-func-index
              (compiled-program-with-definitions-and-value-code
               program
-              `((func ,@(wasm-local-definitions-to-top global-init-code)))
+              `((func ,@(wasm-local-definitions-to-top globals-init-code)))
               '())
              program))
         (global-code-func-index
@@ -86,13 +86,13 @@
               compile)
              program))
         (program
-         (if (or global-init-func-index global-code-func-index)
+         (if (or globals-init-func-index global-code-func-index)
              (let ((start-func-index
                     (compiled-program-definitions-count program 'func)))
                (compiled-program-with-definitions-and-value-code
                 program
                 `((func
-                   ,@(if global-init-func-index `(call ,global-init-func-index) '())
+                   ,@(if globals-init-func-index `(call ,globals-init-func-index) '())
                    ,@(if global-code-func-index `(call ,global-code-func-index drop) '()))
                   (start ,start-func-index))
                 '()))

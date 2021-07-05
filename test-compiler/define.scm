@@ -2,6 +2,7 @@
 
   (export define-constants
           define-combinations
+          define-lambda-combination
           define-procedure
           define-procedure-with-lambda)
 
@@ -17,6 +18,9 @@
     (define b (+ a 11))
 
     (define (define-combinations) b)
+
+    (define c ((lambda (x) (+ x x)) 11))
+    (define (define-lambda-combination) c)
 
     (define (double x) (* x 2))
 

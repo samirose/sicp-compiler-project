@@ -5,6 +5,7 @@
   (export set!-global)
   (export get-global)
   (export increment-global!)
+  (export get-lambda-computed-global)
 
   (import (scheme base))
 
@@ -33,5 +34,10 @@
 
     (define (increment-global!)
       (set! b (+ b 1)))
+
+    (define c 0)
+    (set! c ((lambda (x) (+ x x)) 11))
+
+    (define (get-lambda-computed-global) c)
   )
 )

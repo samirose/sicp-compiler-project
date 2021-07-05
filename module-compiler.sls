@@ -71,11 +71,9 @@
               `((func ,@(wasm-local-definitions-to-top globals-init-code)))
               '())
              program))
-        (global-code-func-index
-         (and (not (null? non-definitions))
-              (compiled-program-definitions-count program 'func)))
         (program
-         (if global-code-func-index
+         (if (null? non-definitions)
+             program
              (compile-proc-to-func
               "$main"
               '()
@@ -83,8 +81,10 @@
               program
               lexical-env
               #f
-              compile)
-             program))
+              compile)))
+        (global-code-func-index
+         (and (not (null? non-definitions))
+              (- (compiled-program-definitions-count program 'func) 1)))
         (program
          (if (or globals-init-func-index global-code-func-index)
              (let ((start-func-index

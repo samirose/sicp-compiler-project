@@ -4,3 +4,4 @@
 (assert_return (invoke "get-global") (i32.const 5))
 (invoke "increment-global!")
 (assert_return (invoke "get-global") (i32.const 6))
+(assert_return (invoke "get-lambda-computed-global") (i32.const 22))

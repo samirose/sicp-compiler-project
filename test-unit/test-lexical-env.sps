@@ -63,6 +63,12 @@
      (env-get-additional-info 'a env)
      "env-get-additional-info of a variable without additional info returns empty info")
 
+    (let ((env (env-add-additional-info env 'b 'test-flag)))
+      (assert-equal
+       '(test-flag (export "func_b"))
+       (env-get-additional-info 'b env)
+       "env-get-additional-info of a variable with additional info returns env with added info"))
+
     (assert-equal
      #f
      (find-variable 'x env)

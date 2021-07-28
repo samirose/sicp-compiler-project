@@ -2,10 +2,19 @@
 (library
  (lexical-env)
 
- (export make-empty-lexical-env global-lexical-env?
-         add-new-lexical-frame add-new-local-frame add-new-local-temporaries-frame
-         find-variable frame-index var-index additional-info global-address?
-         env-get-additional-info env-var-index-offset)
+ (export make-empty-lexical-env
+         global-lexical-env?
+         add-new-lexical-frame
+         add-new-local-frame
+         add-new-local-temporaries-frame
+         find-variable
+         frame-index
+         var-index
+         additional-info
+         global-address?
+         env-add-additional-info
+         env-get-additional-info
+         env-var-index-offset)
 
  (import (rnrs base)
          (rnrs lists)
@@ -17,8 +26,11 @@
    (and (not (null? lexical-env))
         (null? (cdr lexical-env))))
 
+ (define (make-frame frame-index-offset var-index-offset variables additional-info-map)
+   (list (cons frame-index-offset var-index-offset) variables additional-info-map))
+
  (define (make-lexical-frame variables additional-info-map)
-   (list (cons 1 0) variables additional-info-map))
+   (make-frame 1 0 variables additional-info-map))
 
  (define (make-local-frame lexical-env variables additional-info-map)
    (let ((vars-offset
@@ -28,7 +40,7 @@
                      (curr-frame-length (length (frame-variables curr-frame)))
                      (curr-var-index-offset (var-index-offset curr-frame)))
                 (+ curr-var-index-offset curr-frame-length)))))
-     (list (cons 0 vars-offset) variables additional-info-map)))
+     (make-frame 0 vars-offset variables additional-info-map)))
 
  (define (frame-index-offset frame)
    (caar frame))
@@ -48,8 +60,10 @@
    (caddr frame))
 
  (define (frame-get-additional-info var frame)
-   (cond ((assq var (frame-additional-info-map frame)) => cdr)
-         (else '())))
+   (map cadr
+        (filter
+         (lambda (entry) (eq? (car entry) var))
+         (frame-additional-info-map frame))))
 
  (define (env-get-additional-info var lexical-env)
    (if (null? lexical-env)
@@ -68,6 +82,22 @@
 
  (define (add-new-local-temporaries-frame lexical-env n)
    (add-new-local-frame lexical-env (make-list '() n) '()))
+
+ (define (update-head-frame map-frame lexical-env)
+   (cons (map-frame (car lexical-env)) (cdr lexical-env)))
+
+ (define (add-additional-info var additional-info additional-info-map)
+   (cons (list var additional-info) additional-info-map))
+
+ (define (env-add-additional-info lexical-env var additional-info)
+   (update-head-frame
+    (lambda (head-frame)
+      (make-frame
+       (frame-index-offset head-frame)
+       (var-index-offset head-frame)
+       (frame-variables head-frame)
+       (add-additional-info var additional-info (frame-additional-info-map head-frame))))
+    lexical-env))
 
  (define (make-lexical-address frame-index var-index lexical-env additional-info)
    (list frame-index var-index lexical-env additional-info))

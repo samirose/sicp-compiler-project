@@ -77,7 +77,7 @@
    "definition-variable returns the variable of procedure definition")
 
   (assert-equal
-   '(0)
+   '(lambda () 0)
    (definition-value exp)
    "definition-value returns the body of procedure definition"))
 
@@ -93,7 +93,7 @@
    "definition-variable returns the variable of procedure definition")
 
   (assert-equal
-   '((+ 0 1))
+   '(lambda () (+ 0 1))
    (definition-value exp)
    "definition-value returns the body of procedure definition"))
 
@@ -109,7 +109,7 @@
    "definition-variable returns the variable for procedure definition")
 
   (assert-equal
-   '((display "one:") (+ 0 1))
+   '(lambda () (display "one:") (+ 0 1))
    (definition-value exp)
    "definition-value returns the body of procedure definition"))
 
@@ -125,7 +125,7 @@
    "definition-variable returns the variable for procedure definition")
 
   (assert-equal
-   '((* x x))
+   '(lambda (x) (* x x))
    (definition-value exp)
    "definition-value returns the body of procedure definition"))
 
@@ -141,6 +141,6 @@
    "definition-variable returns the variable for procedure definition")
 
     (assert-equal
-   '((+ (* x x) (* y y)))
+   '(lambda (x y) (+ (* x x) (* y y)))
    (definition-value exp)
    "definition-value returns the body of procedure definition"))

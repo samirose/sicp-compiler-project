@@ -88,13 +88,6 @@
  "Duplicate parameter in" '(lambda (x x) (+ x x))
  "Lambda parameters should not be duplicated")
 
-;; definitions
-(assert-expression-raises-compilation-error
- '(define x 42)
- "Internal compiler error: global binding missing from global lexical env"
- (list 'x empty-global-env)
- "Module compilation stage should set up bindings in global lexical environment")
-
 ;; let expression
 (assert-expression-raises-compilation-error
  '(let ((a 1) (b 2) (a 3) (c 4)) (+ a b c))

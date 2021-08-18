@@ -52,51 +52,33 @@
         (lexical-env
          (make-global-lexical-env definition-names exports))
         (program
-         (if (null? definitions)
-             program
-             (compile-values
-              definitions
-              program
-              lexical-env compile)))
-        (globals-init-code
-         (compiled-program-value-code
-          program))
-        (globals-init-func-index
-         (and (not (null? globals-init-code))
-              (compiled-program-definitions-count program 'func)))
-        (program
-         (if globals-init-func-index
-             (compiled-program-with-definitions-and-value-code
-              program
-              `((func ,@(wasm-local-definitions-to-top globals-init-code)))
-              '())
-             program))
+         (compiled-program-with-definitions-and-value-code
+          program
+          (map (lambda (definition) `(global (mut i32) ,uninitialized-value))
+               definitions)
+          '()))
+        (globals-init-assignments
+         (map (lambda (definition)
+                `(set! ,(definition-variable definition) ,(definition-value definition)))
+              definitions))
+        (non-definitions
+         (append globals-init-assignments non-definitions))
         (program
          (if (null? non-definitions)
              program
-             (compile-proc-to-func
-              "$main"
-              '()
-              non-definitions
-              program
-              lexical-env
-              #f
-              compile)))
-        (global-code-func-index
-         (and (not (null? non-definitions))
-              (- (compiled-program-definitions-count program 'func) 1)))
-        (program
-         (if (or globals-init-func-index global-code-func-index)
-             (let ((start-func-index
-                    (compiled-program-definitions-count program 'func)))
+             (let* ((program
+                     (compile-sequence non-definitions program lexical-env compile))
+                    (global-init-code
+                     (compiled-program-value-code program))
+                    (global-init-func-index
+                     (compiled-program-definitions-count program 'func)))
                (compiled-program-with-definitions-and-value-code
                 program
                 `((func
-                   ,@(if globals-init-func-index `(call ,globals-init-func-index) '())
-                   ,@(if global-code-func-index `(call ,global-code-func-index drop) '()))
-                  (start ,start-func-index))
-                '()))
-             program))
+                   ,@(wasm-local-definitions-to-top global-init-code)
+                   drop)
+                  (start ,global-init-func-index))
+                '()))))
         (elem-defs-count
          (compiled-program-definitions-count program 'elem))
         (program

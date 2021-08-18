@@ -91,7 +91,7 @@
 (define (definition-value exp)
   (if (pattern-match? `(define ,variable? ,??) exp)
       (caddr exp)
-      (cddr exp)))
+      `(lambda ,(cdadr exp) ,@(cddr exp))))
 
 ;; let expression
 (define (check-binding exp)

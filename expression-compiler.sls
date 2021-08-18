@@ -5,7 +5,8 @@
  (export compile
          compile-values
          compile-procedure-body
-         compile-proc-to-func)
+         compile-sequence
+         uninitialized-value)
 
  (import (rnrs base)
          (rnrs lists)
@@ -145,47 +146,12 @@
      program-with-value-computing-code
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
-(define (add-global-definition exp variable value-program lexical-env)
-  (let*
-      ((global-index
-        (cond ((not (global-lexical-env? lexical-env))
-               (raise-compilation-error "Only top-level define is supported" exp))
-              ((find-variable variable lexical-env) => var-index)
-              (else
-               (raise-compilation-error
-                "Internal compiler error: global binding missing from global lexical env"
-                (list variable lexical-env)))))
-       (value-code
-        (compiled-program-value-code value-program))
-       (init-instr
-        (if (wasm-const-value? value-code)
-            value-code
-            uninitialized-value))
-       (global-definition
-        `(global (mut i32) ,init-instr))
-       (init-code
-        (if (wasm-const-value? value-code)
-            '()
-            `(,@value-code global.set ,global-index))))
-    (compiled-program-with-definition-and-value-code
-     value-program
-     global-definition
-     init-code)))
-
 (define (compile-variable-definition exp variable value program lexical-env compile)
-   (let ((lexical-env (set-as-current-binding lexical-env variable)))
-     (add-global-definition
-      exp variable
-      (compile value program lexical-env)
-      lexical-env)))
+  (raise-compilation-error "Only top-level define is supported" exp))
 
 (define (compile-procedure-definition exp variable formals body program lexical-env compile)
-  (let ((lexical-env (set-as-current-binding lexical-env variable)))
-    (check-all-identifiers formals)
-    (add-global-definition
-     exp variable
-     (compile-lambda exp formals body program lexical-env compile)
-     lexical-env)))
+  (check-all-identifiers formals)
+  (raise-compilation-error "Only top-level define is supported" exp))
 
 ;;;open-coded primitives
 

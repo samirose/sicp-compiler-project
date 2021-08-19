@@ -55,7 +55,7 @@
         ((pattern-match? `(or ,??*) exp)
          (compile-or exp (cdr exp) program lexical-env compile))
         ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
-         (compile-lambda exp (cadr exp) (cddr exp) program lexical-env '() compile))
+         (compile-lambda exp (cadr exp) (cddr exp) program lexical-env compile))
         ((pattern-match? `(let (,?? ,??*) ,?? ,??*) exp)
          (for-all check-binding (cadr exp))
          (compile-let exp (cadr exp) (cddr exp) program lexical-env compile))
@@ -129,8 +129,6 @@
 (define (compile-assignment exp variable value program lexical-env compile)
   (let* ((lexical-address
           (find-variable variable lexical-env))
-         (program-with-value-computing-code
-          (compile value program lexical-env))
          (set-instr
           (cond
             ((not lexical-address)
@@ -138,7 +136,11 @@
             ((global-address? lexical-address) 'global.set)
             ((= (frame-index lexical-address) 0) 'local.set)
             (else
-             (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+             (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp))))
+         (lexical-env
+          (set-as-current-binding lexical-env variable))
+         (program-with-value-computing-code
+          (compile value program lexical-env)))
     (compiled-program-append-value-code
      program-with-value-computing-code
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
@@ -171,17 +173,19 @@
      init-code)))
 
 (define (compile-variable-definition exp variable value program lexical-env compile)
-  (add-global-definition
-   exp variable
-   (compile value program lexical-env)
-   lexical-env))
+   (let ((lexical-env (set-as-current-binding lexical-env variable)))
+     (add-global-definition
+      exp variable
+      (compile value program lexical-env)
+      lexical-env)))
 
 (define (compile-procedure-definition exp variable formals body program lexical-env compile)
-  (check-all-identifiers formals)
-  (add-global-definition
-   exp variable
-   (compile-lambda exp formals body program lexical-env variable compile)
-   lexical-env))
+  (let ((lexical-env (set-as-current-binding lexical-env variable)))
+    (check-all-identifiers formals)
+    (add-global-definition
+     exp variable
+     (compile-lambda exp formals body program lexical-env compile)
+     lexical-env)))
 
 ;;;open-coded primitives
 
@@ -546,10 +550,11 @@
           `(export ,exported-name (func ,func-index)))
          func-program)))
 
-(define (compile-lambda exp formals body program lexical-env current-binding compile)
+(define (compile-lambda exp formals body program lexical-env compile)
   (check-all-identifiers formals)
   (let*
-      ((exported-name
+      ((current-binding (env-get-current-binding lexical-env))
+       (exported-name
         (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
               (else #f)))
        (func-program

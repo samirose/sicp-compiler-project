@@ -63,11 +63,22 @@
      (env-get-additional-info 'a env)
      "env-get-additional-info of a variable without additional info returns empty info")
 
-    (let ((env (env-add-additional-info env 'b 'test-flag)))
+    (assert-equal
+     #f
+     (env-get-current-binding env)
+     "env-get-current-binding returns false when no current binding is set")
+
+    (let ((env (set-as-current-binding env 'b)))
       (assert-equal
-       '(test-flag (export "func_b"))
-       (env-get-additional-info 'b env)
-       "env-get-additional-info of a variable with additional info returns env with added info"))
+       'b
+       (env-get-current-binding env)
+       "env-get-current-binding returns the variable set as current binding"))
+
+    (let ((env (set-as-current-binding env 'x)))
+      (assert-equal
+       #f
+       (env-get-current-binding env)
+       "env-get-current-binding returns false when current binding is set to a variable not in the current frame"))
 
     (assert-equal
      #f

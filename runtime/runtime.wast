@@ -51,14 +51,25 @@
     call $i32->fixnum
     call $zero?)
 
+  (func (export "i32->fixnum->boolean?") (param $value i32) (result i32)
+    local.get $value
+    call $i32->fixnum
+    call $boolean?)
+
   (func (export "i32->boolean->i32") (param $value i32) (result i32)
     local.get $value
     call $i32->boolean
     call $boolean->i32)
 
-  (func (export "i32->fixnum->boolean?") (param $value i32) (result i32)
+  (func (export "i32->boolean->boolean?") (param $value i32) (result i32)
     local.get $value
-    call $i32->fixnum
+    call $i32->boolean
+    call $boolean?)
+
+  (func (export "i32->boolean->number?") (param $value i32) (result i32)
+    local.get $value
+    call $i32->boolean
+    call $number?)
     call $boolean?)
 )
 
@@ -78,12 +89,19 @@
 (assert_return (invoke "i32->fixnum->zero?" (i32.const -1)) (i32.const 0x00000006))
 (assert_return (invoke "i32->fixnum->zero?" (i32.const 42)) (i32.const 0x00000006))
 
+(assert_return (invoke "i32->fixnum->boolean?" (i32.const   0)) (i32.const 0x00000006))
+(assert_return (invoke "i32->fixnum->boolean?" (i32.const   1)) (i32.const 0x00000006))
+(assert_return (invoke "i32->fixnum->boolean?" (i32.const  -1)) (i32.const 0x00000006))
+(assert_return (invoke "i32->fixnum->boolean?" (i32.const  42)) (i32.const 0x00000006))
+
 (assert_return (invoke "i32->boolean->i32" (i32.const  0)) (i32.const 0))
 (assert_return (invoke "i32->boolean->i32" (i32.const  1)) (i32.const 1))
 (assert_return (invoke "i32->boolean->i32" (i32.const -1)) (i32.const 1))
 (assert_return (invoke "i32->boolean->i32" (i32.const 42)) (i32.const 1))
 
-(assert_return (invoke "i32->fixnum->boolean?" (i32.const  0)) (i32.const 0x00000006))
-(assert_return (invoke "i32->fixnum->boolean?" (i32.const  1)) (i32.const 0x00000006))
-(assert_return (invoke "i32->fixnum->boolean?" (i32.const  -1)) (i32.const 0x00000006))
-(assert_return (invoke "i32->fixnum->boolean?" (i32.const  42)) (i32.const 0x00000006))
+(assert_return (invoke "i32->boolean->boolean?" (i32.const 0)) (i32.const 0x00000016))
+(assert_return (invoke "i32->boolean->boolean?" (i32.const 1)) (i32.const 0x00000016))
+
+(assert_return (invoke "i32->boolean->number?" (i32.const 0)) (i32.const 0x00000006))
+(assert_return (invoke "i32->boolean->number?" (i32.const 1)) (i32.const 0x00000006))
+

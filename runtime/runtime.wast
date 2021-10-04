@@ -43,6 +43,9 @@
   (import "scheme base" "funcidx->procedure" (func $funcidx->procedure  (param i32) (result i32)))
   (import "scheme base" "procedure->funcidx" (func $procedure->funcidx  (param i32) (result i32)))
   (import "scheme base" "procedure?"         (func $procedure?          (param i32) (result i32)))
+  (import "scheme base" "unspecified-value"   (global $unspecified-value i32))
+  (import "scheme base" "uninitialized-value" (global $uninitialized-value i32))
+  (import "scheme base" "check-initialized"   (func $check-initialized (param i32) (result i32)))
 
   (func (export "i32->fixnum->i32") (param $value i32) (result i32)
     local.get $value
@@ -69,6 +72,12 @@
     call $i32->fixnum
     call $procedure?)
 
+  (func (export "i32->fixnum->check-initialized") (param $value i32) (result i32)
+    local.get $value
+    call $i32->fixnum
+    call $check-initialized
+    call $fixnum->i32)
+
   (func (export "i32->boolean->i32") (param $value i32) (result i32)
     local.get $value
     call $i32->boolean
@@ -89,6 +98,12 @@
     call $i32->boolean
     call $procedure?)
 
+  (func (export "i32->boolean->check-initialized") (param $value i32) (result i32)
+    local.get $value
+    call $i32->boolean
+    call $check-initialized
+    call $boolean->i32)
+
   (func (export "funcidx->procedure->funcidx") (param $funcidx i32) (result i32)
     local.get $funcidx
     call $funcidx->procedure
@@ -108,6 +123,32 @@
     local.get $funcidx
     call $funcidx->procedure
     call $boolean?)
+
+  (func (export "funcidx->procedure->check-initialized") (param $funcidx i32) (result i32)
+    local.get $funcidx
+    call $funcidx->procedure
+    call $check-initialized
+    call $procedure->funcidx)
+
+  (func (export "unspecified-value->number?") (result i32)
+    global.get $unspecified-value
+    call $number?)
+
+  (func (export "unspecified-value->boolean?") (result i32)
+    global.get $unspecified-value
+    call $boolean?)
+
+  (func (export "unspecified-value->procedure?") (result i32)
+    global.get $unspecified-value
+    call $procedure?)
+
+  (func (export "unspecified-value->check-initialized") (result i32)
+    global.get $unspecified-value
+    call $check-initialized)
+
+  (func (export "uninitialized-value->check-initialized") (result i32)
+    global.get $uninitialized-value
+    call $check-initialized)
 )
 
 (assert_return (invoke "i32->fixnum->i32" (i32.const  0))  (i32.const  0))
@@ -136,6 +177,10 @@
 (assert_return (invoke "i32->fixnum->procedure?" (i32.const  -1)) (i32.const 0x00000006))
 (assert_return (invoke "i32->fixnum->procedure?" (i32.const  42)) (i32.const 0x00000006))
 
+(assert_return (invoke "i32->fixnum->check-initialized" (i32.const  0)) (i32.const  0))
+(assert_return (invoke "i32->fixnum->check-initialized" (i32.const  1)) (i32.const  1))
+(assert_return (invoke "i32->fixnum->check-initialized" (i32.const -1)) (i32.const -1))
+
 (assert_return (invoke "i32->boolean->i32" (i32.const  0)) (i32.const 0))
 (assert_return (invoke "i32->boolean->i32" (i32.const  1)) (i32.const 1))
 (assert_return (invoke "i32->boolean->i32" (i32.const -1)) (i32.const 1))
@@ -149,6 +194,9 @@
 
 (assert_return (invoke "i32->boolean->procedure?" (i32.const 0)) (i32.const 0x00000006))
 (assert_return (invoke "i32->boolean->procedure?" (i32.const 1)) (i32.const 0x00000006))
+
+(assert_return (invoke "i32->boolean->check-initialized" (i32.const 0)) (i32.const 0))
+(assert_return (invoke "i32->boolean->check-initialized" (i32.const 1)) (i32.const 1))
 
 (assert_return (invoke "funcidx->procedure->funcidx" (i32.const 0)) (i32.const 0))
 (assert_return (invoke "funcidx->procedure->funcidx" (i32.const 1)) (i32.const 1))
@@ -169,3 +217,18 @@
 (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 0))  (i32.const 0x00000006))
 (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 1))  (i32.const 0x00000006))
 (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 42)) (i32.const 0x00000006))
+
+(assert_return (invoke "funcidx->procedure->check-initialized" (i32.const  0)) (i32.const 0))
+(assert_return (invoke "funcidx->procedure->check-initialized" (i32.const  1)) (i32.const 1))
+(assert_return (invoke "funcidx->procedure->check-initialized" (i32.const 42)) (i32.const 42))
+
+(assert_return (invoke "unspecified-value->number?") (i32.const 0x00000006))
+(assert_return (invoke "unspecified-value->boolean?") (i32.const 0x00000006))
+(assert_return (invoke "unspecified-value->procedure?") (i32.const 0x00000006))
+(assert_return (get $scheme-base "unspecified-value") (i32.const 0x0000001e))
+(assert_return (invoke "unspecified-value->check-initialized") (i32.const 0x0000001e))
+
+(assert_return (invoke $scheme-base "get-error-code") (i32.const 0))
+(assert_return (get $scheme-base "error-uninitialized") (i32.const 3))
+(assert_trap (invoke "uninitialized-value->check-initialized") "unreachable")
+(assert_return (invoke $scheme-base "get-error-code") (i32.const 3))

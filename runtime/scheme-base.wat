@@ -1,8 +1,9 @@
-(module
+(module $scheme-base
   (global $error-code (mut i32) (i32.const 0))
   (global $error-no-error (export "error-no-error") i32 (i32.const 0))
   (global $error-expected-number (export "error-expected-number") i32 (i32.const 1))
   (global $error-expected-procedure (export "error-expected-procedure") i32 (i32.const 2))
+  (global $error-uninitialized (export "error-uninitialized") i32 (i32.const 3))
 
   (func (export "get-error-code") (result i32)
     global.get $error-code
@@ -10,24 +11,33 @@
     global.set $error-code)
 
   ;; fixnums are encoded with least signigicant bit set
-  (global $fixnum-mask     i32 (i32.const 0x00000001)) ;; 00000001
-  (global $fixnum-shift    i32 (i32.const 1))
+  (global $fixnum-mask       i32 (i32.const 0x00000001)) ;; 00000001
+  (global $fixnum-shift      i32 (i32.const 1))
 
   ;; Other immediate value types are encoded in the least significant 4 bits
-  (global $immediate-mask  i32 (i32.const 0x0000000f)) ;; 00001111
-  (global $immediate-shift i32 (i32.const 4))
+  ;; Note that the least significant two bits need to non-zero for all immediate type tags to
+  ;; enable detecting 32-bit aligned pointers from immediates.
+  (global $immediate-mask      i32 (i32.const 0x0000000f)) ;; 00001111
+  (global $immediate-shift     i32 (i32.const 4))
 
   ;; Type tag for procedure values.
   ;; Wasm function index of the procedure is encoded in the 3 most significant bytes
-  (global $procedure-tag   i32 (i32.const 0x00000002)) ;; 00000010
+  (global $procedure-tag       i32 (i32.const 0x00000002)) ;; 00000010
 
   ;; Type tag and values for boolean values
-  (global $boolean-tag     i32 (i32.const 0x00000006)) ;; 00000110
-  (global $false-value     i32 (i32.const 0x00000006)) ;; 00000110
-  (global $true-value      i32 (i32.const 0x00000016)) ;; 00010110
+  (global $boolean-tag         i32 (i32.const 0x00000006)) ;; 00000110
+  (global $false-value         i32 (i32.const 0x00000006)) ;; 00000110
+  (global $true-value          i32 (i32.const 0x00000016)) ;; 00010110
+
+  ;; Special type tag and values
+  (global $special-tag         i32 (i32.const 0x0000000e)) ;; 00001110
+  (global $unspecified-value   i32 (i32.const 0x0000001e)) ;; 00011110
+  (global $uninitialized-value i32 (i32.const 0x0000002e)) ;; 00101110
 
   (export "false-value" (global $false-value))
-  (export "true-value"  (global $false-value))
+  (export "true-value"  (global $true-value))
+  (export "unspecified-value" (global $unspecified-value))
+  (export "uninitialized-value" (global $uninitialized-value))
 
   (func (export "i32->fixnum") (param $value i32) (result i32)
     local.get $value
@@ -121,4 +131,15 @@
     global.get $procedure-tag
     i32.eq
     call $i32->boolean)
+
+  (func (export "check-initialized") (param $obj i32) (result i32)
+    local.get $obj
+    local.get $obj
+    global.get $uninitialized-value
+    i32.eq
+    if
+      global.get $error-uninitialized
+      global.set $error-code
+      unreachable
+    end)
 )

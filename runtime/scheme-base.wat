@@ -9,11 +9,19 @@
     global.get $error-no-error
     global.set $error-code)
 
+  ;; fixnums are encoded with least signigicant bit set
   (global $fixnum-mask     i32 (i32.const 0x00000001)) ;; 00000001
   (global $fixnum-shift    i32 (i32.const 1))
+
+  ;; Other immediate value types are encoded in the least significant 4 bits
   (global $immediate-mask  i32 (i32.const 0x0000000f)) ;; 00001111
   (global $immediate-shift i32 (i32.const 4))
+
+  ;; Type tag for procedure values.
+  ;; Wasm function index of the procedure is encoded in the 3 most significant bytes
   (global $procedure-tag   i32 (i32.const 0x00000002)) ;; 00000010
+
+  ;; Type tag and values for boolean values
   (global $boolean-tag     i32 (i32.const 0x00000006)) ;; 00000110
   (global $false-value     i32 (i32.const 0x00000006)) ;; 00000110
   (global $true-value      i32 (i32.const 0x00000016)) ;; 00010110

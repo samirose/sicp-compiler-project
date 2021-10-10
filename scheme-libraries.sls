@@ -14,6 +14,8 @@
  (define library-import-definitions
    '(((scheme base)
       ("scheme base"
+       ("unspecified-value"   (global i32))
+       ("uninitialized-value" (global i32))
        ("get-error-code" (func (result i32)))
        ("i32->fixnum"    (func (param i32) (result i32)))
        ("fixnum->i32"    (func (param i32) (result i32)))

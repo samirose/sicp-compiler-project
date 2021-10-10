@@ -50,7 +50,11 @@
         (exports
          (library-declarations 'export library))
         (lexical-env
-         (make-global-lexical-env definition-names exports))
+         (let* ((imported-globals
+                 (filter wasm-import-definition?
+                         (compiled-program-get-definitions program 'global)))
+                (module-globals-offset (length imported-globals)))
+           (make-global-lexical-env module-globals-offset definition-names exports)))
         (program
          (compiled-program-with-definitions-and-value-code
           program
@@ -101,18 +105,30 @@
              `((elem (i32.const 0) func ,@elem-func-indices))))
         (get-module-definitions
          (lambda (type)
-           (compiled-program-get-definitions program type))))
+           (compiled-program-get-definitions program type)))
+        (not-import-definition?
+         (lambda (def) (not (wasm-import-definition? def))))
+        (imported-globals
+         (filter wasm-import-definition? (get-module-definitions 'global)))
+        (module-globals
+         (filter not-import-definition? (get-module-definitions 'global)))
+        (imported-funcs
+         (filter wasm-import-definition? (get-module-definitions 'func)))
+        (module-funcs
+         (filter not-import-definition? (get-module-definitions 'func))))
      `(module
         ,@(get-module-definitions 'type)
         ,@(get-module-definitions 'import)
-        ,@(get-module-definitions 'func)
+        ,@imported-globals
+        ,@imported-funcs
+        ,@module-globals
+        ,@module-funcs
         ,@(get-module-definitions 'table)
-        ,@(get-module-definitions 'global)
         ,@(get-module-definitions 'export)
         ,@(get-module-definitions 'start)
         ,@elems-def)))
 
- (define (make-global-lexical-env variables exports)
+ (define (make-global-lexical-env var-index-offset variables exports)
    (let ((duplicate-var (first-duplicate variables)))
      (if (not (null? duplicate-var))
          (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
@@ -131,8 +147,9 @@
                 info))
           '()
           variables)))
-     (add-new-lexical-frame
+     (add-new-offset-lexical-frame
       (make-empty-lexical-env)
+      var-index-offset
       variables
       additional-info)))
  )

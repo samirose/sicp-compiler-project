@@ -5,6 +5,7 @@
  (export make-empty-lexical-env
          global-lexical-env?
          add-new-lexical-frame
+         add-new-offset-lexical-frame
          add-new-local-frame
          add-new-local-temporaries-frame
          find-variable
@@ -32,6 +33,9 @@
 
  (define (make-lexical-frame variables additional-info-map)
    (make-frame 1 0 variables additional-info-map #f))
+
+ (define (make-offset-lexical-frame var-index-offset variables additional-info-map)
+   (make-frame 1 var-index-offset variables additional-info-map #f))
 
  (define (make-local-frame lexical-env variables additional-info-map)
    (let ((vars-offset
@@ -76,6 +80,10 @@
 
  (define (add-new-lexical-frame lexical-env variables additional-info-map)
    (cons (make-lexical-frame variables additional-info-map)
+         lexical-env))
+
+ (define (add-new-offset-lexical-frame lexical-env var-index-offset variables additional-info-map)
+   (cons (make-offset-lexical-frame var-index-offset variables additional-info-map)
          lexical-env))
 
  (define (add-new-local-frame lexical-env variables additional-info-map)

@@ -4,7 +4,8 @@
  (export wasm-definition-type wasm-definition-type?
          wasm-elem-definition-func-index
          wasm-const-value?
-         wasm-define-locals wasm-locals-definition? wasm-local-definitions-to-top)
+         wasm-define-locals wasm-locals-definition? wasm-local-definitions-to-top
+         wasm-import-definition?)
  (import (rnrs base)
          (rnrs lists)
          (lists)
@@ -38,4 +39,9 @@
    (let ((split-code (partition-list wasm-locals-definition? seq)))
      (append (car split-code) (cdr split-code))))
 
+ (define (wasm-import-definition? exp)
+   (cond ((null? exp) #f)
+         ((pattern-match? `(import ,string? ,??*) exp))
+         ((pattern-match? `((import ,string? ,??*) ,??*) exp))
+         (else (wasm-import-definition? (cdr exp)))))
  )

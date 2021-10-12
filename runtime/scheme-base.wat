@@ -10,6 +10,11 @@
     global.get $error-no-error
     global.set $error-code)
 
+  (func $raise-error (export "raise-error") (param $error-code i32)
+    local.get $error-code
+    global.set $error-code
+    unreachable)
+
   ;; fixnums are encoded with least signigicant bit set
   (global $fixnum-mask       i32 (i32.const 0x00000001)) ;; 00000001
   (global $fixnum-shift      i32 (i32.const 1))
@@ -48,14 +53,14 @@
 
   (func $check-fixnum (param $obj i32) (result i32)
     local.get $obj
+    local.get $obj
     global.get $fixnum-mask
     i32.and
-    if (result i32)
-      local.get $obj
-    else
+    global.get $fixnum-mask
+    i32.ne
+    if
       global.get $error-expected-number
-      global.set $error-code
-      unreachable
+      call $raise-error
     end)
 
   (func $fixnum->i32 (export "fixnum->i32") (param $obj i32) (result i32)
@@ -91,11 +96,10 @@
     global.get $immediate-mask
     i32.and
     global.get $procedure-tag
-    i32.xor
+    i32.ne
     if
       global.get $error-expected-procedure
-      global.set $error-code
-      unreachable
+      call $raise-error
     end)
 
   (func (export "procedure->funcidx") (param $obj i32) (result i32)
@@ -139,7 +143,6 @@
     i32.eq
     if
       global.get $error-uninitialized
-      global.set $error-code
-      unreachable
+      call $raise-error
     end)
 )

@@ -14,6 +14,10 @@
 (assert_return (get "error-no-error") (i32.const 0))
 (assert_return (invoke "get-error-code") (i32.const 0))
 
+;; raise-error sets error code and traps
+(assert_trap (invoke "raise-error" (i32.const 1)) "unreachable")
+(assert_return (invoke "get-error-code") (i32.const 1))
+
 ;; Converting a non-fixnum with fixnum->i32 causes a trap and error-code being set
 (assert_return (get "error-expected-number") (i32.const 1))
 (assert_trap (invoke "fixnum->i32" (i32.const 0)) "unreachable")

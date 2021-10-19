@@ -68,6 +68,13 @@
      (env-get-current-binding env)
      "env-get-current-binding returns false when no current binding is set")
 
+    (let ((env (add-new-lexical-frame env '(b a b x) '())))
+      (assert-equal
+       '(0 2)
+       (let ((address (find-variable 'b env)))
+         (list (frame-index address) (var-index address)))
+       "find-variable return the var-index of the last matching variable in the environment"))
+
     (let ((env (set-as-current-binding env 'b)))
       (assert-equal
        'b

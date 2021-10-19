@@ -29,7 +29,14 @@
         (null? (cdr lexical-env))))
 
  (define (make-frame frame-index-offset var-index-offset variables additional-info-map current-binding)
-   (list (cons frame-index-offset var-index-offset) variables additional-info-map current-binding))
+   (list
+    current-binding
+    (list frame-index-offset var-index-offset (length variables))
+    (reverse variables)
+    additional-info-map))
+
+ (define (with-current-binding frame current-binding)
+   (cons current-binding (cdr frame)))
 
  (define (make-lexical-frame variables additional-info-map)
    (make-frame 1 0 variables additional-info-map #f))
@@ -42,30 +49,36 @@
           (if (global-lexical-env? lexical-env)
               0
               (let* ((curr-frame (car lexical-env))
-                     (curr-frame-length (length (frame-variables curr-frame)))
+                     (curr-frame-length (var-count curr-frame))
                      (curr-var-index-offset (var-index-offset curr-frame)))
                 (+ curr-var-index-offset curr-frame-length)))))
      (make-frame 0 vars-offset variables additional-info-map #f)))
 
+ (define (frame-indices frame)
+   (cadr frame))
+
  (define (frame-index-offset frame)
-   (caar frame))
+   (car (frame-indices frame)))
 
  (define (var-index-offset frame)
-   (cdar frame))
+   (cadr (frame-indices frame)))
+
+ (define (var-count frame)
+   (caddr (frame-indices frame)))
 
  (define (env-var-index-offset lexical-env)
    (if (null? lexical-env)
        0
        (var-index-offset (car lexical-env))))
 
- (define (frame-variables frame)
-   (cadr frame))
-
- (define (frame-additional-info-map frame)
+ (define (reversed-frame-variables frame)
    (caddr frame))
 
- (define (frame-current-binding frame)
+ (define (frame-additional-info-map frame)
    (cadddr frame))
+
+ (define (frame-current-binding frame)
+   (car frame))
 
  (define (frame-get-additional-info var frame)
    (map cadr
@@ -101,12 +114,7 @@
  (define (set-as-current-binding lexical-env var)
    (update-head-frame
     (lambda (head-frame)
-      (make-frame
-       (frame-index-offset head-frame)
-       (var-index-offset head-frame)
-       (frame-variables head-frame)
-       (frame-additional-info-map head-frame)
-       (memq var (frame-variables head-frame))))
+      (with-current-binding head-frame (memq var (reversed-frame-variables head-frame))))
     lexical-env))
 
  (define (env-get-current-binding lexical-env)
@@ -133,9 +141,9 @@
    (if (null? lexical-env)
        #f
        (let scan ((env lexical-env)
-                  (vars (frame-variables (car lexical-env)))
+                  (vars (reversed-frame-variables (car lexical-env)))
                   (frame-index 0)
-                  (var-index (env-var-index-offset lexical-env)))
+                  (var-index (+ (var-count (car lexical-env)) -1 (var-index-offset (car lexical-env)))))
          (cond ((null? vars)
                 (let ((next-env (cdr env)))
                   (if (null? next-env)
@@ -143,9 +151,9 @@
                       (let ((curr-frame (car env))
                             (next-frame (car next-env)))
                         (scan next-env
-                              (frame-variables next-frame)
+                              (reversed-frame-variables next-frame)
                               (+ frame-index (frame-index-offset curr-frame))
-                              (var-index-offset next-frame))))))
+                              (+ (var-count next-frame) -1 (var-index-offset next-frame)))))))
                ((eq? (car vars) var)
                 (make-lexical-address
                  frame-index
@@ -153,5 +161,5 @@
                  env
                  (frame-get-additional-info var (car env))))
                (else
-                (scan env (cdr vars) frame-index (+ var-index 1)))))))
+                (scan env (cdr vars) frame-index (- var-index 1)))))))
  )

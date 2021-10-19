@@ -66,6 +66,9 @@
  (define (var-count frame)
    (caddr (frame-indices frame)))
 
+ (define (last-var-index frame)
+   (+ (var-count frame) -1 (var-index-offset frame)))
+
  (define (env-var-index-offset lexical-env)
    (if (null? lexical-env)
        0
@@ -143,7 +146,7 @@
        (let scan ((env lexical-env)
                   (vars (reversed-frame-variables (car lexical-env)))
                   (frame-index 0)
-                  (var-index (+ (var-count (car lexical-env)) -1 (var-index-offset (car lexical-env)))))
+                  (var-index (last-var-index (car lexical-env))))
          (cond ((null? vars)
                 (let ((next-env (cdr env)))
                   (if (null? next-env)
@@ -153,7 +156,7 @@
                         (scan next-env
                               (reversed-frame-variables next-frame)
                               (+ frame-index (frame-index-offset curr-frame))
-                              (+ (var-count next-frame) -1 (var-index-offset next-frame)))))))
+                              (last-var-index next-frame))))))
                ((eq? (car vars) var)
                 (make-lexical-address
                  frame-index

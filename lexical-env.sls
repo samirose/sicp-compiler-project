@@ -37,31 +37,28 @@
    (and (not (null? lexical-env))
         (null? (rest-frames lexical-env))))
 
- (define (make-frame frame-index-offset var-index-offset variables additional-info-map current-binding)
+ (define (make-frame-with-variables frame-index-offset var-index-offset variables additional-info-map current-binding)
    (list
     current-binding
     (list frame-index-offset var-index-offset (length variables))
     (reverse variables)
     additional-info-map))
 
+ (define (make-local-temporaries-frame var-index-offset n)
+   (list
+    #f
+    (list 0 var-index-offset n)
+    '()
+    '()))
+
  (define (with-current-binding frame current-binding)
    (cons current-binding (cdr frame)))
 
- (define (make-top-level-frame var-index-offset variables additional-info-map)
-   (make-frame 0 var-index-offset variables additional-info-map #f))
-
  (define (make-lexical-frame variables additional-info-map)
-   (make-frame 1 0 variables additional-info-map #f))
+   (make-frame-with-variables 1 0 variables additional-info-map #f))
 
- (define (make-local-frame lexical-env variables additional-info-map)
-   (let ((vars-offset
-          (if (global-lexical-env? lexical-env)
-              0
-              (let* ((curr-frame (head-frame lexical-env))
-                     (curr-frame-length (var-count curr-frame))
-                     (curr-var-index-offset (var-index-offset curr-frame)))
-                (+ curr-var-index-offset curr-frame-length)))))
-     (make-frame 0 vars-offset variables additional-info-map #f)))
+ (define (make-local-frame var-index-offset variables additional-info-map)
+   (make-frame-with-variables 0 var-index-offset variables additional-info-map #f))
 
  (define (frame-indices frame)
    (cadr frame))
@@ -104,18 +101,36 @@
        (frame-get-additional-info var (head-frame lexical-env))))
 
  (define (add-new-lexical-frame lexical-env variables additional-info-map)
-   (add-frame lexical-env (make-lexical-frame variables additional-info-map)))
+   (add-frame
+    lexical-env
+    (make-lexical-frame variables additional-info-map)))
 
  (define (add-new-top-level-frame lexical-env var-index-offset variables additional-info-map)
-   (add-frame lexical-env (make-top-level-frame var-index-offset variables additional-info-map)))
+   (add-frame
+    lexical-env
+    (make-local-frame var-index-offset variables additional-info-map)))
+
+ (define (next-free-local-var-index lexical-env)
+   (if (global-lexical-env? lexical-env)
+       0
+       (let* ((curr-frame (head-frame lexical-env))
+              (curr-frame-length (var-count curr-frame))
+              (curr-var-index-offset (var-index-offset curr-frame)))
+         (+ curr-var-index-offset curr-frame-length))))
 
  (define (add-new-local-frame lexical-env variables additional-info-map)
    (if (null? lexical-env)
        (error "Internal compiler error: cannot add new local frame to an empty environment" variables)
-       (add-frame lexical-env (make-local-frame lexical-env variables additional-info-map))))
+       (add-frame
+        lexical-env
+        (make-local-frame (next-free-local-var-index lexical-env) variables additional-info-map))))
 
  (define (add-new-local-temporaries-frame lexical-env n)
-   (add-new-local-frame lexical-env (make-list '() n) '()))
+   (if (null? lexical-env)
+       (error "Internal compiler error: cannot add new local temporaries frame to an empty environment" n)
+       (add-frame
+        lexical-env
+        (make-local-temporaries-frame (next-free-local-var-index lexical-env) n))))
 
  (define (update-head-frame map-frame lexical-env)
    (add-frame (rest-frames lexical-env) (map-frame (head-frame lexical-env))))

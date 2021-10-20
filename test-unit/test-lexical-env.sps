@@ -217,19 +217,19 @@
                (env-var-index-offset env)
                "add-new-local-temporaries-frame reserves index space for specified number of variables")))))))
 
-  (let ((env (add-new-offset-lexical-frame env 2 '(a b) '((b (export "func_b"))))))
+  (let ((env (add-new-top-level-frame env 2 '(a b) '((b (export "func_b"))))))
     (assert-equal
      #t
      (global-lexical-env? env)
-     "Lexical env containing one frame is the global lexical env")
+     "Lexical env containing top-level frame is the global lexical env")
 
     (assert-equal
      #t
      (global-address? (find-variable 'a env))
-     "Address of a variable in the only frame is a global address")
+     "Address of a variable in the top-level frame is a global address")
 
     (assert-equal
      '(0 2)
      (let ((address (find-variable 'a env)))
        (list (frame-index address) (var-index address)))
-     "find-variable of first variable in the only frame with offset returns frame-index 0 and var-index equal to offset")))
+     "find-variable of first variable in the top-level frame with offset returns frame-index 0 and var-index equal to offset")))

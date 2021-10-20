@@ -147,7 +147,7 @@
                 info))
           '()
           variables)))
-     (add-new-offset-lexical-frame
+     (add-new-top-level-frame
       (make-empty-lexical-env)
       var-index-offset
       variables

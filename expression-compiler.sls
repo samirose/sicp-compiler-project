@@ -139,7 +139,9 @@
             (else
              (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp))))
          (lexical-env
-          (set-as-current-binding lexical-env variable))
+          (update-additional-info
+           lexical-env
+           (lambda (info) (cons `(,variable current-binding) info))))
          (program-with-value-computing-code
           (compile value program lexical-env)))
     (compiled-program-append-value-code
@@ -519,9 +521,11 @@
 (define (compile-lambda exp formals body program lexical-env compile)
   (check-all-identifiers formals)
   (let*
-      ((current-binding (env-get-current-binding lexical-env))
+      ((current-binding
+        (cond ((env-find-additional-info (lambda (info) (eq? (cadr info) 'current-binding)) lexical-env) => car)
+              (else #f)))
        (exported-name
-        (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
+        (cond ((assq 'export (filter pair? (env-get-additional-info current-binding lexical-env))) => cadr)
               (else #f)))
        (func-program
         (compile-proc-to-func

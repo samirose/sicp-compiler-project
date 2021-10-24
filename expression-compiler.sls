@@ -90,6 +90,20 @@
 ; Result of expressions for which Scheme defines an unspecified result
 (define unspecified-value '(i32.const 0))
 
+;;;lexical-env extensions
+(define (with-current-binding lexical-env variable)
+  (update-additional-info
+   lexical-env
+   (lambda (info) (cons `(,variable current-binding) info))))
+
+(define (get-current-binding lexical-env)
+  (cond ((env-find-additional-info (lambda (info) (eq? (cadr info) 'current-binding)) lexical-env) => car)
+        (else #f)))
+
+(define (get-export-name lexical-env current-binding)
+  (cond ((assq 'export (filter pair? (env-get-additional-info current-binding lexical-env))) => cadr)
+        (else #f)))
+
 ;;;simple expressions
 
 (define (compile-number exp program)
@@ -139,9 +153,7 @@
             (else
              (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp))))
          (lexical-env
-          (update-additional-info
-           lexical-env
-           (lambda (info) (cons `(,variable current-binding) info))))
+           (with-current-binding lexical-env variable))
          (program-with-value-computing-code
           (compile value program lexical-env)))
     (compiled-program-append-value-code
@@ -521,12 +533,8 @@
 (define (compile-lambda exp formals body program lexical-env compile)
   (check-all-identifiers formals)
   (let*
-      ((current-binding
-        (cond ((env-find-additional-info (lambda (info) (eq? (cadr info) 'current-binding)) lexical-env) => car)
-              (else #f)))
-       (exported-name
-        (cond ((assq 'export (filter pair? (env-get-additional-info current-binding lexical-env))) => cadr)
-              (else #f)))
+      ((current-binding (get-current-binding lexical-env))
+       (exported-name (get-export-name lexical-env current-binding))
        (func-program
         (compile-proc-to-func
          exp

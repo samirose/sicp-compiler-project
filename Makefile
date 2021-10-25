@@ -49,8 +49,6 @@ lib/scheme-libraries: \
 	lib/compiled-program \
 	lib/definitions-table \
 	lib/compilation-error
-lib/lexical-env: \
-	lib/lists
 lib/expression-compiler : \
 	lib/lists \
 	lib/scheme-syntax \

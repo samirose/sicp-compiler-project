@@ -19,8 +19,7 @@
          env-var-index-offset)
 
  (import (rnrs base)
-         (rnrs lists)
-         (lists))
+         (rnrs lists))
 
  (define (make-empty-lexical-env) '())
 

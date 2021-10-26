@@ -13,9 +13,10 @@
   (add-new-lexical-frame (make-empty-lexical-env) '() '()))
 
 (define base-program
-  (add-import-definitions
-   '((scheme base))
-   (make-empty-compiled-program)))
+  (compiled-program-with-definitions-and-value-code
+   (make-empty-compiled-program)
+   (map import-definition (import-definitions '((scheme base))))
+   '()))
 
 (define (assert-expression-raises-compilation-error exp expected-message expected-object description)
   (assert-raises-compilation-error

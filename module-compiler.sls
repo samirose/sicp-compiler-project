@@ -33,8 +33,7 @@
    (let*
        ((imports
          (library-declarations 'import library))
-        (program
-         (add-import-definitions imports program))
+        (import-definitions (import-definitions imports))
         (exp-sequence
          (if (library-has-declaration? 'begin library)
              (library-declarations 'begin library)
@@ -49,17 +48,23 @@
           (map definition-variable definitions))
         (exports
          (library-declarations 'export library))
+        (global-imports
+         (filter (lambda (import-def) (eq? (import-type import-def) 'global))
+                 import-definitions))
+        (global-imports-count
+         (length global-imports))
         (lexical-env
-         (let* ((imported-globals
-                 (filter wasm-import-definition?
-                         (compiled-program-get-definitions program 'global)))
-                (module-globals-offset (length imported-globals)))
-           (make-global-lexical-env module-globals-offset definition-names exports)))
+         (make-global-lexical-env global-imports-count definition-names exports))
         (program
          (compiled-program-with-definitions-and-value-code
           program
-          (map (lambda (definition) `(global (mut i32) ,uninitialized-value))
-               definitions)
+          (map import-definition import-definitions)
+          '()))
+        (program
+         (compiled-program-with-definitions-and-value-code
+          program
+          (make-list `(global (mut i32) ,uninitialized-value)
+                     (+ global-imports-count (length definitions)))
           '()))
         (globals-init-assignments
          (map (lambda (definition)

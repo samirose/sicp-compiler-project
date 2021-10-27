@@ -133,8 +133,12 @@
         ,@(get-module-definitions 'start)
         ,@elems-def)))
 
+ (define (duplicate-bindings? b1 b2)
+   ; non-symbol bindings are placeholders, not bound names
+   (and (symbol? b1) (eq? b1 b2)))
+
  (define (make-global-lexical-env var-index-offset variables exports)
-   (let ((duplicate-var (first-duplicate variables)))
+   (let ((duplicate-var (first-duplicate duplicate-bindings? variables)))
      (if (not (null? duplicate-var))
          (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
    (for-each

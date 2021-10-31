@@ -51,21 +51,55 @@
         (global-imports
          (filter (lambda (import-def) (eq? (import-type import-def) 'global))
                  import-definitions))
-        (global-imports-count
-         (length global-imports))
+        (global-import-bindings
+         (map import-binding global-imports))
+        (func-imports
+         (filter (lambda (import-def) (eq? (import-type import-def) 'func))
+                 import-definitions))
+        (func-import-bindings
+         (filter (lambda (b) b) (map import-binding func-imports)))
+        (global-bindings
+         (append global-import-bindings func-import-bindings definition-names))
         (lexical-env
-         (make-global-lexical-env global-imports-count definition-names exports))
+         (make-global-lexical-env 0 global-bindings exports))
         (program
          (compiled-program-with-definitions-and-value-code
           program
           (map import-definition import-definitions)
           '()))
+        (bound-import-func-indices
+         (let loop ((func-imports func-imports)
+                    (func-index 0)
+                    (func-indices '()))
+           (cond ((null? func-imports) (reverse func-indices))
+                 ((import-binding (car func-imports))
+                  (loop (cdr func-imports) (+ func-index 1) (cons func-index func-indices)))
+                 (else
+                  (loop (cdr func-imports) (+ func-index 1) func-indices)))))
+        (program
+         (compiled-program-with-definitions-and-value-code
+          program
+          (map (lambda (i) `(elem ,i))
+               bound-import-func-indices)
+          '()))
         (program
          (compiled-program-with-definitions-and-value-code
           program
           (make-list `(global (mut i32) ,uninitialized-value)
-                     (+ global-imports-count (length definitions)))
+                     (+ (length func-import-bindings) (length definitions)))
           '()))
+        (imported-func-values-init-code
+         (let loop ((bindings func-import-bindings)
+                    (elem-index 0)
+                    (global-index (length global-import-bindings))
+                    (init-code '()))
+           (cond ((null? bindings) (reverse init-code))
+                 (else
+                  (loop (cdr bindings)
+                        (+ elem-index 1)
+                        (+ global-index 1)
+                        (cons `(global.set ,global-index (i32.const ,elem-index))
+                              init-code))))))
         (globals-init-assignments
          (map (lambda (definition)
                 `(set! ,(definition-variable definition) ,(definition-value definition)))
@@ -78,7 +112,9 @@
              (let* ((program
                      (compile-sequence non-definitions program lexical-env compile))
                     (global-init-code
-                     (compiled-program-value-code program))
+                     (append
+                      imported-func-values-init-code
+                      (compiled-program-value-code program)))
                     (global-init-func-index
                      (compiled-program-definitions-count program 'func)))
                (compiled-program-with-definitions-and-value-code
@@ -133,12 +169,8 @@
         ,@(get-module-definitions 'start)
         ,@elems-def)))
 
- (define (duplicate-bindings? b1 b2)
-   ; non-symbol bindings are placeholders, not bound names
-   (and (symbol? b1) (eq? b1 b2)))
-
  (define (make-global-lexical-env var-index-offset variables exports)
-   (let ((duplicate-var (first-duplicate duplicate-bindings? variables)))
+   (let ((duplicate-var (first-duplicate eq? (filter symbol? variables))))
      (if (not (null? duplicate-var))
          (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
    (for-each

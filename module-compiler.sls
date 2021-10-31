@@ -170,7 +170,7 @@
         ,@elems-def)))
 
  (define (make-global-lexical-env var-index-offset variables exports)
-   (let ((duplicate-var (first-duplicate eq? (filter symbol? variables))))
+   (let ((duplicate-var (first-duplicate (filter symbol? variables))))
      (if (not (null? duplicate-var))
          (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
    (for-each

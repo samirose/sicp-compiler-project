@@ -499,7 +499,7 @@
    (let*
        ; Compile the procedure body
        ((body-env
-         (if (null? (first-duplicate eq? formals))
+         (if (null? (first-duplicate formals))
              (add-new-lexical-frame lexical-env formals '())
              (raise-compilation-error "Duplicate parameter in" context-exp)))
         (body-program
@@ -577,7 +577,7 @@
   (let*
       ((variables
         (let* ((vars (map car bindings))
-               (duplicate-var (first-duplicate eq? vars)))
+               (duplicate-var (first-duplicate vars)))
           (if (null? duplicate-var)
               vars
               (raise-compilation-error "Duplicate variable in let expression" exp))))

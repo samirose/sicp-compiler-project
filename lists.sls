@@ -27,16 +27,11 @@
            ((equal? (car l) e) i)
            (else (search (cdr l) (+ i 1))))))
 
- (define (first-duplicate duplicate? l)
-   (if (null? l) '()
-       (let search ((e (car l)) (l (cdr l)))
-         (cond ((null? l) '())
-               ((duplicate? e (car l)) l)
-               (else
-                (let ((e-duplicate (search e (cdr l))))
-                  (if (not (null? e-duplicate))
-                      e-duplicate
-                      (search (car l) (cdr l)))))))))
+ (define (first-duplicate l)
+   (let search ((l l))
+     (cond ((null? l) '())
+           ((memq (car l) (cdr l)))
+           (else (search (cdr l))))))
 
  (define (make-list e n)
    (if (< n 0)

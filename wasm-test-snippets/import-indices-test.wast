@@ -15,6 +15,10 @@
     (call 0) ;; Expect to call "test2"
     (call 1) ;; Expect to call "test1"
     (call 2) ;; Expect to call $local-func
-  ))
+  )
+
+  (export "test2-2" (func 0))
+)
 
 (assert_return (invoke "test") (i32.const 1))
+(assert_return (invoke "test2-2") (i32.const 2))

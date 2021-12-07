@@ -58,8 +58,13 @@
                  import-definitions))
         (func-import-bindings
          (filter (lambda (b) b) (map import-binding func-imports)))
+        (import-bindings
+         (append global-import-bindings func-import-bindings))
         (global-bindings
-         (append global-import-bindings func-import-bindings definition-names))
+         (let ((duplicate-import-binding (first-duplicate (filter symbol? import-bindings))))
+           (if (null? duplicate-import-binding)
+               (append import-bindings definition-names)
+               (raise-compilation-error "Duplicate imported identifier" (car duplicate-import-binding)))))
         (lexical-env
          (make-global-lexical-env 0 global-bindings exports))
         (program

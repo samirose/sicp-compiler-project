@@ -70,3 +70,11 @@
  '(define-library (begin (define (sum a b) (+ a b)) (define sum 42)))
  "Top-level identifier already defined" 'sum
  "Top-level definitions must not be duplicated")
+
+(assert-library-raises-compilation-error
+ '(define-library
+    (import (scheme base))
+    (import (scheme base))
+    (begin 42))
+ "Duplicate imported identifier" 'number?
+ "It is an error to import the same identifier more than once")

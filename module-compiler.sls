@@ -60,13 +60,8 @@
          (filter (lambda (b) b) (map import-binding func-imports)))
         (import-bindings
          (append global-import-bindings func-import-bindings))
-        (global-bindings
-         (let ((duplicate-import-binding (first-duplicate (filter symbol? import-bindings))))
-           (if (null? duplicate-import-binding)
-               (append import-bindings definition-names)
-               (raise-compilation-error "Duplicate imported identifier" (car duplicate-import-binding)))))
         (lexical-env
-         (make-global-lexical-env 0 global-bindings exports))
+         (make-global-lexical-env import-bindings definition-names exports))
         (program
          (compiled-program-with-definitions-and-value-code
           program
@@ -174,28 +169,32 @@
         ,@(get-module-definitions 'start)
         ,@elems-def)))
 
- (define (make-global-lexical-env var-index-offset variables exports)
-   (let ((duplicate-var (first-duplicate (filter symbol? variables))))
+ (define (make-global-lexical-env imported-identifiers defined-variables exports)
+   (let ((duplicate-import (first-duplicate (filter symbol? imported-identifiers))))
+     (if (not (null? duplicate-import))
+         (raise-compilation-error "Duplicate imported identifier" (car duplicate-import))))
+   (let ((duplicate-var (first-duplicate (filter symbol? defined-variables))))
      (if (not (null? duplicate-var))
          (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
-   (for-each
-    (lambda (export)
-      (if (not (memq export variables))
-          (raise-compilation-error "No top-level definition for export" export)))
-    exports)
-   (let
-       ((additional-info
-         (fold-left
-          (lambda (info var)
-            (if (memq var exports)
-                (cons `(,var (export ,(symbol->string var)))
-                      info)
-                info))
-          '()
-          variables)))
-     (add-new-top-level-frame
-      (make-empty-lexical-env)
-      var-index-offset
-      variables
-      additional-info)))
+   (let ((variables (append imported-identifiers defined-variables)))
+     (for-each
+      (lambda (export)
+        (if (not (memq export variables))
+            (raise-compilation-error "No top-level definition for export" export)))
+      exports)
+     (let
+         ((additional-info
+           (fold-left
+            (lambda (info var)
+              (if (memq var exports)
+                  (cons `(,var (export ,(symbol->string var)))
+                        info)
+                  info))
+            '()
+            variables)))
+       (add-new-top-level-frame
+        (make-empty-lexical-env)
+        0
+        variables
+        additional-info))))
  )

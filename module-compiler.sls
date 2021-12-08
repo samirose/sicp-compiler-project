@@ -182,15 +182,18 @@
         (if (not (memq export variables))
             (raise-compilation-error "No top-level definition for export" export)))
       exports)
-     (let
+     (let*
          ((additional-info
+           (map (lambda (imported-identifier) `(,imported-identifier import))
+                imported-identifiers))
+          (additional-info
            (fold-left
             (lambda (info var)
               (if (memq var exports)
                   (cons `(,var (export ,(symbol->string var)))
                         info)
                   info))
-            '()
+            additional-info
             variables)))
        (add-new-top-level-frame
         (make-empty-lexical-env)

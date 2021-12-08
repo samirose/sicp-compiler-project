@@ -148,6 +148,8 @@
           (cond
             ((not lexical-address)
              (raise-compilation-error "Lexically unbound variable" exp))
+            ((memq 'import (additional-info lexical-address))
+             (raise-compilation-error "Cannot set! an imported identifier" variable))
             ((global-address? lexical-address) 'global.set)
             ((= (frame-index lexical-address) 0) 'local.set)
             (else

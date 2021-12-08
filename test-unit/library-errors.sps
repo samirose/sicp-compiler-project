@@ -78,3 +78,10 @@
     (begin 42))
  "Duplicate imported identifier" 'number?
  "It is an error to import the same identifier more than once")
+
+(assert-library-raises-compilation-error
+ '(define-library
+    (import (scheme base))
+    (begin (set! number? 42)))
+ "Cannot set! an imported identifier" 'number?
+ "It is an error to mutate imported identifier")

@@ -71,7 +71,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Add a way to raise errors from compiled code. Needed for halting the program when a type error is detected.
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))
   * ~~detect duplicate imported identfiers~~
-  * check that imports are not mutated
+  * ~~check that imports are not mutated~~
   * allow overriding of imported identifiers
   * implement re-exporting of imported identifiers
   * add name to define-library. It is required r7rs syntax.

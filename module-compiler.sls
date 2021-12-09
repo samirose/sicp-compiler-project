@@ -183,9 +183,12 @@
             (raise-compilation-error "No top-level definition for export" export)))
       exports)
      (let*
-         ((additional-info
-           (map (lambda (imported-identifier) `(,imported-identifier import))
-                imported-identifiers))
+         ((import-variables
+           (filter (lambda (imported-identifier) (not (memq imported-identifier defined-variables)))
+                   imported-identifiers))
+          (additional-info
+           (map (lambda (import-variable) `(,import-variable import))
+                import-variables))
           (additional-info
            (fold-left
             (lambda (info var)

@@ -72,7 +72,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))
   * ~~detect duplicate imported identfiers~~
   * ~~check that imports are not mutated~~
-  * allow overriding of imported identifiers
+  * ~~allow overriding of imported identifiers~~
   * implement re-exporting of imported identifiers
   * add name to define-library. It is required r7rs syntax.
   * add eq? to the runtime library and make it visible to scheme programs

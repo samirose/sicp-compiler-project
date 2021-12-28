@@ -67,20 +67,29 @@
           program
           (map import-definition import-definitions)
           '()))
-        (bound-import-func-indices
+        (bound-import-func-definitions
          (let loop ((func-imports func-imports)
                     (func-index 0)
-                    (func-indices '()))
-           (cond ((null? func-imports) (reverse func-indices))
-                 ((import-binding (car func-imports))
-                  (loop (cdr func-imports) (+ func-index 1) (cons func-index func-indices)))
-                 (else
-                  (loop (cdr func-imports) (+ func-index 1) func-indices)))))
+                    (definitions '()))
+           (let ((next
+                  (lambda (definitions)
+                    (loop (cdr func-imports) (+ func-index 1) definitions))))
+             (cond ((null? func-imports) (reverse definitions))
+                   ((import-binding (car func-imports))
+                    => (lambda (binding)
+                         (let ((definitions
+                                 (cons `(elem ,func-index) definitions))
+                               (next
+                                (lambda (definitions)
+                                  (loop (cdr func-imports) (+ func-index 1) definitions))))
+                           (if (and (memq binding exports) (not (memq binding definition-names)))
+                               (next (cons `(export ,(symbol->string binding) (func ,func-index)) definitions))
+                               (next definitions)))))
+                   (else (next definitions))))))
         (program
          (compiled-program-with-definitions-and-value-code
           program
-          (map (lambda (i) `(elem ,i))
-               bound-import-func-indices)
+          bound-import-func-definitions
           '()))
         (program
          (compiled-program-with-definitions-and-value-code

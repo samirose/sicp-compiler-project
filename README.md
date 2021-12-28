@@ -73,7 +73,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
   * ~~detect duplicate imported identfiers~~
   * ~~check that imports are not mutated~~
   * ~~allow overriding of imported identifiers~~
-  * implement re-exporting of imported identifiers
+  * ~~implement re-exporting of imported identifiers~~
   * add name to define-library. It is required r7rs syntax.
   * add eq? to the runtime library and make it visible to scheme programs
   * Re-write the compiler tests to perform equality comparison in the scheme code to avoid having to use the bit-tagged values in wast assertions. Need to figure out how to run the tests from wast scripts.

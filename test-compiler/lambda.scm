@@ -1,4 +1,5 @@
 (define-library
+  (test-lambda)
 
   (import (scheme base))
 

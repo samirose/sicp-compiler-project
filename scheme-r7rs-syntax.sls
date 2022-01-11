@@ -3,7 +3,7 @@
 (library
  (scheme-r7rs-syntax)
 
- (export r7rs-library?
+ (export check-library
          check-library-declarations
          library-has-declaration?
          library-declarations)
@@ -13,8 +13,27 @@
          (pattern-match)
          (compilation-error))
 
- (define (r7rs-library? exp)
-   (pattern-match? `(define-library ,??*) exp))
+ (define (check-library exp)
+   (cond
+     ((pattern-match? `(define-library (,?? ,??*) ,??*) exp)
+      (let ((identifiers (cadr exp)))
+        (if (pattern-match? `(scheme ,??*) identifiers)
+            (raise-compilation-error "scheme as first library name identifier is reserved" identifiers))
+        (let ((invalid-identifiers
+               (filter
+                (lambda (identifier)
+                  (not
+                   (or (symbol? identifier)
+                       (and (number? identifier) (integer? identifier) (>= identifier 0)))))
+                identifiers)))
+          (if (not (null? invalid-identifiers))
+              (raise-compilation-error "Invalid library name identifiers" invalid-identifiers)))))
+     ((pattern-match? `(define-library) exp)
+      (raise-compilation-error "Empty library definition" exp))
+     ((pattern-match? `(define-library ,??) exp)
+      (raise-compilation-error "Expected list as library name" (cadr exp)))
+     (else
+      (raise-compilation-error "Invalid R7RS library definition" exp))))
 
  (define (check-declaration decl)
    (cond ((pattern-match? `(export ,?? ,??*) decl))
@@ -32,13 +51,13 @@
           (raise-compilation-error "Illegal R7RS library declaration" decl))))
 
  (define (check-library-declarations library-def)
-   (for-each check-declaration (cdr library-def)))
+   (for-each check-declaration (cddr library-def)))
 
  (define (library-has-declaration? type library-def)
-   (and (assq type (cdr library-def)) #t))
+   (and (assq type (cddr library-def)) #t))
 
  (define (library-declarations type library-def)
-   (let collect ((decls (cdr library-def))
+   (let collect ((decls (cddr library-def))
                  (decl '())
                  (result '()))
      (cond ((null? decl)

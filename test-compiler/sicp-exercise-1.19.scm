@@ -11,6 +11,8 @@
 ; -> p ́ = p^2 + q^2, q ́ = 2pq + q^2
 
 (define-library
+  (test-sicp-exercise-1.19)
+
   (export fib)
 
   (import (scheme base))

@@ -1,4 +1,5 @@
 (define-library
+  (test-assignment)
 
   (export set!-local-lambda)
   (export set!-local-let)

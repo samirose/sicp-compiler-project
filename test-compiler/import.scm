@@ -1,4 +1,6 @@
 (define-library
+  (test-import)
+
   (import (scheme base))
 
   ; should export the re-defined number?

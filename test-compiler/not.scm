@@ -1,4 +1,5 @@
 (define-library
+  (test-not)
 
   (export
     not-true-is-false

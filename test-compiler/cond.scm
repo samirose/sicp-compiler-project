@@ -1,4 +1,6 @@
 (define-library
+  (test-cond)
+
   (export no-clauses
           single-exp
           single-exp-else

@@ -1,4 +1,6 @@
 (define-library
+  (test-local-let)
+
   (export constant-let
           expression-let
           multi-variable-let

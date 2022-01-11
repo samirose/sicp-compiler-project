@@ -1,4 +1,5 @@
 (define-library
+  (test-sequence)
 
   (export
     sequence-has-last-value

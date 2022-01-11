@@ -1,4 +1,6 @@
 (define-library
+  (test-arithmetic-operators)
+
   (export
    plus-identity
    multiply-identity

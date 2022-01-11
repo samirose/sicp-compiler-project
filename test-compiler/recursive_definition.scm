@@ -1,4 +1,5 @@
 (define-library
+  (test-recursive-definition)
 
   (export gcd)
 

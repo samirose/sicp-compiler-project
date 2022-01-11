@@ -1,4 +1,6 @@
 (define-library
+  (test-comparison-operators)
+
   (export
     all-with-single-argument-are-true
     binary-equal

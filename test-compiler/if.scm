@@ -1,4 +1,6 @@
 (define-library
+  (test-if)
+
   (export if-true
           if-true-expression
           if-true-does-not-evaluate-alternative

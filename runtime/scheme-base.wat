@@ -136,6 +136,12 @@
     i32.eq
     call $i32->boolean)
 
+  (func (export "eq?") (param $obj1 i32) (param $obj2 i32) (result i32)
+    local.get $obj1
+    local.get $obj2
+    i32.eq
+    call $i32->boolean)
+
   (func (export "check-initialized") (param $obj i32) (result i32)
     local.get $obj
     local.get $obj

@@ -47,6 +47,7 @@
   (import "scheme base" "funcidx->procedure" (func $funcidx->procedure  (param i32) (result i32)))
   (import "scheme base" "procedure->funcidx" (func $procedure->funcidx  (param i32) (result i32)))
   (import "scheme base" "procedure?"         (func $procedure?          (param i32) (result i32)))
+  (import "scheme base" "eq?" (func $eq? (param i32) (param i32) (result i32)))
   (import "scheme base" "unspecified-value"   (global $unspecified-value i32))
   (import "scheme base" "uninitialized-value" (global $uninitialized-value i32))
   (import "scheme base" "check-initialized"   (func $check-initialized (param i32) (result i32)))
@@ -146,6 +147,34 @@
     global.get $unspecified-value
     call $procedure?)
 
+  (func (export "i32->fixnum-i32->fixnum-eq?") (param i32) (param i32) (result i32)
+    local.get 0
+    call $i32->fixnum
+    local.get 1
+    call $i32->fixnum
+    call $eq?)
+
+  (func (export "i32->boolean-i32->boolean-eq?") (param i32) (param i32) (result i32)
+    local.get 0
+    call $i32->boolean
+    local.get 1
+    call $i32->boolean
+    call $eq?)
+
+  (func (export "funcidx->procedure-funcidx->procedure-eq?") (param i32) (param i32) (result i32)
+    local.get 0
+    call $funcidx->procedure
+    local.get 1
+    call $funcidx->procedure
+    call $eq?)
+
+  (func (export "i32->fixnum-i32->boolean-eq?") (param i32) (param i32) (result i32)
+    local.get 0
+    call $i32->fixnum
+    local.get 1
+    call $i32->boolean
+    call $eq?)
+
   (func (export "unspecified-value->check-initialized") (result i32)
     global.get $unspecified-value
     call $check-initialized)
@@ -225,6 +254,28 @@
 (assert_return (invoke "funcidx->procedure->check-initialized" (i32.const  0)) (i32.const 0))
 (assert_return (invoke "funcidx->procedure->check-initialized" (i32.const  1)) (i32.const 1))
 (assert_return (invoke "funcidx->procedure->check-initialized" (i32.const 42)) (i32.const 42))
+
+(assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 1)) (i32.const 0x00000006))
+(assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 1) (i32.const 0)) (i32.const 0x00000006))
+(assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 0)) (i32.const 0x00000016))
+(assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 1) (i32.const 1)) (i32.const 0x00000016))
+(assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 42) (i32.const 42)) (i32.const 0x00000016))
+
+(assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 0) (i32.const 1)) (i32.const 0x00000006))
+(assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const 0x00000006))
+(assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const 0x00000016))
+(assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const 0x00000016))
+
+(assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 0) (i32.const 1)) (i32.const 0x00000006))
+(assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 1) (i32.const 0)) (i32.const 0x00000006))
+(assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 0) (i32.const 0)) (i32.const 0x00000016))
+(assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 1) (i32.const 1)) (i32.const 0x00000016))
+(assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 42) (i32.const 42)) (i32.const 0x00000016))
+
+(assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 1)) (i32.const 0x00000006))
+(assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const 0x00000006))
+(assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const 0x00000006))
+(assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const 0x00000006))
 
 (assert_return (invoke "unspecified-value->number?") (i32.const 0x00000006))
 (assert_return (invoke "unspecified-value->boolean?") (i32.const 0x00000006))

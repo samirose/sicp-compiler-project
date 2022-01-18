@@ -28,7 +28,8 @@
        (#f         "i32->boolean"        (func (param i32) (result i32)))
        (#f         "boolean->i32"        (func (param i32) (result i32)))
        (boolean?   "boolean?"            (func (param i32) (result i32)))
-       (procedure? "procedure?"          (func (param i32) (result i32)))))))
+       (procedure? "procedure?"          (func (param i32) (result i32)))
+       (eq?        "eq?"                 (func (param i32) (param i32) (result i32)))))))
 
  (define (library-definitions library)
    (cond ((assoc library library-import-table) => cadr)

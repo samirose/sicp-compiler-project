@@ -7,4 +7,4 @@
 (assert_return (invoke "let*-value-shadowing-lambda-arg") (i32.const 36))
 (assert_return (invoke "mutate-locals") (i32.const 13))
 (assert_return (invoke "get-global-with-let*-value") (i32.const 5))
-(assert_return (invoke "main") (i32.const 9))
+(assert_return (invoke "get-global-assigned-with-let*-value") (i32.const 9))

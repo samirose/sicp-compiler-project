@@ -1,0 +1,5 @@
+(assert_return (invoke "lambda-application") (i32.const 4))
+(assert_return (invoke "lambda-argument") (i32.const 120))
+(assert_return (invoke "lambda-without-parameters") (i32.const 42))
+(assert_return (invoke "lambda-parameters-shadow-globals") (i32.const 7))
+(assert_return (invoke "inner-lambda-parameters-shadow-outer") (i32.const 11))

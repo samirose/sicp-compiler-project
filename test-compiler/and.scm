@@ -1,4 +1,5 @@
 (define-library
+  (test-and)
 
   (export
     empty-and-is-true
@@ -9,6 +10,8 @@
     and-with-complex-expressions
     and-evaluates-expressions-from-left-to-right
     and-false-short-circuits-to-false)
+
+  (import (scheme base))
 
   (begin
     (define (empty-and-is-true)

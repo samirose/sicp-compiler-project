@@ -1,4 +1,6 @@
 (define-library
+  (test-override-special-form-as-variable)
+
   (export override-quote-let
           override-quote-arg
           override-define-let
@@ -6,6 +8,8 @@
           override-lambda-let
           override-lambda-arg
           override-special-symbols-let*)
+
+  (import (scheme base))
 
   (begin
     (define (override-quote-let)

@@ -81,6 +81,21 @@
 
 (assert-equal
  '()
+ (make-list-with (lambda (i) i) 0)
+ "make-list-with with zero length results in empty list")
+
+(assert-equal
+ '(0)
+ (make-list-with (lambda (i) i) 1)
+ "make-list-with with length of one results in list with one item")
+
+(assert-equal
+ '(0 1 4 9)
+ (make-list-with (lambda (i) (* i i)) 4)
+ "make-list-with with length of n>1 results in list with n items")
+
+(assert-equal
+ '()
  (flatten-n 1 '())
  "flatten-n of empty list results in empty list")
 
@@ -130,55 +145,3 @@
 (assert-equal
  #f (all? number? '(1 2 'foo 3))
  "all is false for a list where the predicate is false for any item")
-
-(assert-equal
- 0
- (let ((s (make-counted-set)))
-   (counted-set-count s 'x))
- "counted-set-count results to 0 with an empty set")
-
-(assert-equal
- 0
- (let ((s (make-counted-set)))
-   (let ((s (counted-set-add s 'x)))
-     (counted-set-count s 'y)))
- "counted-set-count results to 0 when the key has not been added")
-
-(assert-equal
- 1
- (let ((s (make-counted-set)))
-   (let ((s (counted-set-add s 'x)))
-     (counted-set-count s 'x)))
- "counted-set-count results to 1 when the key has been added")
-
-(assert-equal
- 2
- (let ((s (make-counted-set)))
-   (let ((s (counted-set-add s 'x)))
-     (let ((s (counted-set-add s 'x)))
-       (counted-set-count s 'x))))
- "counted-set-count results to 2 when the key has been added twice")
-
-(assert-equal
- 1
- (let ((s (make-counted-set)))
-   (let ((s (counted-set-add s 'x)))
-     (let ((s (counted-set-add s 'y)))
-       (counted-set-count s 'x))))
- "counted-set-count results to 1 when the queried key has been added once")
-
-(assert-equal
- 1
- (let ((s (make-counted-set)))
-   (let ((s (counted-set-add s 'x)))
-     (let ((s (counted-set-add s 'y)))
-       (counted-set-count s 'y))))
- "counted-set-count results to 1 when the queried key has been added once")
-
-(assert-equal
- 1
- (let ((s (make-counted-set)))
-   (let ((s (counted-set-add s 'x)))
-     (let ((s (counted-set-add s 'x)))
-       (counted-set-unique-keys s))))
- "counted-set-count should have 1 unique key when the same key has been added twice")

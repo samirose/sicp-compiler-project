@@ -53,6 +53,12 @@
      (additional-info (find-variable 'a env))
      "find-variable of a variable without additional info returns empty info")
 
+    (let ((env (update-additional-info env (lambda (info) (cons '(a added-info) info)))))
+      (assert-equal
+       '(added-info)
+       (additional-info (find-variable 'a env))
+       "find-variable of a variable with updated info returns the info"))
+
     (assert-equal
      '((export "func_b"))
      (env-get-additional-info 'b env)
@@ -62,6 +68,29 @@
      '()
      (env-get-additional-info 'a env)
      "env-get-additional-info of a variable without additional info returns empty info")
+
+    (let ((env (update-additional-info env (lambda (info) (cons '(a added-info) info)))))
+      (assert-equal
+       '(added-info)
+       (env-get-additional-info 'a env)
+       "env-get-additional-info of a variable with updated info returns the info")
+
+      (assert-equal
+       '(a added-info)
+       (env-find-additional-info (lambda (info) '(eq? (cadr info) 'added-info)) env)
+       "env-find-additional-info returns matching info")
+
+      (assert-equal
+       '((export "func_b"))
+       (env-get-additional-info 'b env)
+       "env-get-additional-info of a variable with base info returns the info"))
+
+    (let ((env (add-new-lexical-frame env '(b a b x) '())))
+      (assert-equal
+       '(0 2)
+       (let ((address (find-variable 'b env)))
+         (list (frame-index address) (var-index address)))
+       "find-variable returns the var-index of the last matching variable in the environment"))
 
     (assert-equal
      #f
@@ -180,6 +209,13 @@
              (list (frame-index address) (var-index address)))
            "find-variable will return frame-index of 1 and correct var-index for variable found in the next lexical frame")
 
+          (let ((env (update-additional-info env (lambda (info) (cons '(z new-info) info)))))
+            (assert-equal
+             '(1 1)
+             (let ((address (find-variable 'b env)))
+               (list (frame-index address) (var-index address)))
+             "update-additional-info does not affect variable addresses"))
+
           (let ((prev-frames-size 5)
                 (env (add-new-local-temporaries-frame env 2)))
             (assert-equal
@@ -191,4 +227,21 @@
               (assert-equal
                7
                (env-var-index-offset env)
-               "add-new-local-temporaries-frame reserves index space for specified number of variables"))))))))
+               "add-new-local-temporaries-frame reserves index space for specified number of variables")))))))
+
+  (let ((env (add-new-top-level-frame env 2 '(a b) '((b (export "func_b"))))))
+    (assert-equal
+     #t
+     (global-lexical-env? env)
+     "Lexical env containing top-level frame is the global lexical env")
+
+    (assert-equal
+     #t
+     (global-address? (find-variable 'a env))
+     "Address of a variable in the top-level frame is a global address")
+
+    (assert-equal
+     '(0 2)
+     (let ((address (find-variable 'a env)))
+       (list (frame-index address) (var-index address)))
+     "find-variable of first variable in the top-level frame with offset returns frame-index 0 and var-index equal to offset")))

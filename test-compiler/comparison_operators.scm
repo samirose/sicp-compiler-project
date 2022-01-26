@@ -1,4 +1,6 @@
 (define-library
+  (test-comparison-operators)
+
   (export
     all-with-single-argument-are-true
     binary-equal
@@ -8,6 +10,8 @@
     binary-less-or-equal-than
     more-than-two-params-true
     more-than-two-params-false)
+
+  (import (scheme base))
 
   (begin
     (define (all-with-single-argument-are-true)

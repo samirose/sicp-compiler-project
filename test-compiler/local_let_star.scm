@@ -1,4 +1,6 @@
 (define-library
+  (test-local-let*)
+
   (export constant-let*
           expression-let*
           let*-shadowing
@@ -7,7 +9,10 @@
           let*-value-shadowing-lambda-arg
           lambda-as-let*-value
           mutate-locals
-          get-global-with-let*-value)
+          get-global-with-let*-value
+          get-global-assigned-with-let*-value)
+
+  (import (scheme base))
 
   (begin
     (define (constant-let*)
@@ -59,7 +64,13 @@
     (define (get-global-with-let*-value)
       global-with-let*-value)
 
-    (let* ((a 2) (b 3) (b (+ a b 4)))
-      b)
+    (define global-assigned-with-let*-value 0)
+
+    (define (get-global-assigned-with-let*-value)
+      global-assigned-with-let*-value)
+
+    (set! global-assigned-with-let*-value
+      (let* ((a 2) (b 3) (b (+ a b 4)))
+        b))
   )
 )

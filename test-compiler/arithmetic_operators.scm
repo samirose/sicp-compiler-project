@@ -1,4 +1,6 @@
 (define-library
+  (test-arithmetic-operators)
+
   (export
    plus-identity
    multiply-identity
@@ -13,6 +15,8 @@
    plus-zero-to-negative
    plus-multiple
    complex)
+
+  (import (scheme base))
 
   (begin
     (define (plus-identity) (+))

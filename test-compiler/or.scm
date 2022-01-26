@@ -1,4 +1,5 @@
 (define-library
+  (test-or)
 
   (export
     empty-or-is-false
@@ -9,6 +10,8 @@
     or-with-complex-expressions
     or-evaluates-expressions-from-left-to-right
     or-true-short-circuits-to-true)
+
+  (import (scheme base))
 
   (begin
     (define (empty-or-is-false)

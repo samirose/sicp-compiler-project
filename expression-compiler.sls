@@ -5,18 +5,19 @@
  (export compile
          compile-values
          compile-procedure-body
-         compile-proc-to-func)
+         compile-sequence
+         uninitialized-value)
 
  (import (rnrs base)
          (rnrs lists)
          (lists)
          (scheme-syntax)
+         (scheme-libraries)
          (pattern-match)
          (lexical-env)
          (compiled-program)
          (compilation-error)
-         (wasm-syntax)
-         (wasm-module-definitions))
+         (wasm-syntax))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
@@ -55,7 +56,7 @@
         ((pattern-match? `(or ,??*) exp)
          (compile-or exp (cdr exp) program lexical-env compile))
         ((pattern-match? `(lambda (,??*) ,?? ,??*) exp)
-         (compile-lambda exp (cadr exp) (cddr exp) program lexical-env '() compile))
+         (compile-lambda exp (cadr exp) (cddr exp) program lexical-env compile))
         ((pattern-match? `(let (,?? ,??*) ,?? ,??*) exp)
          (for-all check-binding (cadr exp))
          (compile-let exp (cadr exp) (cddr exp) program lexical-env compile))
@@ -89,15 +90,31 @@
 ; Result of expressions for which Scheme defines an unspecified result
 (define unspecified-value '(i32.const 0))
 
+;;;lexical-env extensions
+(define (with-current-binding lexical-env variable)
+  (update-additional-info
+   lexical-env
+   (lambda (info) (cons `(,variable current-binding) info))))
+
+(define (get-current-binding lexical-env)
+  (cond ((env-find-additional-info (lambda (info) (eq? (cadr info) 'current-binding)) lexical-env) => car)
+        (else #f)))
+
+(define (get-export-name lexical-env current-binding)
+  (cond ((assq 'export (filter pair? (env-get-additional-info current-binding lexical-env))) => cadr)
+        (else #f)))
+
 ;;;simple expressions
 
 (define (compile-number exp program)
-  (compiled-program-with-value-code
-   program
-   (cond ((integer? exp)
-          `(i32.const ,exp))
-         (else
-          (raise-compilation-error "Unsupported number" exp)))))
+  (let* ((i32->fixnum-index (lookup-import program 'func "scheme base" "i32->fixnum"))
+         (fixnum->i32-index (lookup-import program 'func "scheme base" "fixnum->i32")))
+    (compiled-program-with-value-code
+     program
+     (cond ((integer? exp)
+            `((i32.const ,exp) (call ,i32->fixnum-index) (call ,fixnum->i32-index)))
+           (else
+            (raise-compilation-error "Unsupported number" exp))))))
 
 (define (compile-boolean exp program)
   (compiled-program-with-value-code
@@ -127,59 +144,30 @@
 (define (compile-assignment exp variable value program lexical-env compile)
   (let* ((lexical-address
           (find-variable variable lexical-env))
-         (program-with-value-computing-code
-          (compile value program lexical-env))
          (set-instr
           (cond
             ((not lexical-address)
              (raise-compilation-error "Lexically unbound variable" exp))
+            ((memq 'import (additional-info lexical-address))
+             (raise-compilation-error "Cannot set! an imported identifier" variable))
             ((global-address? lexical-address) 'global.set)
             ((= (frame-index lexical-address) 0) 'local.set)
             (else
-             (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp)))))
+             (raise-compilation-error "Variables in immediate enclosing scope or top-level only supported" exp))))
+         (lexical-env
+           (with-current-binding lexical-env variable))
+         (program-with-value-computing-code
+          (compile value program lexical-env)))
     (compiled-program-append-value-code
      program-with-value-computing-code
      `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
 
-(define (add-global-definition exp variable value-program lexical-env)
-  (let*
-      ((global-index
-        (cond ((not (global-lexical-env? lexical-env))
-               (raise-compilation-error "Only top-level define is supported" exp))
-              ((find-variable variable lexical-env) => var-index)
-              (else
-               (raise-compilation-error
-                "Internal compiler error: global binding missing from global lexical env"
-                (list variable lexical-env)))))
-       (value-code
-        (compiled-program-value-code value-program))
-       (init-instr
-        (if (wasm-const-value? value-code)
-            value-code
-            uninitialized-value))
-       (global-definition
-        `(global (mut i32) ,init-instr))
-       (init-code
-        (if (wasm-const-value? value-code)
-            '()
-            `(,@value-code global.set ,global-index))))
-    (compiled-program-with-definition-and-value-code
-     value-program
-     global-definition
-     init-code)))
-
 (define (compile-variable-definition exp variable value program lexical-env compile)
-  (add-global-definition
-   exp variable
-   (compile value program lexical-env)
-   lexical-env))
+  (raise-compilation-error "Only top-level define is supported" exp))
 
 (define (compile-procedure-definition exp variable formals body program lexical-env compile)
   (check-all-identifiers formals)
-  (add-global-definition
-   exp variable
-   (compile-lambda exp formals body program lexical-env variable compile)
-   lexical-env))
+  (raise-compilation-error "Only top-level define is supported" exp))
 
 ;;;open-coded primitives
 
@@ -544,12 +532,11 @@
           `(export ,exported-name (func ,func-index)))
          func-program)))
 
-(define (compile-lambda exp formals body program lexical-env current-binding compile)
+(define (compile-lambda exp formals body program lexical-env compile)
   (check-all-identifiers formals)
   (let*
-      ((exported-name
-        (cond ((assq 'export (env-get-additional-info current-binding lexical-env)) => cadr)
-              (else #f)))
+      ((current-binding (get-current-binding lexical-env))
+       (exported-name (get-export-name lexical-env current-binding))
        (func-program
         (compile-proc-to-func
          exp

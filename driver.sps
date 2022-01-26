@@ -3,5 +3,5 @@
         (rnrs io simple)
         (module-compiler))
 
-(write (compile-single-exp-to-wasm-module (read)))
+(write (compile-r7rs-library-to-wasm-module (read)))
 (newline)

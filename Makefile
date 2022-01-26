@@ -3,17 +3,19 @@ SHELL = /bin/bash
 LIBDIR := lib/
 LIBS := \
 	lists \
+	counted-set \
 	pattern-match \
 	scheme-syntax \
 	scheme-r7rs-syntax \
+	scheme-libraries \
 	lexical-env \
 	wasm-syntax \
-	wasm-module-definitions \
+	definitions-table \
 	compiled-program \
 	compilation-error \
 	expression-compiler \
 	module-compiler
-LIBDIRS = $(addprefix $(LIBDIR),$(LIBS))
+LIBDIRS := $(addprefix $(LIBDIR),$(LIBS))
 COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
 SCHEME := plt-r6rs
 SCHEME_COMPILE_PROGRAM := plt-r6rs ++path ${LIBDIR} --compile
@@ -31,31 +33,36 @@ $(LIBDIR)% : %.sls
 
 RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.sps
 
-lib/wasm-module-definitions : \
+lib/definitions-table : \
 	lib/lists \
+	lib/counted-set \
 	lib/wasm-syntax
 lib/compiled-program : \
-	lib/wasm-module-definitions
+	lib/definitions-table
 lib/scheme-r7rs-syntax: \
 	lib/pattern-match \
 	lib/compilation-error
 lib/scheme-syntax: \
 	lib/pattern-match \
 	lib/compilation-error
-lib/lexical-env: \
-	lib/lists
+lib/scheme-libraries: \
+	lib/compiled-program \
+	lib/definitions-table \
+	lib/compilation-error
 lib/expression-compiler : \
 	lib/lists \
 	lib/scheme-syntax \
+	lib/scheme-libraries \
+	lib/pattern-match \
 	lib/lexical-env \
 	lib/compiled-program \
 	lib/compilation-error \
-	lib/wasm-syntax \
-	lib/wasm-module-definitions
+	lib/wasm-syntax
 lib/module-compiler : \
 	lib/lists \
 	lib/scheme-syntax \
 	lib/scheme-r7rs-syntax \
+	lib/scheme-libraries \
 	lib/compilation-error \
 	lib/lexical-env \
 	lib/compiled-program \
@@ -67,52 +74,70 @@ lib/module-compiler : \
 compile : $(COMPILED_COMPILER)
 	$(RUN_DRIVER) $<
 
-TEST_COMPILER_DIR := test-compiler
-COMPILER_TEST_PROGRAMS = $(wildcard $(TEST_COMPILER_DIR)/*.scm)
-COMPILER_TEST_LOGS = $(patsubst $(TEST_COMPILER_DIR)/%.scm,$(TEST_COMPILER_DIR)/log/%.log,$(COMPILER_TEST_PROGRAMS))
+.PHONY : test-runtime
+test-runtime : runtime/test/test-runtime.log
 
-.PHONY : test-compiler-dirs test-compiler
-test-compiler : test-compiler-dirs $(COMPILER_TEST_LOGS)
+runtime/test/ :
+	mkdir -p runtime/test
 
-test-compiler-dirs : $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log
-$(TEST_COMPILER_DIR)/build :
-	mkdir -p $@
- $(TEST_COMPILER_DIR)/log :
-	mkdir -p $@
-
-$(TEST_COMPILER_DIR)/log/%.log : $(TEST_COMPILER_DIR)/build/%.json
+runtime/test/test-runtime.log : runtime/test/test-runtime.json | runtime/test/
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(TEST_COMPILER_DIR)/build/%.json : $(TEST_COMPILER_DIR)/build/%.wast
+runtime/test/test-runtime.json : runtime/test/test-runtime.wast|  runtime/test/
 	wast2json $< -o $@
 
-$(TEST_COMPILER_DIR)/build/%.wast : $(TEST_COMPILER_DIR)/build/%.wat $(TEST_COMPILER_DIR)/%.wast
+runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/runtime.wast | runtime/test/
 	cat $^ > $@
 
-$(TEST_COMPILER_DIR)/build/%.wat : $(TEST_COMPILER_DIR)/%.scm $(COMPILED_COMPILER) $(TEST_COMPILER_DIR)/build
-	$(RUN_DRIVER) < $< > $@
+TEST_COMPILER_DIR := test-compiler/
+COMPILER_TEST_PROGRAMS := $(wildcard $(TEST_COMPILER_DIR)*.scm)
+COMPILER_TEST_TARGETS := $(COMPILER_TEST_PROGRAMS:.scm=)
+COMPILER_TEST_LOGS = $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)log/%.log)
 
-.PRECIOUS : $(TEST_COMPILER_DIR)/build/%.json $(TEST_COMPILER_DIR)/build/%.wast $(TEST_COMPILER_DIR)/build/%.wat
+.PHONY : test-compiler $(COMPILER_TEST_TARGETS)
+test-compiler : $(COMPILER_TEST_LOGS)
 
-TEST_UNIT_DIR := test-unit
-UNIT_TEST_LIBS = lib/assert
-UNIT_TEST_PROGRAMS = $(wildcard $(TEST_UNIT_DIR)/*.sps)
-UNIT_TEST_LOGS = $(patsubst $(TEST_UNIT_DIR)/%.sps,$(TEST_UNIT_DIR)/log/%.log,$(UNIT_TEST_PROGRAMS))
+$(COMPILER_TEST_TARGETS) : $(TEST_COMPILER_DIR)% : $(TEST_COMPILER_DIR)log/%.log
 
-.PHONY : test-unit-dirs test-unit
-test-unit : test-unit-dirs $(UNIT_TEST_LOGS)
-
-test-unit-dirs : $(TEST_UNIT_DIR)/log
-$(TEST_UNIT_DIR)/log :
+$(TEST_COMPILER_DIR)build/ $(TEST_COMPILER_DIR)log/ :
 	mkdir -p $@
 
-$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)/log/%.log : $(TEST_UNIT_DIR)/%.sps $(LIBDIRS) $(UNIT_TEST_LIBS)
+$(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPILER_DIR)log/
+	spectest-interp $< | tee $@.tmp \
+	  && mv -f $@.tmp $@
+
+$(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/%.wast | $(TEST_COMPILER_DIR)build/
+	wast2json $< -o $@
+
+$(TEST_COMPILER_DIR)build/%.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast $(TEST_COMPILER_DIR)build/%.wat $(TEST_COMPILER_DIR)%.wast | $(TEST_COMPILER_DIR)build/
+	cat $^ > $@
+
+$(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILED_COMPILER) $(TEST_COMPILER_DIR)build/ | $(TEST_COMPILER_DIR)build/
+	$(RUN_DRIVER) < $< > $@
+
+.PRECIOUS : $(TEST_COMPILER_DIR)build/%.json $(TEST_COMPILER_DIR)build/%.wast $(TEST_COMPILER_DIR)build/%.wat
+
+TEST_UNIT_DIR := test-unit/
+UNIT_TEST_LIBS := lib/assert
+UNIT_TEST_PROGRAMS := $(wildcard $(TEST_UNIT_DIR)*.sps)
+UNIT_TEST_TARGETS := $(UNIT_TEST_PROGRAMS:.sps=)
+UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.sps=$(TEST_UNIT_DIR)log/%.log)
+
+.PHONY : test-unit $(UNIT_TEST_TARGETS)
+test-unit : $(UNIT_TEST_LOGS)
+
+$(UNIT_TEST_TARGETS) : $(TEST_UNIT_DIR)% : $(TEST_UNIT_DIR)log/%.log
+
+$(TEST_UNIT_DIR)log :
+	mkdir -p $@
+
+$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.sps $(LIBDIRS) $(UNIT_TEST_LIBS) | $(TEST_UNIT_DIR)log
 	$(SCHEME_RUN_PROGRAM) $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
 .PHONY : test
-test : test-unit test-compiler
+test : test-runtime test-unit test-compiler
 
 .PHONY : cleanall
 cleanall : cleantest cleancompiler cleanlibs
@@ -127,4 +152,4 @@ cleanlibs :
 
 .PHONY : cleantest
 cleantest :
-	-rm -rf $(TEST_UNIT_DIR)/log $(TEST_COMPILER_DIR)/build $(TEST_COMPILER_DIR)/log $(UNIT_TEST_LIBS)
+	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log $(UNIT_TEST_LIBS)

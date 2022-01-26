@@ -1,4 +1,6 @@
 (define-library
+  (test-cond)
+
   (export no-clauses
           single-exp
           single-exp-else
@@ -9,6 +11,8 @@
           short-circuit
           sequence-exps
           lambda-exps)
+
+  (import (scheme base))
 
   (begin
     (define (no-clauses)

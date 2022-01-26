@@ -2,61 +2,67 @@
 
 (library
  (scheme-r7rs-syntax)
- (export r7rs-library?
+
+ (export check-library
          check-library-declarations
-         library-declaration
+         library-has-declaration?
          library-declarations)
+
  (import (rnrs base)
          (rnrs lists)
          (pattern-match)
          (compilation-error))
 
- (define (r7rs-library? exp)
-   (pattern-match? `(define-library ,??*) exp))
+ (define (check-library exp)
+   (cond
+     ((pattern-match? `(define-library (,?? ,??*) ,??*) exp)
+      (let ((identifiers (cadr exp)))
+        (if (pattern-match? `(scheme ,??*) identifiers)
+            (raise-compilation-error "scheme as first library name identifier is reserved" identifiers))
+        (let ((invalid-identifiers
+               (filter
+                (lambda (identifier)
+                  (not
+                   (or (symbol? identifier)
+                       (and (number? identifier) (integer? identifier) (>= identifier 0)))))
+                identifiers)))
+          (if (not (null? invalid-identifiers))
+              (raise-compilation-error "Invalid library name identifiers" invalid-identifiers)))))
+     ((pattern-match? `(define-library) exp)
+      (raise-compilation-error "Empty library definition" exp))
+     ((pattern-match? `(define-library ,??) exp)
+      (raise-compilation-error "Expected list as library name" (cadr exp)))
+     (else
+      (raise-compilation-error "Invalid R7RS library definition" exp))))
 
- (define library-decltypes
-   '(export begin))
-
- (define (library-decltype? type)
-   (and (memq type library-decltypes) #t))
+ (define (check-declaration decl)
+   (cond ((pattern-match? `(export ,?? ,??*) decl))
+         ((pattern-match? '(export) decl)
+          (raise-compilation-error "Empty export library declaration" decl))
+         ((pattern-match? `(import ,?? ,??*) decl))
+         ((pattern-match? '(import) decl)
+          (raise-compilation-error "Empty import library declaration" decl))
+         ((pattern-match? `(begin ,?? ,??*) decl))
+         ((pattern-match? '(begin) decl)
+          (raise-compilation-error "Empty begin library declaration" decl))
+         ((pattern-match? `(,?? ,??*) decl)
+          (raise-compilation-error "Unsupported R7RS library declaration" decl))
+         ((not (pattern-match? `(,?? ,??*) decl))
+          (raise-compilation-error "Illegal R7RS library declaration" decl))))
 
  (define (check-library-declarations library-def)
-   (letrec*
-    ((check-declaration
-      (lambda (decl)
-        (cond ((pattern-match? `(,library-decltype? ,??*) decl) 'ok)
-              ((pattern-match? `(,(lambda (d) (not (library-decltype? d))) ,??*) decl)
-               (make-compilation-error "Unsupported R7RS library declaration" decl))
-              ((not (pattern-match? `(,?? ,??*) decl))
-               (make-compilation-error "Illegal R7RS library declaration" decl)))))
-     (check-all-lists-and-types
-      (lambda (decls)
-        (cond ((null? decls) 'ok)
-              ((check-declaration (car decls)))
-              (else (check-all-lists-and-types (cdr decls))))))
-     (check-decl-ordering
-      (lambda (types decls)
-        (cond ((null? decls) 'ok)
-              ((null? types)
-               (or (null? decls)
-                   (make-compilation-error "Duplicated R7RS library declarations" decls)))
-              ((not (eq? (caar decls) (car types)))
-               (make-compilation-error "Unexpected R7RS library declaration" (car decls)))
-              (else (check-decl-ordering (cdr types) (cdr decls))))))
-     (library-declarations (cdr library-def))
-     (first-result (check-all-lists-and-types library-declarations)))
-    (if (compilation-error? first-result)
-        first-result
-        (check-decl-ordering
-         (filter
-          (lambda (type) (assq type library-declarations))
-          library-decltypes)
-         library-declarations))))
+   (for-each check-declaration (cddr library-def)))
 
- (define (library-declaration type library-def)
-   (assq type (cdr library-def)))
+ (define (library-has-declaration? type library-def)
+   (and (assq type (cddr library-def)) #t))
 
  (define (library-declarations type library-def)
-   (let ((decl (library-declaration type library-def)))
-     (if decl (cdr decl) '())))
-)
+   (let collect ((decls (cddr library-def))
+                 (decl '())
+                 (result '()))
+     (cond ((null? decl)
+            (cond ((null? decls) (reverse result))
+                  ((eq? (caar decls) type) (collect (cdr decls) (cdar decls) result))
+                  (else (collect (cdr decls) '() result))))
+           (else (collect decls (cdr decl) (cons (car decl) result))))))
+ )

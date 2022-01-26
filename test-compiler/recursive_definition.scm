@@ -1,12 +1,19 @@
-(begin
-  (define (gcd a b)
-    (if (= b 0)
-        a
-        (gcd b (remainder a b))))
+(define-library
+  (test-recursive-definition)
 
-  (define (remainder n d)
-    (if (< n d)
-        n
-        (remainder (- n d) d)))
+  (export gcd)
 
-  (gcd 480 28))
+  (import (scheme base))
+
+  (begin
+    (define (gcd a b)
+      (if (= b 0)
+          a
+          (gcd b (remainder a b))))
+
+    (define (remainder n d)
+      (if (< n d)
+          n
+          (remainder (- n d) d)))
+  )
+)

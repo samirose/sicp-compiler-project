@@ -5,7 +5,7 @@
  (scheme-syntax)
 
  (export variable?
-         definition? definition-variable
+         definition? definition-variable definition-value
          check-binding
          check-all-identifiers check-syntax-errors)
 
@@ -80,13 +80,18 @@
 
 ;; definition
 (define (definition? exp)
-  (or (pattern-match? `(define ,variable? ,??*) exp)
-      (pattern-match? `(define (,variable? ,??*) ,??*) exp)))
+  (or (pattern-match? `(define ,variable? ,??) exp)
+      (pattern-match? `(define (,variable? ,??*) ,?? ,??*) exp)))
 
 (define (definition-variable exp)
   (if (pattern-match? `(define ,variable? ,??) exp)
       (cadr exp)
       (caadr exp)))
+
+(define (definition-value exp)
+  (if (pattern-match? `(define ,variable? ,??) exp)
+      (caddr exp)
+      `(lambda ,(cdadr exp) ,@(cddr exp))))
 
 ;; let expression
 (define (check-binding exp)

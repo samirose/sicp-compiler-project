@@ -16,22 +16,22 @@ LIBS := \
 	expression-compiler \
 	module-compiler
 LIBDIRS := $(addprefix $(LIBDIR),$(LIBS))
-COMPILED_COMPILER := compiled/driver_sps.dep compiled/driver_sps.zo
+COMPILED_COMPILER := compiled/driver_scm.dep compiled/driver_scm.zo
 SCHEME := plt-r6rs
 SCHEME_COMPILE_PROGRAM := plt-r6rs ++path ${LIBDIR} --compile
 SCHEME_COMPILE_LIBRARY := plt-r6rs --install --collections ${LIBDIR}
 SCHEME_RUN_PROGRAM := plt-r6rs ++path ${LIBDIR}
 
-$(COMPILED_COMPILER) &: $(LIBDIRS) driver.sps
+$(COMPILED_COMPILER) &: $(LIBDIRS) driver.scm
 	rm -f $(COMPILED_COMPILER)
-	$(SCHEME_COMPILE_PROGRAM) driver.sps
+	$(SCHEME_COMPILE_PROGRAM) driver.scm
 
-$(LIBDIR)% : %.sls
+$(LIBDIR)% : %.scm
 	rm -rf $@
 	$(SCHEME_COMPILE_LIBRARY) $<
 	touch $@
 
-RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.sps
+RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.scm
 
 lib/definitions-table : \
 	lib/lists \
@@ -120,9 +120,9 @@ $(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILED_COMPILER)
 
 TEST_UNIT_DIR := test-unit/
 UNIT_TEST_LIBS := lib/assert
-UNIT_TEST_PROGRAMS := $(wildcard $(TEST_UNIT_DIR)*.sps)
-UNIT_TEST_TARGETS := $(UNIT_TEST_PROGRAMS:.sps=)
-UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.sps=$(TEST_UNIT_DIR)log/%.log)
+UNIT_TEST_PROGRAMS := $(wildcard $(TEST_UNIT_DIR)*.scm)
+UNIT_TEST_TARGETS := $(UNIT_TEST_PROGRAMS:.scm=)
+UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.scm=$(TEST_UNIT_DIR)log/%.log)
 
 .PHONY : test-unit $(UNIT_TEST_TARGETS)
 test-unit : $(UNIT_TEST_LOGS)
@@ -132,7 +132,7 @@ $(UNIT_TEST_TARGETS) : $(TEST_UNIT_DIR)% : $(TEST_UNIT_DIR)log/%.log
 $(TEST_UNIT_DIR)log :
 	mkdir -p $@
 
-$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.sps $(LIBDIRS) $(UNIT_TEST_LIBS) | $(TEST_UNIT_DIR)log
+$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm $(LIBDIRS) $(UNIT_TEST_LIBS) | $(TEST_UNIT_DIR)log
 	$(SCHEME_RUN_PROGRAM) $< > $@.tmp \
 	  && mv -f $@.tmp $@
 

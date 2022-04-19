@@ -1,47 +1,47 @@
-#!r6rs
-(library
- (wasm-syntax)
- (export wasm-definition-type wasm-definition-type?
-         wasm-elem-definition-func-index
-         wasm-const-value?
-         wasm-define-locals wasm-locals-definition? wasm-local-definitions-to-top
-         wasm-import-definition?)
- (import (rnrs base)
-         (rnrs lists)
-         (lists)
-         (pattern-match))
+(define-library (wasm-syntax)
 
- (define (wasm-definition-type wasm-definition)
-   (car wasm-definition))
+  (export wasm-definition-type wasm-definition-type?
+          wasm-elem-definition-func-index
+          wasm-const-value?
+          wasm-define-locals wasm-locals-definition? wasm-local-definitions-to-top
+          wasm-import-definition?)
 
- (define (wasm-definition-type? type wasm-definition)
-   (eq? (wasm-definition-type wasm-definition) type))
+  (import (scheme base)
+          (lists)
+          (pattern-match))
 
- (define (wasm-elem-definition-func-index elem-definition)
-   (cadr elem-definition))
+  (begin
+    (define (wasm-definition-type wasm-definition)
+      (car wasm-definition))
 
- (define wasm-const-instructions
-   '(i32.const f32.const))
+    (define (wasm-definition-type? type wasm-definition)
+      (eq? (wasm-definition-type wasm-definition) type))
 
- (define (wasm-const-instruction? instr)
-   (memq instr wasm-const-instructions))
+    (define (wasm-elem-definition-func-index elem-definition)
+      (cadr elem-definition))
 
- (define (wasm-const-value? instr)
-   (pattern-match? `(,wasm-const-instruction? ,??) instr))
+    (define wasm-const-instructions
+      '(i32.const f32.const))
 
- (define (wasm-define-locals type n)
-   (cons 'local (make-list n type)))
+    (define (wasm-const-instruction? instr)
+      (memq instr wasm-const-instructions))
 
- (define (wasm-locals-definition? exp)
-   (pattern-match? `(local ,?? ,??*) exp))
+    (define (wasm-const-value? instr)
+      (pattern-match? `(,wasm-const-instruction? ,??) instr))
 
- (define (wasm-local-definitions-to-top seq)
-   (let ((split-code (partition-list wasm-locals-definition? seq)))
-     (append (car split-code) (cdr split-code))))
+    (define (wasm-define-locals type n)
+      (cons 'local (make-list n type)))
 
- (define (wasm-import-definition? exp)
-   (cond ((null? exp) #f)
-         ((pattern-match? `(import ,string? ,??*) exp))
-         ((pattern-match? `((import ,string? ,??*) ,??*) exp))
-         (else (wasm-import-definition? (cdr exp)))))
- )
+    (define (wasm-locals-definition? exp)
+      (pattern-match? `(local ,?? ,??*) exp))
+
+    (define (wasm-local-definitions-to-top seq)
+      (let ((split-code (partition-list wasm-locals-definition? seq)))
+	(append (car split-code) (cdr split-code))))
+
+    (define (wasm-import-definition? exp)
+      (cond ((null? exp) #f)
+            ((pattern-match? `(import ,string? ,??*) exp))
+            ((pattern-match? `((import ,string? ,??*) ,??*) exp))
+            (else (wasm-import-definition? (cdr exp)))))
+    ))

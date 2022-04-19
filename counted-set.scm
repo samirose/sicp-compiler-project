@@ -1,27 +1,30 @@
-#!r6rs
-(library
+(define-library
  (counted-set)
 
- (export make-counted-set counted-set-add counted-set-count counted-set-unique-keys)
+ (export make-counted-set
+	 counted-set-add
+	 counted-set-count
+	 counted-set-unique-keys)
 
- (import (rnrs base)
-         (rnrs lists))
+ (import (scheme base)
+	 (only (srfi srfi-1) filter))
 
- (define (make-counted-set) '())
+ (begin
+   (define (make-counted-set) '())
 
- (define (counted-set-add s key amount)
-   (let* ((existing (assq key s))
-          (count (if existing
-                     (+ (cdr existing) amount)
-                     amount))
-          (new-head (cons key count))
-          (rest (filter (lambda (entry) (not (eq? key (car entry)))) s)))
-     (cons new-head rest)))
+   (define (counted-set-add s key amount)
+     (let* ((existing (assq key s))
+            (count (if existing
+                       (+ (cdr existing) amount)
+                       amount))
+            (new-head (cons key count))
+            (rest (filter (lambda (entry) (not (eq? key (car entry)))) s)))
+       (cons new-head rest)))
 
- (define (counted-set-count s key)
-   (let ((existing (assq key s)))
-     (if existing (cdr existing) 0)))
+   (define (counted-set-count s key)
+     (let ((existing (assq key s)))
+       (if existing (cdr existing) 0)))
 
- (define (counted-set-unique-keys s)
-   (length s))
- )
+   (define (counted-set-unique-keys s)
+     (length s))
+   ))

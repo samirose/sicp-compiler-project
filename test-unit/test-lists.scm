@@ -80,21 +80,6 @@
 
 (assert-equal
  '()
- (make-list-with (lambda (i) i) 0)
- "make-list-with with zero length results in empty list")
-
-(assert-equal
- '(0)
- (make-list-with (lambda (i) i) 1)
- "make-list-with with length of one results in list with one item")
-
-(assert-equal
- '(0 1 4 9)
- (make-list-with (lambda (i) (* i i)) 4)
- "make-list-with with length of n>1 results in list with n items")
-
-(assert-equal
- '()
  (flatten-n 1 '())
  "flatten-n of empty list results in empty list")
 

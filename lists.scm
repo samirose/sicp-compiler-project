@@ -4,7 +4,6 @@
          index-of-equal
          first-duplicate
          make-list
-         make-list-with
          flatten-n
          all?)
 
@@ -39,15 +38,6 @@
            (if (= n 0)
                l
                (loop (cons e l) (- n 1))))))
-
-   (define (make-list-with p n)
-     (if (< n 0)
-	 (error "Expected positive n -- make-list:" n)
-	 (let loop ((l '()) (i n))
-           (if (= i 0)
-               l
-               (let ((i (- i 1)))
-		 (loop (cons (p i) l) i))))))
 
    (define (flatten-n n x)
      (cond ((null? x) '())

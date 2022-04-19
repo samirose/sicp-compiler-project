@@ -93,8 +93,8 @@
         (program
          (compiled-program-with-definitions-and-value-code
           program
-          (make-list `(global (mut i32) ,uninitialized-value)
-                     (+ (length func-import-bindings) (length definitions)))
+          (make-list (+ (length func-import-bindings) (length definitions))
+		     `(global (mut i32) ,uninitialized-value))
           '()))
         (imported-func-values-init-code
          (let loop ((bindings func-import-bindings)

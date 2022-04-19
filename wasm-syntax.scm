@@ -30,7 +30,7 @@
    (pattern-match? `(,wasm-const-instruction? ,??) instr))
 
  (define (wasm-define-locals type n)
-   (cons 'local (make-list type n)))
+   (cons 'local (make-list n type)))
 
  (define (wasm-locals-definition? exp)
    (pattern-match? `(local ,?? ,??*) exp))

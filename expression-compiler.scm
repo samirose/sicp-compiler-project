@@ -485,7 +485,7 @@
              '()
              (list
               (cons 'param
-                    (make-list scheme-procedure-param-type arity))))))
+                    (make-list arity scheme-procedure-param-type))))))
     `(type (func ,@param-types (result i32)))))
 
 (define (compile-procedure-body seq program lexical-env compile)

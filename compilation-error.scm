@@ -7,7 +7,7 @@
          raise-as-error raise-if-error
          raise-compilation-error set-compilation-error-handler!)
 
- (import (rnrs base))
+ (import (scheme base))
 
  (define compilation-error-handler error)
 

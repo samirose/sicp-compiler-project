@@ -7,8 +7,7 @@
          flatten-n
          all?)
 
- (import (rnrs base)
-         (rnrs lists))
+ (import (scheme  base))
 
  (begin
    (define (partition-list p l)
@@ -30,14 +29,6 @@
        (cond ((null? l) '())
              ((memq (car l) (cdr l)))
              (else (search (cdr l))))))
-
-   (define (make-list e n)
-     (if (< n 0)
-	 (error "Expected positive n -- make-list:" n)
-	 (let loop ((l '()) (n n))
-           (if (= n 0)
-               l
-               (loop (cons e l) (- n 1))))))
 
    (define (flatten-n n x)
      (cond ((null? x) '())

@@ -5,9 +5,11 @@
          first-duplicate
          make-list
          flatten-n
-         all?)
+         all?
+	 filter)
 
- (import (scheme  base))
+ (import (scheme  base)
+	 (only (srfi srfi-1) filter))
 
  (begin
    (define (partition-list p l)

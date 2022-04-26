@@ -7,7 +7,7 @@
 	 counted-set-unique-keys)
 
  (import (scheme base)
-	 (only (srfi srfi-1) filter))
+	 (lists))
 
  (begin
    (define (make-counted-set) '())

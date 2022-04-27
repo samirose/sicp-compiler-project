@@ -1,7 +1,5 @@
-#!r6rs
 (import
- (rnrs base)
- (rnrs exceptions)
+ (scheme base)
  (lists)
  (assert)
  (lexical-env)

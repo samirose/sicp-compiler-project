@@ -6,10 +6,11 @@
          make-list
          flatten-n
          all?
-	 filter)
+	 filter
+	 fold)
 
  (import (scheme  base)
-	 (only (srfi srfi-1) filter))
+	 (only (srfi srfi-1) filter fold))
 
  (begin
    (define (partition-list p l)

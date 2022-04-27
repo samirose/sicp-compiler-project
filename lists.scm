@@ -7,10 +7,11 @@
          flatten-n
          all?
 	 filter
+	 find
 	 fold)
 
  (import (scheme  base)
-	 (only (srfi srfi-1) filter fold))
+	 (only (srfi srfi-1) filter find fold))
 
  (begin
    (define (partition-list p l)

@@ -1,6 +1,6 @@
-#!r6rs
-(import (rnrs base)
-        (rnrs io simple)
+(import (scheme base)
+        (scheme read)
+	(scheme write)
         (module-compiler))
 
 (write (compile-r7rs-library-to-wasm-module (read)))

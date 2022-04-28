@@ -1,6 +1,5 @@
-#!r6rs
 (import
- (rnrs base)
+ (scheme base)
  (assert)
  (module-compiler))
 

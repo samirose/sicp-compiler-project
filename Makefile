@@ -2,7 +2,7 @@ SHELL = /bin/bash
 .SHELLFLAGS = -o pipefail -c
 SCHEME := guile
 SCHEME_RUN_PROGRAM := $(SCHEME) --r7rs -L .
-
+COMPILER_SOURCES = $(wildcard *.scm)
 RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.scm
 
 .PHONY : compile
@@ -38,9 +38,11 @@ $(COMPILER_TEST_TARGETS) : $(TEST_COMPILER_DIR)% : $(TEST_COMPILER_DIR)log/%.log
 $(TEST_COMPILER_DIR)build/ $(TEST_COMPILER_DIR)log/ :
 	mkdir -p $@
 
-$(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPILER_DIR)log/
+$(COMPILER_TEST_LOGS) : $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPILER_DIR)log/
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
+
+$(COMPILER_TEST_LOGS) : $(COMPILER_SOURCES)
 
 $(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/%.wast | $(TEST_COMPILER_DIR)build/
 	wast2json $< -o $@
@@ -69,6 +71,8 @@ $(TEST_UNIT_DIR)log :
 $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_UNIT_DIR)log
 	$(SCHEME_RUN_PROGRAM) $< > $@.tmp \
 	  && mv -f $@.tmp $@
+
+$(UNIT_TEST_LOGS) : $(COMPILER_SOURCES)
 
 .PHONY : test
 test : test-runtime test-unit test-compiler

@@ -77,9 +77,14 @@ $(UNIT_TEST_LOGS) : $(COMPILER_SOURCES)
 .PHONY : test
 test : test-runtime test-unit test-compiler
 
-.PHONY : cleanall
-cleanall : cleantest
+.PHONY : clean
+clean : clean-test clean-compiler
 
-.PHONY : cleantest
-cleantest :
+.PHONY : clean-compiler
+clean-compiler :
+# This will force guile to recompile the compiler modules
+	-touch *.scm
+
+.PHONY : clean-test
+clean-test :
 	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log

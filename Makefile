@@ -5,12 +5,16 @@ SCHEME_RUN_PROGRAM := $(SCHEME) --r7rs -L .
 COMPILER_SOURCES = $(wildcard *.scm)
 RUN_DRIVER = $(SCHEME_RUN_PROGRAM) driver.scm
 
+.PHONY : help
+help : Makefile ## Display this help
+	@sed -nE 's/^([[:alnum:]-]+)[[:space:]]*:[^#]*##[[:space:]]*(.*)$$/\1: \2/p' $<
+
 .PHONY : compile
-compile :
+compile : ## Compiles a scheme file from standard input and outputs WAT to standard output
 	$(RUN_DRIVER) $<
 
 .PHONY : test-runtime
-test-runtime : runtime/test/test-runtime.log
+test-runtime : runtime/test/test-runtime.log ## Executes tests for the runtime library
 
 runtime/test/ :
 	mkdir -p runtime/test
@@ -31,7 +35,7 @@ COMPILER_TEST_TARGETS := $(COMPILER_TEST_PROGRAMS:.scm=)
 COMPILER_TEST_LOGS = $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)log/%.log)
 
 .PHONY : test-compiler $(COMPILER_TEST_TARGETS)
-test-compiler : $(COMPILER_TEST_LOGS)
+test-compiler : $(COMPILER_TEST_LOGS) ## Executes the integration tests for the compiler
 
 $(COMPILER_TEST_TARGETS) : $(TEST_COMPILER_DIR)% : $(TEST_COMPILER_DIR)log/%.log
 
@@ -61,7 +65,7 @@ UNIT_TEST_TARGETS := $(UNIT_TEST_PROGRAMS:.scm=)
 UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.scm=$(TEST_UNIT_DIR)log/%.log)
 
 .PHONY : test-unit $(UNIT_TEST_TARGETS)
-test-unit : $(UNIT_TEST_LOGS)
+test-unit : $(UNIT_TEST_LOGS) ## Executes the unit tests for the compiler
 
 $(UNIT_TEST_TARGETS) : $(TEST_UNIT_DIR)% : $(TEST_UNIT_DIR)log/%.log
 
@@ -74,17 +78,16 @@ $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_U
 
 $(UNIT_TEST_LOGS) : $(COMPILER_SOURCES)
 
-.PHONY : test
-test : test-runtime test-unit test-compiler
+.PHONY : tes
+test : test-runtime test-unit test-compiler ## Executes all tests
 
 .PHONY : clean
-clean : clean-test clean-compiler
+clean : clean-test clean-compiler ## Removes test outputs and forces compiler re-compilation
 
 .PHONY : clean-compiler
-clean-compiler :
-# This will force guile to recompile the compiler modules
+clean-compiler : ## Forces compiler re-compilation
 	-touch *.scm
 
 .PHONY : clean-test
-clean-test :
+clean-test : ## Removes test build artefacts and results
 	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log

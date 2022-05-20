@@ -83,6 +83,8 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 
 ## Known issues
 * The Scheme values are not type checked in the compiled programs: a number can be used as a procedure reference and vice-versa. Using of uninitialized values is not detected.
+* Numeric computations are not checked for over- or underflow. WebAssembly semantics apply in case
+of over- or underflow
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Backlog

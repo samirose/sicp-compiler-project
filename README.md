@@ -46,7 +46,7 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 ## Implemented features
 
 * Compilation of 32-bit integer values and open-coded application of + - * / = operators
-* Compilation of comparison operators = < > <= >= for 32-bit integeres
+* Compilation of comparison operators = < > <= >= for 32-bit integers
 * Scheme if statement to Wasm if statement
 * Compilation of lambda expressions to Wasm functions and values that can be applied to arguments
 * Port the compiler from Racket `#lang sicp` to standard R6RS Scheme (still using Racket as the development platform)

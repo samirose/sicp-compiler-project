@@ -8,10 +8,12 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 
 ## Goals
 
-* Implement the compiler in [Scheme](https://en.wikipedia.org/wiki/Scheme_(programming_language)) [R6RS](http://www.r6rs.org), using [Racket](https://racket-lang.org) as the development platform
+* Implement the compiler in [R7RS-small Scheme](https://small.r7rs.org/), using [GNU Guile](https://www.gnu.org/software/guile/) and [GNU Emacs](https://www.gnu.org/software/emacs/) as the development platform. (N.B.
+this project originally used R6RS Scheme and [Racket](https://racket-lang.org/)
+for development)
 * Learn about Scheme and compilation of functional languages in general
 * Get familiar with WebAssembly as an execution environment and compiler target
-* Stay in the spirit of simple Scheme and target initially to support a subset of [R7RS-small Scheme](https://r7rs.org)
+* Stay in the spirit of simple Scheme and target initially to support a subset of [R7RS-small Scheme](https://small.r7rs.org)
 * Compile Scheme forms directly to as idiomatic Wasm as feasible
 * Use only basic, standardised [Wasm core](https://www.w3.org/TR/wasm-core-1/) features initially
 * Implement as much of the required run-time support in Scheme as possible
@@ -29,19 +31,16 @@ In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html
 ## Running
 
 Required tools:
-* GNU Make
-* [Racket](https://racket-lang.org) with [R6RS support](https://docs.racket-lang.org/r6rs/index.html) (Other R6RS supporting Schemes may work too, but the Makefile at least will need modification)
-* [WABT](https://github.com/WebAssembly/wabt) for running the compiler tests as defined in the Makefile. Compiler's output can be tested with any Wasm tooling that provides a WAT to Wasm assembler and a Wasm runtime.
+* [GNU Make](https://www.gnu.org/software/make/) for build and test orchestration
+* [GNU Guile](https://www.gnu.org/software/guile/) for running the compiler on the host
+* [WABT](https://github.com/WebAssembly/wabt) for assembling the WAT files produced by the compiler
+to Wasm binaries and for running the compiler tests as defined in the Makefile. Compiler's output
+can be tested with any Wasm tooling that provides a WAT to Wasm assembler and a Wasm runtime.
 
-On macOS the built-in `make` is sufficient. Racket and WABT can be installed with [Homebrew](https://brew.sh).
+Run GNU `make` or `make help` to list the build targets with short explanations.
 
-* Run `make` to compile the compiler. Requires Racket to be installed and in PATH.
-* `make test-unit` to run unit tests defined in [test-unit](./test-unit) of the compiler support libraries
-* `make test-compiler` to run tests defined in [test-compiler](./test-compiler) for the full compiler. This requires WABT to be installed and in PATH.
-* `make test` to run both unit and compiler tests
-* `cat test.scm | make compile` to compile the Scheme file `test.scm` to a WAT module to standard output.
-
-Test runs can be a bit slow, but can be executed faster in parallel using GNU make's concurrent exeuction. For example, `make -j4 -O test` compiles the compiler and runs all tests with 4-way concurrency. Requires recent-enough GNU make. The option `-O` keeps the output ordered despite the parallel execution.
+[GNU Emacs](https://www.gnu.org/software/emacs/)  with [Geiser](https://www.nongnu.org/geiser/)
+forms a good development platform for working with the code.
 
 ## Implemented features
 
@@ -68,6 +67,10 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 * Compile `cond` to Wasm block structure and conditional branch instructions
 * Special form symbols and inlined procedures can be overridden with local bindings
 * Add a way to raise errors from compiled code. Needed for halting the program when a type error is detected.
+* Convert the source code R7RS-small Scheme and switch to Guile as the host Scheme implementation.
+(It would have been natural to use [MIT Scheme](https://www.gnu.org/software/mit-scheme/) for this
+project because of its SICP origins, but it does not support the M1 Apple Silicon Mac I am using
+as my main machine.)
 
 ## Features currently under work
 * Add bit tagged typing to values and type predicates: `number?`, `procedure?` and uninitialized value and add type checking to generated code. (see [Known issues](#known-issues))

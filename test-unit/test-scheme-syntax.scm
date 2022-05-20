@@ -1,7 +1,5 @@
-#!r6rs
 (import
- (rnrs base)
- (rnrs lists)
+ (scheme base)
  (scheme-syntax)
  (assert))
 
@@ -140,7 +138,7 @@
    (definition-variable exp)
    "definition-variable returns the variable for procedure definition")
 
-    (assert-equal
+  (assert-equal
    '(lambda (x y) (+ (* x x) (* y y)))
    (definition-value exp)
    "definition-value returns the body of procedure definition"))

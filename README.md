@@ -46,15 +46,16 @@ Test runs can be a bit slow, but can be executed faster in parallel using GNU ma
 ## Implemented features
 
 * Compilation of 32-bit integer values and open-coded application of + - * / = operators
-* Compilation of comparison operators = < > <= >= for 32-bit integers
+* comparison operators = < > <= >= for 32-bit integers
 * Scheme if statement to Wasm if statement
-* Compilation of lambda expressions to Wasm functions and values that can be applied to arguments
+* Scheme lambda expressions to Wasm functions and values that can be applied to arguments
 * Port the compiler from Racket `#lang sicp` to standard R6RS Scheme (still using Racket as the development platform)
 * A simple compiler "driver" that can be given a Scheme program from standard input and that emits a Wasm module to standard output in WAT format
 * Makefile for building the compiler and regression test execution
 * Regression tests for the implemented features
-  * Tests are specified in WAST and executed with [WABT](https://github.com/WebAssembly/wabt)'s [spectest-interp](https://webassembly.github.io/wabt/doc/spectest-interp.1.html) tool
-  * The tests invoke the compiler with a Scheme expression, compile it and check the executed WebAssembly's result with WAST assertions
+  * Tests are specified in [WAST](https://github.com/WebAssembly/spec/tree/master/interpreter#scripts)
+  and executed with [WABT](https://github.com/WebAssembly/wabt)'s [spectest-interp](https://webassembly.github.io/wabt/doc/spectest-interp.1.html) tool
+  * The tests invoke the compiler with a Scheme library, compile it and check the executed WebAssembly's result with WAST assertions
   * See [test-compiler](./test-compiler) for the tests. They also give an overall idea of what works and has been implemented in the compiler.
 * Compilation of Scheme R7RS library to a Wasm module with the top-level code in an exported `func` "main"
 * Top-level `define` of values and procedures

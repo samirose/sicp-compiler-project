@@ -17,7 +17,7 @@
           (compilation-error)
           (wasm-syntax))
 
-;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R6RS
+;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R7RS-small
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 

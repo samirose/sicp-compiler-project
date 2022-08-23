@@ -78,7 +78,7 @@ $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_U
 
 $(UNIT_TEST_LOGS) : $(COMPILER_SOURCES)
 
-.PHONY : tes
+.PHONY : test
 test : test-runtime test-unit test-compiler ## Executes all tests
 
 .PHONY : clean

@@ -11,8 +11,8 @@
 (test-eq "(+ 0 x) is x, x > 0" 2 (+ 0 2))
 (test-eq "(+ 0 x) is x, x < 0" -2 (+ -2 0))
 (test-eq "(+ x y) is x + y (x > 0, y > 0)" 3 (+ 1 2))
-(test-eq "(+ x y) is x + y (x > 0, y < 0, x > y)" 1 (+ 2 -1))
-(test-eq "(+ x y) is x + y (x > 0, y < 0, x < y)" -1 (+ 2 -3))
+(test-eq "(+ x y) is x + y (x > 0, y < 0, |x| > |y|)" 1 (+ 2 -1))
+(test-eq "(+ x y) is x + y (x > 0, y < 0, |x| < |y|)" -1 (+ 2 -3))
 (test-eq "(+ a b c) is a + b + c" 6 (+ 1 2 3))
 (test-eq "complex arithmetic expression evaluates to correct result"
   -8

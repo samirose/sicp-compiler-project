@@ -59,6 +59,21 @@ $(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(TEST_COMPILER_DIR)
 
 .PRECIOUS : $(TEST_COMPILER_DIR)build/%.json $(TEST_COMPILER_DIR)build/%.wast $(TEST_COMPILER_DIR)build/%.wat
 
+NEW_TEST_COMPILER_DIR := new-test-compiler/
+NEW_TEST_COMPILER_PROGRAMS := $(wildcard $(NEW_TEST_COMPILER_DIR)*.scm)
+NEW_TEST_COMPILER_TARGETS := $(NEW_TEST_COMPILER_PROGRAMS:.scm=)
+NEW_TEST_COMPILER_LOGS = $(NEW_TEST_COMPILER_PROGRAMS:$(NEW_TEST_COMPILER_DIR)%.scm=$(NEW_TEST_COMPILER_DIR)%.log)
+
+.PHONY : new-test-compiler $(NEW_TEST_COMPILER_TARGETS)
+new-test-compiler: $(NEW_TEST_COMPILER_LOGS) ## Executes the new integration tests for the compiler
+
+$(NEW_TEST_COMPILER_TARGETS) : $(NEW_TEST_COMPILER_LOGS)
+
+$(NEW_TEST_COMPILER_LOGS) : $(NEW_TEST_COMPILER_DIR)%.log : $(NEW_TEST_COMPILER_DIR)%.scm
+	pushd $(NEW_TEST_COMPILER_DIR) && guile --r7rs -L ./lib $(notdir $<) ; popd
+
+$(NEW_TEST_COMPILER_LOGS) : $(COMPILER_SOURCES)
+
 TEST_UNIT_DIR := test-unit/
 UNIT_TEST_PROGRAMS := $(wildcard $(TEST_UNIT_DIR)*.scm)
 UNIT_TEST_TARGETS := $(UNIT_TEST_PROGRAMS:.scm=)
@@ -79,7 +94,7 @@ $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_U
 $(UNIT_TEST_LOGS) : $(COMPILER_SOURCES)
 
 .PHONY : test
-test : test-runtime test-unit test-compiler ## Executes all tests
+test : test-runtime test-unit test-compiler new-test-compiler ## Executes all tests
 
 .PHONY : clean
 clean : clean-test clean-compiler ## Removes test outputs and forces compiler re-compilation
@@ -90,4 +105,4 @@ clean-compiler : ## Forces compiler re-compilation
 
 .PHONY : clean-test
 clean-test : ## Removes test build artefacts and results
-	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log
+	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log $(NEW_TEST_COMPILER_DIR)*.log

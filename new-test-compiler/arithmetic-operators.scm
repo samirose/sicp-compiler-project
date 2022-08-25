@@ -1,5 +1,5 @@
 (import (scheme base)
-	(run-compiler-test))
+	(compiler-test))
 
 (begin-compiler-test "arithmetic-operators")
 

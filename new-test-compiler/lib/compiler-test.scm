@@ -1,5 +1,5 @@
 (define-library
-    (run-compiler-test)
+    (compiler-test)
 
   (export begin-compiler-test
 	  end-compiler-test

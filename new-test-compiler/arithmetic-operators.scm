@@ -1,6 +1,3 @@
-(import (scheme base)
-	(compiler-test))
-
 (compiler-test-begin "arithmetic-operators")
 
 (compiler-test-eq plus-identity "(+) is zero"

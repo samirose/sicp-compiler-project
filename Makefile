@@ -69,8 +69,14 @@ new-test-compiler: $(NEW_TEST_COMPILER_LOGS) ## Executes the new integration tes
 
 $(NEW_TEST_COMPILER_TARGETS) : $(NEW_TEST_COMPILER_LOGS)
 
-$(NEW_TEST_COMPILER_LOGS) : $(NEW_TEST_COMPILER_DIR)%.log : $(NEW_TEST_COMPILER_DIR)%.scm
-	pushd $(NEW_TEST_COMPILER_DIR) && guile --r7rs -L ./lib $(notdir $<) ; popd
+$(NEW_TEST_COMPILER_DIR)build :
+	mkdir -p $@
+
+$(NEW_TEST_COMPILER_DIR)build/host-%.scm : $(NEW_TEST_COMPILER_DIR)%.scm $(NEW_TEST_COMPILER_DIR)lib/host-compiler-test-prelude.scm | $(NEW_TEST_COMPILER_DIR)build
+	cat $(NEW_TEST_COMPILER_DIR)lib/host-compiler-test-prelude.scm $< > $@
+
+$(NEW_TEST_COMPILER_LOGS) : $(NEW_TEST_COMPILER_DIR)%.log : $(NEW_TEST_COMPILER_DIR)build/host-%.scm
+	pushd $(NEW_TEST_COMPILER_DIR) && guile --r7rs -L ./lib build/$(notdir $<) ; popd
 
 $(NEW_TEST_COMPILER_LOGS) : $(COMPILER_SOURCES)
 
@@ -105,4 +111,4 @@ clean-compiler : ## Forces compiler re-compilation
 
 .PHONY : clean-test
 clean-test : ## Removes test build artefacts and results
-	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log $(NEW_TEST_COMPILER_DIR)*.log
+	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log $(NEW_TEST_COMPILER_DIR)*.log $(NEW_TEST_COMPILER_DIR)build

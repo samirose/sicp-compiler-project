@@ -1,5 +1,4 @@
-(define-library
-    (compiler-test)
+(define-library (host-compiler-test)
 
   (export compiler-test-begin
 	  compiler-test-end

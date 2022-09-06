@@ -1,4 +1,4 @@
-(compiler-test-begin "arithmetic-operators")
+(compiler-test-begin 'arithmetic-operators)
 
 (compiler-test-eq plus-identity "(+) is zero"
 		  0 (+))
@@ -28,4 +28,4 @@
   -8
   (+ (/ (* 2 -6 2) 3 2) (- (+ 1 2 3)) (* (+ (+ 1 1)))))
 
-(compiler-test-end "arithmetic-operators")
+(compiler-test-end 'arithmetic-operators)

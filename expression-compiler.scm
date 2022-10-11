@@ -101,15 +101,19 @@
       (cond ((assq 'export (filter pair? (env-get-additional-info current-binding lexical-env))) => cadr)
             (else #f)))
 
+;;;compiled-program extensions
+    (define (call-import program module name)
+      `(call ,(lookup-import program 'func module name)))
+
 ;;;simple expressions
 
     (define (compile-number exp program)
-      (let* ((i32->fixnum-index (lookup-import program 'func "scheme base" "i32->fixnum"))
-             (fixnum->i32-index (lookup-import program 'func "scheme base" "fixnum->i32")))
+      (let* ((call-i32->fixnum-index (call-import program "scheme base" "i32->fixnum"))
+             (call-fixnum->i32-index (call-import program "scheme base" "fixnum->i32")))
 	(compiled-program-with-value-code
 	 program
 	 (cond ((integer? exp)
-		`((i32.const ,exp) (call ,i32->fixnum-index) (call ,fixnum->i32-index)))
+		`((i32.const ,exp) ,call-i32->fixnum-index ,call-fixnum->i32-index))
                (else
 		(raise-compilation-error "Unsupported number" exp))))))
 

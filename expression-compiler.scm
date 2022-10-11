@@ -1,8 +1,6 @@
 (define-library (expression-compiler)
 
   (export compile
-          compile-values
-          compile-procedure-body
           compile-sequence
           uninitialized-value)
 

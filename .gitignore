@@ -5,4 +5,3 @@ compiled/
 build/
 log/
 test/
-new-test-compiler/*.log

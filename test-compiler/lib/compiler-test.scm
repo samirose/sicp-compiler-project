@@ -9,15 +9,15 @@
 	  (srfi srfi-64))
 
   (begin
-    (define (compiler-test-begin name-symbol)
-      (test-begin (symbol->string name-symbol)))
+    (define (compiler-test-begin name)
+      (test-begin name))
 
     (define-syntax compiler-test-eq
       (syntax-rules ()
 	((compiler-test-eq test-name expected test-expr)
 	 (test-eq test-name expected test-expr))))
 
-    (define (compiler-test-end name-symbol)
+    (define (compiler-test-end name)
       (let ((success (= 0 (test-runner-fail-count (test-runner-current)))))
-	(test-end (symbol->string name-symbol))
+	(test-end name)
 	(exit success)))))

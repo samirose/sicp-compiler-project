@@ -1,7 +1,7 @@
 (import (compiler-test)
 	(comparison-operators))
 
-(compiler-test-begin 'comparison-operators)
+(compiler-test-begin "comparison-operators")
 
 (compiler-test-eq
  "all comparison operators with a single argument evaluate to true"
@@ -75,4 +75,4 @@
  "more-than-two-params-false"
  #f (more-than-two-params-false))
 
-(compiler-test-end 'comparison-operators)
+(compiler-test-end "comparison-operators")

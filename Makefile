@@ -90,4 +90,4 @@ clean-compiler : ## Forces compiler re-compilation
 
 .PHONY : clean-test
 clean-test : ## Removes test build artefacts and results
-	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log $(NEW_TEST_COMPILER_DIR)*.log $(NEW_TEST_COMPILER_DIR)build
+	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log

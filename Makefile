@@ -30,17 +30,30 @@ runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme
 	cat $^ > $@
 
 TEST_COMPILER_DIR := test-compiler/
-COMPILER_TEST_PROGRAMS := $(wildcard $(TEST_COMPILER_DIR)*.scm)
-COMPILER_TEST_TARGETS := $(COMPILER_TEST_PROGRAMS:.scm=)
-COMPILER_TEST_LOGS = $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)log/%.log)
+COMPILER_TEST_MODULES := $(wildcard $(TEST_COMPILER_DIR)*.scm)
+COMPILER_TEST_TARGETS := $(COMPILER_TEST_MODULES:.scm=)
+COMPILER_TEST_LOGS = $(COMPILER_TEST_MODULES:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)log/%.log)
+COMPILER_TEST_PROGRAMS := $(wildcard $(TEST_COMPILER_DIR)test/*.scm)
+COMPILER_TEST_HOST_TARGETS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)%-host)
+COMPILER_TEST_HOST_LOGS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm= $(TEST_COMPILER_DIR)host-log/%.log)
+RUN_COMPILER_TEST_HOST = $(SCHEME_RUN_PROGRAM) -L .. -L ../lib
+
+$(TEST_COMPILER_DIR)build/ $(TEST_COMPILER_DIR)log/ $(TEST_COMPILER_DIR)host-log/ :
+	mkdir -p $@
+
+.PHONY : test-compiler-host $(COMPILER_TEST_HOST_TARGETS)
+test-compiler-host : $(COMPILER_TEST_HOST_LOGS) ## Executes the compiler integration tests on the host scheme
+
+$(COMPILER_TEST_HOST_TARGETS) : $(TEST_COMPILER_DIR)%-host : $(TEST_COMPILER_DIR)host-log/%.log
+
+$(COMPILER_TEST_HOST_LOGS) : $(TEST_COMPILER_DIR)host-log/%.log : $(TEST_COMPILER_DIR)test/%.scm | $(TEST_COMPILER_DIR)host-log/
+	cd $(TEST_COMPILER_DIR)host-log ; \
+	$(RUN_COMPILER_TEST_HOST) ../test/$(notdir $<)
 
 .PHONY : test-compiler $(COMPILER_TEST_TARGETS)
 test-compiler : $(COMPILER_TEST_LOGS) ## Executes the integration tests for the compiler
 
 $(COMPILER_TEST_TARGETS) : $(TEST_COMPILER_DIR)% : $(TEST_COMPILER_DIR)log/%.log
-
-$(TEST_COMPILER_DIR)build/ $(TEST_COMPILER_DIR)log/ :
-	mkdir -p $@
 
 $(COMPILER_TEST_LOGS) : $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPILER_DIR)log/
 	spectest-interp $< | tee $@.tmp \
@@ -79,7 +92,7 @@ $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_U
 $(UNIT_TEST_LOGS) : $(COMPILER_SOURCES)
 
 .PHONY : test
-test : test-runtime test-unit test-compiler ## Executes all tests
+test : test-runtime test-unit test-compiler-host test-compiler ## Executes all tests
 
 .PHONY : clean
 clean : clean-test clean-compiler ## Removes test outputs and forces compiler re-compilation
@@ -90,4 +103,9 @@ clean-compiler : ## Forces compiler re-compilation
 
 .PHONY : clean-test
 clean-test : ## Removes test build artefacts and results
-	-rm -rf runtime/test $(TEST_UNIT_DIR)log $(TEST_COMPILER_DIR)build $(TEST_COMPILER_DIR)log
+	-rm -rf \
+	  runtime/test \
+	  $(TEST_UNIT_DIR)log \
+	  $(TEST_COMPILER_DIR)build \
+	  $(TEST_COMPILER_DIR)log \
+	  $(TEST_COMPILER_DIR)host-log

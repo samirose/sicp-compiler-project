@@ -1,0 +1,45 @@
+(import (scheme base)
+        (scheme read)
+	(scheme write)
+	(pattern-match))
+
+(define (compile-value exp)
+  (cond ((boolean? exp)
+	 `(i32.const ,(if exp 1 0)))
+	((number? exp)
+	 `(i32.const ,exp))
+	(else (error "Unsupported value" exp))))
+
+(define (compile-test-exp exp)
+  (let ((proc-name (symbol->string (car exp)))
+	(args (cdr exp)))
+    `(invoke ,proc-name ,@(map compile-value args))))
+
+(define (compile-test-eq exp)
+  (let ((name (cadr exp))
+	(test-exp (compile-test-exp (cadddr exp)))
+	(expected-value (compile-value (caddr exp))))
+    `(,(string-append ";; " name)
+      (assert_return ,test-exp ,expected-value))))
+
+(define (compile-exp exp)
+  (cond ((pattern-match? `(compiler-test-eq ,?? ,?? ,??) exp)
+	 (compile-test-eq exp))
+	(else 'UNKNOWN)))
+
+(define (is-wast-ast? ast)
+  (pair? ast))
+
+(define (emit-wast wast-ast)
+  (write-string (car wast-ast))
+  (newline)
+  (write (cadr wast-ast))
+  (newline))
+
+(let compile-next ((exp (read)))
+  (cond ((eof-object? exp) (newline))
+	(else
+	 (let ((ast (compile-exp exp)))
+	   (if (is-wast-ast? ast)
+	       (emit-wast ast)))
+	 (compile-next (read)))))

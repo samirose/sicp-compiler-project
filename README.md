@@ -1,8 +1,8 @@
 # Scheme to WAT/Wasm compiler
 
-In spirit of [SICP](https://mitpress.mit.edu/sites/default/files/sicp/index.html) exercises [5.49](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-35.html#%_thm_5.49)-52.
+In spirit of [SICP](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html) exercises [5.49](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-35.html#%_thm_5.49)-52.
 
-* The compiler is based on the Scheme to register machine compiler from [SICP section 5.5](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-35.html#%_sec_5.5)
+* The compiler is based on the Scheme to register machine compiler from [SICP section 5.5](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-35.html#%_sec_5.5)
 * Wasm stands for [WebAssembly](https://webassembly.org)
 * WAT is the [WebAssembly Text Format](https://webassembly.github.io/spec/core/text/index.html#)
 
@@ -18,7 +18,7 @@ for development)
 * Use only basic, standardised [Wasm core](https://www.w3.org/TR/wasm-core-1/) features initially
 * Implement as much of the required run-time support in Scheme as possible
 * Write the required native run-time support in WAT
-* Compile a Scheme interpreter to Wasm using the compiler (see also [SICP exercise 5.52](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-35.html#%_thm_5.52))
+* Compile a Scheme interpreter to Wasm using the compiler (see also [SICP exercise 5.52](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-35.html#%_thm_5.52))
 * If the interpreter works, host it on a web page with minimal JavaScript-driven [REPL](https://en.wikipedia.org/wiki/Read–eval–print_loop)
 * _Maybe_ try to [bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(compilers)) the compiler at some point as an interesting exercise
 
@@ -91,13 +91,12 @@ of over- or underflow
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Backlog
-* Fix broken links to SICP
 * Add support for read-only symbols and strings
 * Add run-time support for rudimentary heap-based values: vectors, pairs
-* Implement simple garbage collection using [SICP section 5.3](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-33.html#%_sec_5.3) as a guideline in WAT
+* Implement simple garbage collection using [SICP section 5.3](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-33.html#%_sec_5.3) as a guideline in WAT
 * Implement lexical [closures](https://en.wikipedia.org/wiki/Closure_(computer_programming)) with function activation records as vector lists on the heap
 * Implement `letrec` form. It does not make sense to implement it before closure support to enable common use case of recursion and procedures calling each other.
-* _Scan out_ (see [SICP chapter 4.16](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1.6)) internal definitions and implement the bindings with `letrec*`
+* _Scan out_ (see [SICP chapter 4.16](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-26.html#%_sec_4.1.6)) internal definitions and implement the bindings with `letrec*`
 * Come up with a name for this project
 * Add high-level design documentation with guide to the source code of the compiler
 * More R7RS-small features, prioritisation TBD.
@@ -105,7 +104,7 @@ of over- or underflow
 ## References
 
 ### Essential
-* [Structure and Interpretation of Computer Programs (SICP) Web Site](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
+* [Structure and Interpretation of Computer Programs (SICP) Web Site](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html)
 * [WebAssembly home page](https://webassembly.org)
 * [WebAssembly specification](https://webassembly.github.io/spec/core/)
 * [WebAssembly text format (WAT)](https://webassembly.github.io/spec/core/text/index.html)

@@ -91,6 +91,7 @@ of over- or underflow
 * The Makefile always runs the tests twice after clean before recognizing that there is nothing more to be done
 
 ## Backlog
+* Fix broken links to SICP
 * Add support for read-only symbols and strings
 * Add run-time support for rudimentary heap-based values: vectors, pairs
 * Implement simple garbage collection using [SICP section 5.3](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-33.html#%_sec_5.3) as a guideline in WAT

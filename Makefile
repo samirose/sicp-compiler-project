@@ -61,13 +61,18 @@ $(COMPILER_TEST_LOGS) : $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)buil
 
 $(COMPILER_TEST_LOGS) : $(COMPILER_SOURCES)
 
-$(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/%.wast | $(TEST_COMPILER_DIR)build/
-	wast2json $< -o $@
+$(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/test-prelude.wast \
+                                   $(TEST_COMPILER_DIR)build/%.wat \
+                                   $(TEST_COMPILER_DIR)%.wast \
+                                   | $(TEST_COMPILER_DIR)build/
+	cat $^ | wast2json - -o $@
 
-$(TEST_COMPILER_DIR)build/%.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast $(TEST_COMPILER_DIR)build/%.wat $(TEST_COMPILER_DIR)%.wast | $(TEST_COMPILER_DIR)build/
+$(TEST_COMPILER_DIR)build/test-prelude.wast : runtime/scheme-base.wat \
+                                              runtime/register-scheme-base.wast \
+                                              | $(TEST_COMPILER_DIR)build/
 	cat $^ > $@
 
-$(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(TEST_COMPILER_DIR)build/ | $(TEST_COMPILER_DIR)build/
+$(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm | $(TEST_COMPILER_DIR)build/
 	$(RUN_DRIVER) < $< > $@
 
 .PRECIOUS : $(TEST_COMPILER_DIR)build/%.json $(TEST_COMPILER_DIR)build/%.wast $(TEST_COMPILER_DIR)build/%.wat

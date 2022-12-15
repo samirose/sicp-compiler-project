@@ -7,7 +7,8 @@
          raise-as-error raise-if-error
          raise-compilation-error set-compilation-error-handler!)
 
- (import (scheme base))
+ (import (scheme base)
+	 (scheme cxr))
 
  (define compilation-error-handler error)
 

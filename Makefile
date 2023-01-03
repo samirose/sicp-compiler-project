@@ -89,7 +89,7 @@ $(TEST_COMPILER_DIR)build/%-test.json : $(TEST_COMPILER_DIR)build/test-prelude.w
 
 $(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)lib/compiler-test-to-wast.scm
 $(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)build/%-test.wast : $(TEST_COMPILER_DIR)test/%.scm | $(TEST_COMPILER_DIR)build/
-	$(COMPILER_TEST_TO_WAST) < $< | tee $@.tmp \
+	$(COMPILER_TEST_TO_WAST) < $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
 .PHONY : test-compiler $(COMPILER_TEST_TARGETS)

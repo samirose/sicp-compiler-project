@@ -101,7 +101,7 @@ $(COMPILER_TEST_LOGS) : $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)buil
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(COMPILER_TEST_LOGS) : compile-compiler
+$(COMPILER_TEST_LOGS) : $(COMPILER_BINARIES)
 
 $(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/test-prelude.wast \
                                    $(TEST_COMPILER_DIR)build/%.wat \
@@ -140,7 +140,7 @@ $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | compile-
 	$(HOST_SCHEME_RUN_PROGRAM) $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(UNIT_TEST_LOGS) : compile-compiler $(UNIT_TEST_BINARIES)
+$(UNIT_TEST_LOGS) : $(COMPILER_BINARIES) $(UNIT_TEST_BINARIES)
 
 .PHONY : test
 test : test-runtime test-unit test-compiler-host test-compiler-wast test-compiler ## Executes all tests

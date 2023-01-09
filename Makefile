@@ -1,9 +1,9 @@
 SHELL = /bin/bash
 .SHELLFLAGS = -o pipefail -c
 HOST_SCHEME_FLAGS := --r7rs -L .
-HOST_SCHEME_COMPILE_MODULE := GUILE_LOAD_COMPILED_PATH=$(HOST_SCHEME_COMPILED_DIR) guild compile $(HOST_SCHEME_FLAGS)
 HOST_SCHEME_COMPILED_DIR := compiled/
-HOST_SCHEME_RUN_PROGRAM := GUILE_LOAD_COMPILED_PATH=$(HOST_SCHEME_COMPILED_DIR) guile $(HOST_SCHEME_FLAGS) --no-auto-compile
+HOST_SCHEME_COMPILE_MODULE := GUILE_LOAD_COMPILED_PATH=$(HOST_SCHEME_COMPILED_DIR) guild compile $(HOST_SCHEME_FLAGS)
+HOST_SCHEME_RUN_PROGRAM := guile $(HOST_SCHEME_FLAGS) -C $(HOST_SCHEME_COMPILED_DIR) --no-auto-compile
 COMPILER_SOURCES = $(wildcard *.scm)
 RUN_COMPILER = $(HOST_SCHEME_RUN_PROGRAM) driver.scm
 
@@ -138,10 +138,11 @@ $(UNIT_TEST_BINARIES) : $(TEST_UNIT_DIR)compiled/%.go : $(TEST_UNIT_DIR)%.scm | 
 	$(HOST_SCHEME_COMPILE_MODULE) -L .. -o $@ $<
 
 $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_UNIT_DIR)log
-	$(HOST_SCHEME_RUN_PROGRAM) $< > $@.tmp \
+	$(HOST_SCHEME_RUN_PROGRAM) -C $(TEST_UNIT_DIR)compiled $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(UNIT_TEST_LOGS) : $(COMPILER_BINARIES) $(UNIT_TEST_BINARIES)
+$(UNIT_TEST_LOGS) : $(UNIT_TEST_BINARIES)
+$(UNIT_TEST_BINARIES) : $(COMPILER_BINARIES)
 
 .PHONY : test
 test : test-runtime test-unit test-compiler-host test-compiler-wast test-compiler ## Executes all tests

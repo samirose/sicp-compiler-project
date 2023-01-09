@@ -18,6 +18,7 @@
 	 (test-eq test-name expected test-expr))))
 
     (define (compiler-test-end name)
-      (let ((success (= 0 (test-runner-fail-count (test-runner-current)))))
+      (let ((fail-count (test-runner-fail-count (test-runner-current))))
 	(test-end name)
-	(exit success)))))
+	(if (> fail-count 0)
+	    (exit #f))))))

@@ -63,8 +63,9 @@ test-compiler-host : $(COMPILER_TEST_HOST_LOGS) ## Executes the compiler integra
 $(COMPILER_TEST_HOST_TARGETS) : $(TEST_COMPILER_DIR)%-host : $(TEST_COMPILER_DIR)host-log/%.log
 
 $(COMPILER_TEST_HOST_LOGS) : $(TEST_COMPILER_DIR)host-log/%.log : $(TEST_COMPILER_DIR)test/%.scm | $(TEST_COMPILER_DIR)host-log/
-	cd $(TEST_COMPILER_DIR)host-log ; \
-	$(RUN_COMPILER_TEST_HOST) ../test/$(notdir $<)
+	cd $(TEST_COMPILER_DIR)host-log && \
+	$(RUN_COMPILER_TEST_HOST) ../test/$(notdir $<) || \
+	mv -f $(notdir $@) $(notdir $(@:%.log=%.fail.log))
 
 COMPILER_TEST_WAST_TARGETS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)%-wast)
 COMPILER_TEST_WAST_TESTS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)build/%-test.wast)

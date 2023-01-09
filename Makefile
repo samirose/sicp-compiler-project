@@ -114,7 +114,7 @@ $(TEST_COMPILER_DIR)build/test-prelude.wast : runtime/scheme-base.wat \
                                               | $(TEST_COMPILER_DIR)build/
 	cat $^ > $@
 
-$(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm | compile-compiler $(TEST_COMPILER_DIR)build/
+$(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm | $(TEST_COMPILER_DIR)build/
 	$(RUN_COMPILER) < $< > $@
 
 .PRECIOUS : $(TEST_COMPILER_DIR)build/%.json $(TEST_COMPILER_DIR)build/%.wast $(TEST_COMPILER_DIR)build/%.wat
@@ -136,7 +136,7 @@ $(TEST_UNIT_DIR)log $(TEST_UNIT_DIR)compiled :
 $(UNIT_TEST_BINARIES) : $(TEST_UNIT_DIR)compiled/%.go : $(TEST_UNIT_DIR)%.scm | $(TEST_UNIT_DIR)compiled
 	$(HOST_SCHEME_COMPILE_MODULE) -L .. -o $@ $<
 
-$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | compile-compiler $(TEST_UNIT_DIR)log
+$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_UNIT_DIR)log
 	$(HOST_SCHEME_RUN_PROGRAM) $< > $@.tmp \
 	  && mv -f $@.tmp $@
 

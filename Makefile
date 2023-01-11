@@ -1,20 +1,20 @@
 SHELL = /bin/bash
 .SHELLFLAGS = -o pipefail -c
-HOST_SCHEME_FLAGS := --r7rs -L .
-HOST_SCHEME_COMPILED_DIR := ./compiled/
-HOST_SCHEME_COMPILED_DIR_REALPATH = $(realpath $(HOST_SCHEME_COMPILED_DIR))
-export GUILE_LOAD_COMPILED_PATH = "$(HOST_SCHEME_COMPILED_DIR_REALPATH)"
-HOST_SCHEME_COMPILE_MODULE = guild compile $(HOST_SCHEME_FLAGS)
-HOST_SCHEME_RUN_PROGRAM = guile $(HOST_SCHEME_FLAGS) --no-auto-compile
-COMPILER_SOURCES = $(wildcard *.scm)
-RUN_COMPILER = $(HOST_SCHEME_RUN_PROGRAM) driver.scm
 
 .PHONY : help
 help : Makefile ## Display this help
 	@sed -nE 's/^([[:alnum:]-]+)[[:space:]]*:[^#]*##[[:space:]]*(.*)$$/\1: \2/p' $<
 
+HOST_SCHEME_FLAGS := --r7rs
+HOST_SCHEME_COMPILED_DIR := ./compiled/
+HOST_SCHEME_COMPILE_MODULE = guild compile $(HOST_SCHEME_FLAGS)
+HOST_SCHEME_RUN_PROGRAM = guile $(HOST_SCHEME_FLAGS) --no-auto-compile
+COMPILER_SOURCES = $(wildcard *.scm)
+COMPILER_BINARIES := $(COMPILER_SOURCES:%.scm=$(HOST_SCHEME_COMPILED_DIR)%.go)
+RUN_COMPILER = $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) driver.scm
+
 .PHONY : compile
-compile : compile-compiler ## Compiles a scheme file from standard input and outputs WAT to standard output
+compile : $(COMPILER_BINARIES) ## Compiles a scheme file from standard input and outputs WAT to standard output
 	$(RUN_COMPILER) $<
 
 .PHONY : test-runtime
@@ -33,16 +33,26 @@ runtime/test/test-runtime.json : runtime/test/test-runtime.wast | runtime/test/
 runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/runtime.wast | runtime/test/
 	cat $^ > $@
 
-COMPILER_BINARIES := $(COMPILER_SOURCES:%.scm=$(HOST_SCHEME_COMPILED_DIR)%.go)
-
 .PHONY : compile-compiler
 compile-compiler : $(COMPILER_BINARIES) ## Compiles the compiler with host scheme
+
+binaries = $(patsubst %,$(HOST_SCHEME_COMPILED_DIR)%.go,$(1))
+
+$(call binaries,compiled-program counted-set definitions-table expression-compiler lexical-env module-compiler scheme-r7rs-syntax scheme-libraries wasm-syntax) : $(call binaries,lists)
+$(call binaries,expression-compiler module-compiler scheme-syntax scheme-r7rs-syntax wasm-syntax) : $(call binaries,pattern-match)
+$(call binaries,assert scheme-libraries scheme-syntax scheme-r7rs-syntax) : $(call binaries,compilation-error)
+$(call binaries,compiled-program) : $(call binaries,counted-set definitions-table)
+$(call binaries,definitions-table) : $(call binaries,wasm-syntax counted-set)
+$(call binaries,scheme-libraries) : $(call binaries,compiled-program)
+$(call binaries,expression-compiler module-compiler) : $(call binaries,lexical-env scheme-syntax scheme-libraries)
+$(call binaries,module-compiler) : $(call binaries,expression-compiler scheme-r7rs-syntax)
+$(call binaries,driver) : $(call binaries,module-compiler)
 
 $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@
 
 $(COMPILER_BINARIES) : $(HOST_SCHEME_COMPILED_DIR)%.go : %.scm | $(HOST_SCHEME_COMPILED_DIR)
-	$(HOST_SCHEME_COMPILE_MODULE) -o $@ $<
+	GUILE_LOAD_COMPILED_PATH=$(HOST_SCHEME_COMPILED_DIR) $(HOST_SCHEME_COMPILE_MODULE) -o $@ $<
 
 TEST_COMPILER_DIR := test-compiler/
 COMPILER_TEST_MODULES := $(wildcard $(TEST_COMPILER_DIR)*.scm)
@@ -73,7 +83,7 @@ COMPILER_TEST_WAST_TARGETS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/
 COMPILER_TEST_WAST_TESTS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)build/%-test.wast)
 COMPILER_TEST_WAST_LOGS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)wast-log/%.log)
 COMPILER_TEST_WAST_COMPILER := $(TEST_COMPILER_DIR)lib/compiler-test-to-wast.scm
-COMPILER_TEST_TO_WAST := $(HOST_SCHEME_RUN_PROGRAM) $(COMPILER_TEST_WAST_COMPILER)
+COMPILER_TEST_TO_WAST := $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) $(COMPILER_TEST_WAST_COMPILER)
 
 .PHONY : test-compiler-wast $(COMPILER_TEST_WAST_TARGETS)
 test-compiler-wast : $(COMPILER_TEST_WAST_LOGS) ## Compiles the compiler tests to WAST scripts and executes them
@@ -127,6 +137,7 @@ UNIT_TEST_PROGRAMS := $(wildcard $(TEST_UNIT_DIR)*.scm)
 UNIT_TEST_BINARIES := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.scm=$(TEST_UNIT_DIR)compiled/%.go)
 UNIT_TEST_TARGETS := $(UNIT_TEST_PROGRAMS:.scm=)
 UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.scm=$(TEST_UNIT_DIR)log/%.log)
+RUN_UNIT_TEST := $(HOST_SCHEME_RUN_PROGRAM) -C $(TEST_UNIT_DIR)compiled -C $(HOST_SCHEME_COMPILED_DIR)
 
 .PHONY : test-unit $(UNIT_TEST_TARGETS)
 test-unit : $(UNIT_TEST_LOGS) ## Executes the unit tests for the compiler
@@ -137,10 +148,10 @@ $(TEST_UNIT_DIR)log $(TEST_UNIT_DIR)compiled :
 	mkdir -p $@
 
 $(UNIT_TEST_BINARIES) : $(TEST_UNIT_DIR)compiled/%.go : $(TEST_UNIT_DIR)%.scm | $(TEST_UNIT_DIR)compiled
-	$(HOST_SCHEME_COMPILE_MODULE) -L .. -o $@ $<
+	$(HOST_SCHEME_COMPILE_MODULE) -L . -o $@ $<
 
 $(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_UNIT_DIR)log
-	$(HOST_SCHEME_RUN_PROGRAM) -C $(TEST_UNIT_DIR)compiled $< > $@.tmp \
+	$(RUN_UNIT_TEST) $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
 $(UNIT_TEST_LOGS) : $(UNIT_TEST_BINARIES)

@@ -1,5 +1,4 @@
-#!r6rs
-(library
+(define-library
  (compilation-error)
 
  (export make-compilation-error compilation-error?
@@ -10,27 +9,27 @@
  (import (scheme base)
 	 (scheme cxr))
 
- (define compilation-error-handler error)
+ (begin
+   (define compilation-error-handler error)
 
- (define (set-compilation-error-handler! handler)
-   (set! compilation-error-handler handler))
+   (define (set-compilation-error-handler! handler)
+     (set! compilation-error-handler handler))
 
- (define (make-compilation-error message object)
-   (list make-compilation-error message object))
+   (define (make-compilation-error message object)
+     (list make-compilation-error message object))
 
- (define (compilation-error? x)
-   (and (list? x) (eq? (car x) make-compilation-error)))
+   (define (compilation-error? x)
+     (and (list? x) (eq? (car x) make-compilation-error)))
 
- (define (compilation-error-message e) (cadr e))
- (define (compilation-error-object e) (caddr e))
+   (define (compilation-error-message e) (cadr e))
+   (define (compilation-error-object e) (caddr e))
 
- (define (raise-as-error e)
-   (raise-compilation-error (compilation-error-message e) (compilation-error-object e)))
+   (define (raise-as-error e)
+     (raise-compilation-error (compilation-error-message e) (compilation-error-object e)))
 
- (define (raise-if-error x)
-   (if (compilation-error? x)
-       (raise-as-error x)))
+   (define (raise-if-error x)
+     (if (compilation-error? x)
+	 (raise-as-error x)))
 
- (define (raise-compilation-error message object)
-   (compilation-error-handler message object))
-)
+   (define (raise-compilation-error message object)
+     (compilation-error-handler message object))))

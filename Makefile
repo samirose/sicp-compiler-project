@@ -114,8 +114,6 @@ $(COMPILER_TEST_LOGS) : $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)buil
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(COMPILER_TEST_LOGS) : $(COMPILER_BINARIES)
-
 $(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/test-prelude.wast \
                                    $(TEST_COMPILER_DIR)build/%.wat \
                                    $(TEST_COMPILER_DIR)%.wast \
@@ -127,7 +125,7 @@ $(TEST_COMPILER_DIR)build/test-prelude.wast : runtime/scheme-base.wat \
                                               | $(TEST_COMPILER_DIR)build/
 	cat $^ > $@
 
-$(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm | $(TEST_COMPILER_DIR)build/
+$(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILER_BINARIES) | $(TEST_COMPILER_DIR)build/
 	$(RUN_COMPILER) < $< > $@
 
 .PRECIOUS : $(TEST_COMPILER_DIR)build/%.json $(TEST_COMPILER_DIR)build/%.wast $(TEST_COMPILER_DIR)build/%.wat

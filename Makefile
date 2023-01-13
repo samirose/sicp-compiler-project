@@ -36,17 +36,17 @@ runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme
 .PHONY : compile-compiler
 compile-compiler : $(COMPILER_BINARIES) ## Compiles the compiler with host scheme
 
-binaries = $(patsubst %,$(HOST_SCHEME_COMPILED_DIR)%.go,$(1))
+binaries = $(patsubst $(HOST_SCHEME_COMPILED_DIR):.go,:,$(patsubst %,$(HOST_SCHEME_COMPILED_DIR)%.go,$(1)))
 
-$(call binaries,compiled-program counted-set definitions-table expression-compiler lexical-env module-compiler scheme-r7rs-syntax scheme-libraries wasm-syntax) : $(call binaries,lists)
-$(call binaries,expression-compiler module-compiler scheme-syntax scheme-r7rs-syntax wasm-syntax) : $(call binaries,pattern-match)
-$(call binaries,assert scheme-libraries scheme-syntax scheme-r7rs-syntax) : $(call binaries,compilation-error)
-$(call binaries,compiled-program) : $(call binaries,counted-set definitions-table)
-$(call binaries,definitions-table) : $(call binaries,wasm-syntax counted-set)
-$(call binaries,scheme-libraries) : $(call binaries,compiled-program)
-$(call binaries,expression-compiler module-compiler) : $(call binaries,lexical-env scheme-syntax scheme-libraries)
-$(call binaries,module-compiler) : $(call binaries,expression-compiler scheme-r7rs-syntax)
-$(call binaries,driver) : $(call binaries,module-compiler)
+$(call binaries,compiled-program counted-set definitions-table expression-compiler lexical-env module-compiler scheme-r7rs-syntax scheme-libraries wasm-syntax : lists)
+$(call binaries,expression-compiler module-compiler scheme-syntax scheme-r7rs-syntax wasm-syntax : pattern-match)
+$(call binaries,assert scheme-libraries scheme-syntax scheme-r7rs-syntax : compilation-error)
+$(call binaries,compiled-program : counted-set definitions-table)
+$(call binaries,definitions-table : wasm-syntax counted-set)
+$(call binaries,scheme-libraries : compiled-program)
+$(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries)
+$(call binaries,module-compiler : expression-compiler scheme-r7rs-syntax)
+$(call binaries,driver : module-compiler)
 
 $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@

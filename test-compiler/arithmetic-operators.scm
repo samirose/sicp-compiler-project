@@ -1,5 +1,5 @@
 (define-library
-  (test-arithmetic-operators)
+  (arithmetic-operators)
 
   (export
    plus-identity

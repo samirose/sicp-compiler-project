@@ -1,11 +1,11 @@
 (define-library
-  (test-and)
+  (and)
 
   (export
     empty-and-is-true
     and-one-false-is-false
     and-one-non-false-value-is-value
-    and-two-non-falses-is-last-value
+    and-two-non-false-values-is-last-value
     and-any-false-is-false
     and-with-complex-expressions
     and-evaluates-expressions-from-left-to-right
@@ -23,7 +23,7 @@
     (define (and-one-non-false-value-is-value)
       (and 42))
 
-    (define (and-two-non-falses-is-last-value)
+    (define (and-two-non-false-values-is-last-value)
       (and 1 2))
 
     (define (and-any-false-is-false)

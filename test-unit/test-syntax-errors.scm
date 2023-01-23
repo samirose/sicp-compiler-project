@@ -158,6 +158,11 @@
  "If expression must not contain more subexpressions than test, consequent and alternative")
 
 (assert-expression-raises-compilation-error
+ '(cond)
+ "No clauses in cond expression" '(cond)
+ "cond expression must have at least one clause")
+
+(assert-expression-raises-compilation-error
  '(cond (1) 2 (else 3))
  "Invalid cond clause" 2
  "cond clauses must be lists")

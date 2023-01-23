@@ -277,80 +277,78 @@
 	   end))))
 
     (define (compile-cond exp clauses program lexical-env compile)
-      (cond
-       ((null? clauses)
-	(compiled-program-with-value-code program unspecified-value))
-       (else
-	(let
-            ((clauses-prog
-              (let generate ((clauses clauses)
-                             (program program)
-                             (env lexical-env)
-                             (temp-var-index #f))
-		(cond
-		 ((null? clauses)
+      (if (null? clauses)
+	(raise-compilation-error "No clauses in cond expression" exp))
+      (let
+          ((clauses-prog
+            (let generate ((clauses clauses)
+                           (program program)
+                           (env lexical-env)
+                           (temp-var-index #f))
+	      (cond
+	       ((null? clauses)
+                (compiled-program-with-value-code
+                 program
+                 `(end
+                   ,unspecified-value)))
+	       ((pattern-match? `(,??) (car clauses))
+                (let*
+                    ((env (if temp-var-index
+			      env
+			      (add-new-local-temporaries-frame env 1)))
+                     (temp-var-index (env-var-index-offset env))
+                     (test-prog (compile (caar clauses) program env))
+                     (clause-prog
+		      (compiled-program-with-value-code
+		       test-prog
+		       `(block
+                         ,@(compiled-program-value-code test-prog)
+                         ,@(if temp-var-index '((local i32)) '())
+                         local.tee ,temp-var-index
+                         local.get ,temp-var-index
+                         br_if 2
+                         drop
+                         end))))
+                  (compiled-program-append-value-codes
+                   clause-prog
+                   (generate (cdr clauses) clause-prog env temp-var-index))))
+	       ((or (pattern-match? `(else ,?? ,??*) (car clauses))
+                    (pattern-match? `(#t ,?? ,??*) (car clauses)))
+                (if (not (null? (cdr clauses)))
+                    (raise-compilation-error
+                     "else or #t clause must be last in cond clauses" exp))
+                (let ((exp-prog (compile-sequence (cdar clauses) program env compile)))
                   (compiled-program-with-value-code
-                   program
+                   exp-prog
                    `(end
-                     ,unspecified-value)))
-		 ((pattern-match? `(,??) (car clauses))
-                  (let*
-                      ((env (if temp-var-index
-				env
-				(add-new-local-temporaries-frame env 1)))
-                       (temp-var-index (env-var-index-offset env))
-                       (test-prog (compile (caar clauses) program env))
-                       (clause-prog
-			(compiled-program-with-value-code
-			 test-prog
-			 `(block
-                           ,@(compiled-program-value-code test-prog)
-                           ,@(if temp-var-index '((local i32)) '())
-                           local.tee ,temp-var-index
-                           local.get ,temp-var-index
-                           br_if 2
-                           drop
-                           end))))
-                    (compiled-program-append-value-codes
-                     clause-prog
-                     (generate (cdr clauses) clause-prog env temp-var-index))))
-		 ((or (pattern-match? `(else ,?? ,??*) (car clauses))
-                      (pattern-match? `(#t ,?? ,??*) (car clauses)))
-                  (if (not (null? (cdr clauses)))
-                      (raise-compilation-error
-                       "else or #t clause must be last in cond clauses" exp))
-                  (let ((exp-prog (compile-sequence (cdar clauses) program env compile)))
-                    (compiled-program-with-value-code
-                     exp-prog
-                     `(end
-                       ,@(compiled-program-value-code exp-prog)))))
-		 ((pattern-match? `(,?? ,?? ,??*) (car clauses))
-                  (let*
-                      ((test-prog (compile (caar clauses) program env))
-                       (exp-prog (compile-sequence (cdar clauses) test-prog env compile))
-                       (clause-prog
-			(compiled-program-with-value-code
-			 exp-prog
-			 `(block
-                           block
-                           ,@(compiled-program-value-code test-prog)
-                           br_if 0
-                           br 1
-                           end
-                           ,@(compiled-program-value-code exp-prog)
-                           br 2
-                           end))))
-                    (compiled-program-append-value-codes
-                     clause-prog
-                     (generate (cdr clauses) clause-prog env temp-var-index))))
-		 (else
-                  (raise-compilation-error "Invalid cond clause" (car clauses)))))))
-	  (compiled-program-with-value-code
-           clauses-prog
-           `(block (result i32)
-		   block
-		   ,@(compiled-program-value-code clauses-prog)
-		   end))))))
+                     ,@(compiled-program-value-code exp-prog)))))
+	       ((pattern-match? `(,?? ,?? ,??*) (car clauses))
+                (let*
+                    ((test-prog (compile (caar clauses) program env))
+                     (exp-prog (compile-sequence (cdar clauses) test-prog env compile))
+                     (clause-prog
+		      (compiled-program-with-value-code
+		       exp-prog
+		       `(block
+                         block
+                         ,@(compiled-program-value-code test-prog)
+                         br_if 0
+                         br 1
+                         end
+                         ,@(compiled-program-value-code exp-prog)
+                         br 2
+                         end))))
+                  (compiled-program-append-value-codes
+                   clause-prog
+                   (generate (cdr clauses) clause-prog env temp-var-index))))
+	       (else
+                (raise-compilation-error "Invalid cond clause" (car clauses)))))))
+	(compiled-program-with-value-code
+         clauses-prog
+         `(block (result i32)
+		 block
+		 ,@(compiled-program-value-code clauses-prog)
+		 end))))
 
     (define (compile-not exp test program lexical-env compile)
       (let ((test-prog (compile test program lexical-env)))

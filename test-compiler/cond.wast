@@ -1,4 +1,3 @@
-(assert_return (invoke "no-clauses") (i32.const 0))
 (assert_return (invoke "single-exp" (i32.const 1)) (i32.const 1))
 (assert_return (invoke "single-exp" (i32.const 0)) (i32.const 0))
 (assert_return (invoke "single-exp-else" (i32.const 1)) (i32.const 1))

@@ -23,6 +23,12 @@
     `(,(string-append ";; " name)
       (assert_return ,test-exp ,expected-value))))
 
+(define (compile-test-unspecified exp)
+  (let ((name (cadr exp))
+	(test-exp (compile-test-exp (caddr exp))))
+    `(,(string-append ";; " name)
+      (assert_return ,test-exp (i32.const 0)))))
+
 (define (value->string exp)
   (cond ((boolean? exp)
 	 (if exp "#t" "#f"))
@@ -53,6 +59,8 @@
 	 (compile-test-eq exp))
 	((pattern-match? `(compiler-test-invoke ,?? ,??*) exp)
 	 (compile-test-invoke exp))
+	((pattern-match? `(compiler-test-unspecified ,?? ,??*) exp)
+	 (compile-test-unspecified exp))
 	(else 'UNKNOWN)))
 
 (define (is-wast-ast? ast)

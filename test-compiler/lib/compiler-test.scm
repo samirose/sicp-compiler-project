@@ -3,6 +3,7 @@
   (export compiler-test-begin
 	  compiler-test-end
 	  compiler-test-eq
+	  compiler-test-unspecified
 	  compiler-test-invoke)
 
   (import (scheme base)
@@ -17,6 +18,11 @@
       (syntax-rules ()
 	((compiler-test-eq test-name expected test-expr)
 	 (test-eq test-name expected test-expr))))
+
+    (define-syntax compiler-test-unspecified
+      (syntax-rules ()
+	((compiler-test-unspecified test-name test-expr)
+	 test-expr)))
 
     (define-syntax compiler-test-invoke
       (syntax-rules ()

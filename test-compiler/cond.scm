@@ -1,5 +1,5 @@
 (define-library
-  (test-cond)
+  (cond)
 
   (export single-exp
           single-exp-else

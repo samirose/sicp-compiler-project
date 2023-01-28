@@ -48,6 +48,8 @@
 	((if) "Test and consequent missing from if expression")
 	((if ,??) "Consequent missing from if expression")
 	((if ,?? ,?? ,?? ,??*) "Too many subexpressions in if expression")
+	;; cond expression
+	((cond) "No clauses in cond expression")
 	;; not expression
 	((not) "Argument missing from not expression")
 	((not ,?? ,??*) "Too many arguments in not expression")

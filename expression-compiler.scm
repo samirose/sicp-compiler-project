@@ -44,7 +44,7 @@
              (compile-if exp (cadr exp) (caddr exp) (cadddr exp) program lexical-env compile))
             ((pattern-match? `(if ,?? ,??) exp)
              (compile-if exp (cadr exp) (caddr exp) #f program lexical-env compile))
-            ((pattern-match? `(cond ,??*) exp)
+            ((pattern-match? `(cond (,?? ,??*) ,??*) exp)
              (compile-cond exp (cdr exp) program lexical-env compile))
             ((pattern-match? `(not ,??) exp)
              (compile-not exp (cadr exp) program lexical-env compile))
@@ -277,8 +277,6 @@
 	   end))))
 
     (define (compile-cond exp clauses program lexical-env compile)
-      (if (null? clauses)
-	(raise-compilation-error "No clauses in cond expression" exp))
       (let
           ((clauses-prog
             (let generate ((clauses clauses)

@@ -1,5 +1,5 @@
 (define-library 
-  (test-exported-procedure)
+  (exported-procedure)
 
   (export square minus)
 

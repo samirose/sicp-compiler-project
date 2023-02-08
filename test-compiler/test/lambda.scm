@@ -23,5 +23,9 @@
  "inner lambda parameters shadow outer lambda parameters with the same names"
  11 (inner-lambda-parameters-shadow-outer))
 
+(compiler-test-eq
+ "lambda returned from a procedure can be applied to arguments"
+ 6 (lambda-procedure-result))
+
 (compiler-test-end "lambda")
 

@@ -26,8 +26,9 @@
       (if (= x 1) x (+ x 1)))
 
     (define (if-true-does-not-evaluate-alternative)
-      (set! x 1)
-      (if (= x 1) x (set! x 2)))
+      (set! x 0)
+      (if (= x 0) (set! x (+ x 1))  (set! x (+ x 2)))
+      x)
 
     (define (if-true-consequent-only)
       (set! x 1)
@@ -42,8 +43,9 @@
       (if (> x 1) x (+ x 1)))
 
     (define (if-false-does-not-evaluate-consequent)
-      (set! x 1)
-      (if (= x 0) (set! x 2) x))
+      (set! x 0)
+      (if (= x 1) (set! x (+ x 2)) (set! x (+ x 1)))
+      x)
 
     (define (if-false-consequent-only)
       (set! x 1)

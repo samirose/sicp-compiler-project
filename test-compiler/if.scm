@@ -1,5 +1,5 @@
 (define-library
-  (test-if)
+  (if)
 
   (export if-true
           if-true-expression

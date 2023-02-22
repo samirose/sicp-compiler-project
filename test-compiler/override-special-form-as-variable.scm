@@ -1,5 +1,5 @@
 (define-library
-  (test-override-special-form-as-variable)
+  (override-special-form-as-variable)
 
   (export override-quote-let
           override-quote-arg

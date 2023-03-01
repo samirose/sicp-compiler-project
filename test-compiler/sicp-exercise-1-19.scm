@@ -11,7 +11,7 @@
 ; -> p ́ = p^2 + q^2, q ́ = 2pq + q^2
 
 (define-library
-  (test-sicp-exercise-1.19)
+  (sicp-exercise-1-19)
 
   (export fib)
 
@@ -20,9 +20,18 @@
   (begin
     (define (square x) (* x x))
 
+    ;; Define odd? and even? iteratively as reminder operation is not yet implemented in the compiler
+    (define (odd? x)
+      (cond ((= x 0) #f)
+	    ((= x 1) #t)
+	    ((= x 2) #f)
+	    (else (even? (- x 1)))))
+
     (define (even? x)
-      ; Naive integers-only implementation
-      (= x (* 2 (/ x 2))))
+      (cond ((= x 0) #t)
+	    ((= x 1) #f)
+	    ((= x 2) #t)
+	    (else (odd? (- x 1)))))
 
     (define (fib-iter a b p q count)
       (cond ((= count 0) b)

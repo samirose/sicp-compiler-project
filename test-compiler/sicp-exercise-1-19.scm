@@ -20,18 +20,11 @@
   (begin
     (define (square x) (* x x))
 
-    ;; Define odd? and even? iteratively as reminder operation is not yet implemented in the compiler
-    (define (odd? x)
-      (cond ((= x 0) #f)
-	    ((= x 1) #t)
-	    ((= x 2) #f)
-	    (else (even? (- x 1)))))
-
+    ;; Define even? iteratively as reminder operation is not yet implemented in the compiler
     (define (even? x)
       (cond ((= x 0) #t)
 	    ((= x 1) #f)
-	    ((= x 2) #t)
-	    (else (odd? (- x 1)))))
+	    (else (even? (- x 2)))))
 
     (define (fib-iter a b p q count)
       (cond ((= count 0) b)

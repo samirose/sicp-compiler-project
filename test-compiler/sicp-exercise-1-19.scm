@@ -20,11 +20,14 @@
   (begin
     (define (square x) (* x x))
 
-    ;; Define even? iteratively as reminder operation is not yet implemented in the compiler
+    (define (even?-exp-neg x e)
+      (cond ((= x  0) #t)
+	    ((= x -1) #f)
+	    ((<= x e) (even?-exp-neg (- x e) (* e 2)))
+	    (else (even?-exp-neg x (/ e 2)))))
+
     (define (even? x)
-      (cond ((= x 0) #t)
-	    ((= x 1) #f)
-	    (else (even? (- x 2)))))
+      (even?-exp-neg (if (> x 0) (- x) x) -2))
 
     (define (fib-iter a b p q count)
       (cond ((= count 0) b)

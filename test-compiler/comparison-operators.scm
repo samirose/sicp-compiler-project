@@ -1,5 +1,5 @@
 (define-library
-  (test-comparison-operators)
+  (comparison-operators)
 
   (export
     all-with-single-argument-are-true

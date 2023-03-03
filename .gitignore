@@ -2,7 +2,7 @@
 *~
 \#*\#
 compiled/
-lib/
 build/
 log/
-test/
+test-compiler/host-log/
+test-compiler/wast-log/

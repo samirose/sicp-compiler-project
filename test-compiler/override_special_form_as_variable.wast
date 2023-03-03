@@ -1,7 +1,0 @@
-(assert_return (invoke "override-quote-let") (i32.const 42))
-(assert_return (invoke "override-quote-arg" (i32.const 41)) (i32.const 42))
-(assert_return (invoke "override-define-let") (i32.const 42))
-(assert_return (invoke "override-define-arg" (i32.const 41)) (i32.const 42))
-(assert_return (invoke "override-lambda-let") (i32.const 42))
-(assert_return (invoke "override-lambda-arg" (i32.const 41)) (i32.const 42))
-(assert_return (invoke "override-special-symbols-let*") (i32.const 42))

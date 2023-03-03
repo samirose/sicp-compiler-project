@@ -1,5 +1,5 @@
 (define-library
-  (test-local-let*)
+  (local-let-star)
 
   (export constant-let*
           expression-let*

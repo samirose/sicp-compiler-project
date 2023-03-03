@@ -1,5 +1,5 @@
 (define-library
-  (test-or)
+  (or)
 
   (export
     empty-or-is-false

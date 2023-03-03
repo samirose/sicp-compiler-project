@@ -1,5 +1,5 @@
 (define-library
-  (test-lambda)
+  (lambda)
 
   (import (scheme base))
 
@@ -7,7 +7,8 @@
           lambda-argument
           lambda-without-parameters
           lambda-parameters-shadow-globals
-          inner-lambda-parameters-shadow-outer)
+          inner-lambda-parameters-shadow-outer
+	  lambda-procedure-result)
 
   (begin
     (define (lambda-application)
@@ -29,5 +30,11 @@
       ((lambda (g) (+ g h)) 4))
 
     (define (inner-lambda-parameters-shadow-outer)
-      ((lambda (x) (+ 2 ((lambda (x) (* x x)) 3))) 4)))
+      ((lambda (x) (+ 2 ((lambda (x) (* x x)) 3))) 4))
+
+    (define (doubler)
+      (lambda (x) (* 2 x)))
+
+    (define (lambda-procedure-result)
+      ((doubler) 3)))
 )

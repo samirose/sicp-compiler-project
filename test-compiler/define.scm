@@ -1,5 +1,5 @@
 (define-library
-  (test-define)
+  (define)
 
   (export define-constants
           define-combinations

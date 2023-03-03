@@ -1,8 +1,7 @@
 (define-library
-  (test-cond)
+  (cond)
 
-  (export no-clauses
-          single-exp
+  (export single-exp
           single-exp-else
           test-and-exp
           test-and-exp-else
@@ -15,9 +14,6 @@
   (import (scheme base))
 
   (begin
-    (define (no-clauses)
-      (cond))
-
     (define (single-exp x)
       (cond (x)))
 

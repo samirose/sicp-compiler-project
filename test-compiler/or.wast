@@ -1,8 +1,0 @@
-(assert_return (invoke "empty-or-is-false") (i32.const 0))
-(assert_return (invoke "or-one-false-is-false") (i32.const 0))
-(assert_return (invoke "or-one-non-false-value-is-value") (i32.const 42))
-(assert_return (invoke "or-two-non-falses-is-first-value") (i32.const 1))
-(assert_return (invoke "or-any-non-false-is-non-false") (i32.const 1))
-(assert_return (invoke "or-with-complex-expressions") (i32.const 2))
-(assert_return (invoke "or-evaluates-expressions-from-left-to-right") (i32.const 3))
-(assert_return (invoke "or-true-short-circuits-to-true") (i32.const 2))

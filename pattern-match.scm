@@ -23,7 +23,7 @@
        ((boolean? pat) (eq? pat exp))
        ((symbol? pat) (eq? pat exp))
        ((number? pat) (and (number? exp) (= pat exp)))
-       ((string? pat) (and (string? exp) (eqv? pat exp)))
+       ((string? pat) (and (string? exp) (equal? pat exp)))
        (else (error "Pattern matching not supported for" exp))))
 
     (define (?? exp) #t)

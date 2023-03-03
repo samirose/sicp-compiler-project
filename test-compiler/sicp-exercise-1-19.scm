@@ -11,7 +11,7 @@
 ; -> p ́ = p^2 + q^2, q ́ = 2pq + q^2
 
 (define-library
-  (test-sicp-exercise-1.19)
+  (sicp-exercise-1-19)
 
   (export fib)
 
@@ -20,9 +20,14 @@
   (begin
     (define (square x) (* x x))
 
+    (define (even?-exp-neg x e)
+      (cond ((= x  0) #t)
+	    ((= x -1) #f)
+	    ((<= x e) (even?-exp-neg (- x e) (* e 2)))
+	    (else (even?-exp-neg x (/ e 2)))))
+
     (define (even? x)
-      ; Naive integers-only implementation
-      (= x (* 2 (/ x 2))))
+      (even?-exp-neg (if (> x 0) (- x) x) -2))
 
     (define (fib-iter a b p q count)
       (cond ((= count 0) b)

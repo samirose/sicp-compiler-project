@@ -1,5 +1,5 @@
 (define-library
-  (test-import)
+  (import)
 
   (import (scheme base))
 

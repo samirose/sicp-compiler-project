@@ -1,8 +1,0 @@
-(assert_return (invoke "empty-and-is-true") (i32.const 1))
-(assert_return (invoke "and-one-false-is-false") (i32.const 0))
-(assert_return (invoke "and-one-non-false-value-is-value") (i32.const 42))
-(assert_return (invoke "and-two-non-false-values-is-last-value") (i32.const 2))
-(assert_return (invoke "and-any-false-is-false") (i32.const 0))
-(assert_return (invoke "and-evaluates-expressions-from-left-to-right") (i32.const 3))
-(assert_return (invoke "and-with-complex-expressions") (i32.const 2))
-(assert_return (invoke "and-false-short-circuits-to-false") (i32.const 2))

@@ -55,9 +55,6 @@ $(COMPILER_BINARIES) : $(HOST_SCHEME_COMPILED_DIR)%.go : %.scm | $(HOST_SCHEME_C
 	GUILE_LOAD_COMPILED_PATH=$(HOST_SCHEME_COMPILED_DIR) $(HOST_SCHEME_COMPILE_MODULE) -o $@ $<
 
 TEST_COMPILER_DIR := test-compiler/
-COMPILER_TEST_MODULES := $(wildcard $(TEST_COMPILER_DIR)*.scm)
-COMPILER_TEST_TARGETS := $(COMPILER_TEST_MODULES:.scm=)
-COMPILER_TEST_LOGS = $(COMPILER_TEST_MODULES:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)log/%.log)
 COMPILER_TEST_PROGRAMS := $(wildcard $(TEST_COMPILER_DIR)test/*.scm)
 COMPILER_TEST_HOST_TARGETS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)%-host)
 COMPILER_TEST_HOST_LOGS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)host-log/%.log)
@@ -106,18 +103,23 @@ $(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)build/%-test.wast : $(TEST_COM
 	$(COMPILER_TEST_TO_WAST) < $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
-.PHONY : test-compiler $(COMPILER_TEST_TARGETS)
-test-compiler : $(COMPILER_TEST_LOGS) ## Executes the integration tests for the compiler
 
-$(COMPILER_TEST_TARGETS) : $(TEST_COMPILER_DIR)% : $(TEST_COMPILER_DIR)log/%.log
+COMPILER_TEST_DIRECT_TESTS := $(wildcard $(TEST_COMPILER_DIR)wast/*.wast)
+COMPILER_TEST_DIRECT_TARGETS := $(COMPILER_TEST_DIRECT_TESTS:%.wast=%)
+COMPILER_TEST_DIRECT_LOGS := $(COMPILER_TEST_DIRECT_TARGETS:$(TEST_COMPILER_DIR)wast/%=$(TEST_COMPILER_DIR)log/%.log)
 
-$(COMPILER_TEST_LOGS) : $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPILER_DIR)log/
+.PHONY : test-compiler-direct
+test-compiler-direct : $(COMPILER_TEST_DIRECT_LOGS) ## Executes integration tests for the compiler
+
+$(COMPILER_TEST_DIRECT_TARGETS) : $(TEST_COMPILER_DIR)wast/% : $(TEST_COMPILER_DIR)log/%.log
+
+$(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPILER_DIR)log/
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
 $(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/test-prelude.wast \
                                    $(TEST_COMPILER_DIR)build/%.wat \
-                                   $(TEST_COMPILER_DIR)%.wast \
+                                   $(TEST_COMPILER_DIR)wast/%.wast \
                                    | $(TEST_COMPILER_DIR)build/
 	cat $^ | wast2json - -o $@
 
@@ -157,7 +159,7 @@ $(UNIT_TEST_LOGS) : $(UNIT_TEST_BINARIES)
 $(UNIT_TEST_BINARIES) : $(COMPILER_BINARIES)
 
 .PHONY : test
-test : test-runtime test-unit test-compiler-host test-compiler-wast test-compiler ## Executes all tests
+test : test-runtime test-unit test-compiler-host test-compiler-wast test-compiler-direct ## Executes all tests
 
 .PHONY : clean
 clean : clean-test clean-compiler ## Removes test outputs and forces compiler re-compilation

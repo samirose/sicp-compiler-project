@@ -43,7 +43,7 @@
             ((pattern-match? `(if ,?? ,?? ,??) exp)
              (compile-if exp (cadr exp) (caddr exp) (cadddr exp) program lexical-env compile))
             ((pattern-match? `(if ,?? ,??) exp)
-             (compile-if exp (cadr exp) (caddr exp) #f program lexical-env compile))
+             (compile-if-no-alternate exp (cadr exp) (caddr exp) program lexical-env compile))
             ((pattern-match? `(cond (,?? ,??*) ,??*) exp)
              (compile-cond exp (cdr exp) program lexical-env compile))
             ((pattern-match? `(not ,??) exp)
@@ -263,10 +263,7 @@
     (define (compile-if exp test consequent alternate program lexical-env compile)
       (let* ((t-prog (compile test program lexical-env))
              (c-prog (compile consequent t-prog lexical-env))
-             (a-prog
-              (if alternate
-		  (compile alternate c-prog lexical-env)
-		  (compiled-program-with-value-code c-prog unspecified-value))))
+             (a-prog (compile alternate c-prog lexical-env)))
 	(compiled-program-with-value-code
 	 a-prog
 	 `(,@(compiled-program-value-code t-prog)
@@ -274,6 +271,18 @@
            ,@(compiled-program-value-code c-prog)
 	   else
            ,@(compiled-program-value-code a-prog)
+	   end))))
+
+    (define (compile-if-no-alternate exp test consequent program lexical-env compile)
+      (let* ((t-prog (compile test program lexical-env))
+             (c-prog (compile consequent t-prog lexical-env)))
+	(compiled-program-with-value-code
+	 c-prog
+	 `(,@(compiled-program-value-code t-prog)
+	   if (result i32)
+           ,@(compiled-program-value-code c-prog)
+	   else
+           ,unspecified-value
 	   end))))
 
     (define (compile-cond exp clauses program lexical-env compile)

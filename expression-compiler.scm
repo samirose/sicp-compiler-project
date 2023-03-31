@@ -9,6 +9,7 @@
           (lists)
           (scheme-syntax)
           (scheme-libraries)
+          (values)
           (pattern-match)
           (lexical-env)
           (compiled-program)
@@ -77,15 +78,6 @@
              (compile-application exp (car exp) (cdr exp) program lexical-env compile))
             (else
              (raise-compilation-error "Unknown expression type" exp))))
-
-;;;special values
-
-					; Uninitialized value should be distinguishable from valid values.
-					; Use zero for now until typing of primitive values is implemented.
-    (define uninitialized-value '(i32.const 0))
-
-					; Result of expressions for which Scheme defines an unspecified result
-    (define unspecified-value '(i32.const 0))
 
 ;;;lexical-env extensions
     (define (with-current-binding lexical-env variable)
@@ -161,7 +153,7 @@
               (compile value program lexical-env)))
 	(compiled-program-append-value-code
 	 program-with-value-computing-code
-	 `(,set-instr ,(var-index lexical-address) ,@unspecified-value))))
+	 `(,set-instr ,(var-index lexical-address) i32.const ,unspecified-value))))
 
     (define (compile-variable-definition exp variable value program lexical-env compile)
       (raise-compilation-error "Only top-level define is supported" exp))
@@ -282,7 +274,7 @@
 	   if (result i32)
            ,@(compiled-program-value-code c-prog)
 	   else
-           ,unspecified-value
+           i32.const ,unspecified-value
 	   end))))
 
     (define (compile-cond exp clauses program lexical-env compile)
@@ -297,7 +289,7 @@
                 (compiled-program-with-value-code
                  program
                  `(end
-                   ,unspecified-value)))
+                   i32.const ,unspecified-value)))
 	       ((pattern-match? `(,??) (car clauses))
                 (let*
                     ((env (if temp-var-index

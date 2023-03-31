@@ -13,20 +13,20 @@
   (import "scheme base" "boolean?" (func (;7;) (param i32) (result i32)))
   (import "scheme base" "procedure?" (func (;8;) (param i32) (result i32)))
   (import "scheme base" "eq?" (func (;9;) (param i32 i32) (result i32)))
-  (global (;2;) (mut i32) (i32.const 0))
-  (global (;3;) (mut i32) (i32.const 0))
-  (global (;4;) (mut i32) (i32.const 0))
-  (global (;5;) (mut i32) (i32.const 0))
-  (global (;6;) (mut i32) (i32.const 0))
-  (global (;7;) (mut i32) (i32.const 0))
-  (global (;8;) (mut i32) (i32.const 0))
-  (global (;9;) (mut i32) (i32.const 0))
-  (global (;10;) (mut i32) (i32.const 0))
-  (global (;11;) (mut i32) (i32.const 0))
-  (global (;12;) (mut i32) (i32.const 0))
-  (global (;13;) (mut i32) (i32.const 0))
-  (global (;14;) (mut i32) (i32.const 0))
-  (global (;15;) (mut i32) (i32.const 0))
+  (global (;2;) (mut i32) (i32.const 46))
+  (global (;3;) (mut i32) (i32.const 46))
+  (global (;4;) (mut i32) (i32.const 46))
+  (global (;5;) (mut i32) (i32.const 46))
+  (global (;6;) (mut i32) (i32.const 46))
+  (global (;7;) (mut i32) (i32.const 46))
+  (global (;8;) (mut i32) (i32.const 46))
+  (global (;9;) (mut i32) (i32.const 46))
+  (global (;10;) (mut i32) (i32.const 46))
+  (global (;11;) (mut i32) (i32.const 46))
+  (global (;12;) (mut i32) (i32.const 46))
+  (global (;13;) (mut i32) (i32.const 46))
+  (global (;14;) (mut i32) (i32.const 46))
+  (global (;15;) (mut i32) (i32.const 46))
   (func (;10;) (type 0) (param i32) (result i32)
     (local i32)
     block (result i32)  ;; label = @1
@@ -39,7 +39,7 @@
           drop
         end
       end
-      i32.const 0
+      i32.const 30
     end)
   (func (;11;) (type 0) (param i32) (result i32)
     (local i32)
@@ -78,7 +78,7 @@
           br 2 (;@1;)
         end
       end
-      i32.const 0
+      i32.const 30
     end)
   (func (;13;) (type 0) (param i32) (result i32)
     block (result i32)  ;; label = @1
@@ -185,7 +185,7 @@
           call 2
           i32.add
           local.set 1
-          i32.const 0
+          i32.const 30
           br 2 (;@1;)
         end
         block  ;; label = @3
@@ -204,7 +204,7 @@
           call 2
           i32.add
           local.set 1
-          i32.const 0
+          i32.const 30
           br 2 (;@1;)
         end
       end
@@ -214,7 +214,7 @@
       call 2
       i32.add
       local.set 1
-      i32.const 0
+      i32.const 30
     end
     drop
     local.get 1)
@@ -242,7 +242,7 @@
           call 2
           i32.add
           local.set 1
-          i32.const 0
+          i32.const 30
           drop
           local.get 1
           br 2 (;@1;)
@@ -263,7 +263,7 @@
           call 2
           i32.add
           local.set 1
-          i32.const 0
+          i32.const 30
           drop
           local.get 1
           br 2 (;@1;)
@@ -275,7 +275,7 @@
       call 2
       i32.add
       local.set 1
-      i32.const 0
+      i32.const 30
       drop
       local.get 1
     end)
@@ -344,39 +344,39 @@
     global.set 6
     i32.const 5
     global.set 7
-    i32.const 0
+    i32.const 30
     drop
     i32.const 6
     global.set 8
-    i32.const 0
+    i32.const 30
     drop
     i32.const 7
     global.set 9
-    i32.const 0
+    i32.const 30
     drop
     i32.const 8
     global.set 10
-    i32.const 0
+    i32.const 30
     drop
     i32.const 9
     global.set 11
-    i32.const 0
+    i32.const 30
     drop
     i32.const 10
     global.set 12
-    i32.const 0
+    i32.const 30
     drop
     i32.const 11
     global.set 13
-    i32.const 0
+    i32.const 30
     drop
     i32.const 12
     global.set 14
-    i32.const 0
+    i32.const 30
     drop
     i32.const 16
     global.set 15
-    i32.const 0
+    i32.const 30
     drop)
   (table (;0;) 17 funcref)
   (export "single-exp" (func 10))

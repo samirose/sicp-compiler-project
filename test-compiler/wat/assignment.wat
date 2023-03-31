@@ -13,26 +13,26 @@
   (import "scheme base" "boolean?" (func (;7;) (param i32) (result i32)))
   (import "scheme base" "procedure?" (func (;8;) (param i32) (result i32)))
   (import "scheme base" "eq?" (func (;9;) (param i32 i32) (result i32)))
-  (global (;2;) (mut i32) (i32.const 0))
-  (global (;3;) (mut i32) (i32.const 0))
-  (global (;4;) (mut i32) (i32.const 0))
-  (global (;5;) (mut i32) (i32.const 0))
-  (global (;6;) (mut i32) (i32.const 0))
-  (global (;7;) (mut i32) (i32.const 0))
-  (global (;8;) (mut i32) (i32.const 0))
-  (global (;9;) (mut i32) (i32.const 0))
-  (global (;10;) (mut i32) (i32.const 0))
-  (global (;11;) (mut i32) (i32.const 0))
-  (global (;12;) (mut i32) (i32.const 0))
-  (global (;13;) (mut i32) (i32.const 0))
-  (global (;14;) (mut i32) (i32.const 0))
-  (global (;15;) (mut i32) (i32.const 0))
+  (global (;2;) (mut i32) (i32.const 46))
+  (global (;3;) (mut i32) (i32.const 46))
+  (global (;4;) (mut i32) (i32.const 46))
+  (global (;5;) (mut i32) (i32.const 46))
+  (global (;6;) (mut i32) (i32.const 46))
+  (global (;7;) (mut i32) (i32.const 46))
+  (global (;8;) (mut i32) (i32.const 46))
+  (global (;9;) (mut i32) (i32.const 46))
+  (global (;10;) (mut i32) (i32.const 46))
+  (global (;11;) (mut i32) (i32.const 46))
+  (global (;12;) (mut i32) (i32.const 46))
+  (global (;13;) (mut i32) (i32.const 46))
+  (global (;14;) (mut i32) (i32.const 46))
+  (global (;15;) (mut i32) (i32.const 46))
   (func (;10;) (type 0) (param i32) (result i32)
     i32.const 10
     call 1
     call 2
     local.set 0
-    i32.const 0
+    i32.const 30
     drop
     local.get 0
     i32.const 3
@@ -55,7 +55,7 @@
     call 1
     call 2
     local.set 0
-    i32.const 0
+    i32.const 30
     drop
     local.get 0
     i32.const 3
@@ -67,7 +67,7 @@
     call 1
     call 2
     global.set 9
-    i32.const 0
+    i32.const 30
     drop
     global.get 9
     i32.const 3
@@ -83,7 +83,7 @@
     call 2
     i32.add
     global.set 11
-    i32.const 0)
+    i32.const 30)
   (func (;16;) (type 1) (result i32)
     global.get 14)
   (func (;17;) (type 0) (param i32) (result i32)
@@ -103,51 +103,51 @@
     global.set 6
     i32.const 6
     global.set 7
-    i32.const 0
+    i32.const 30
     drop
     i32.const 7
     global.set 8
-    i32.const 0
+    i32.const 30
     drop
     i32.const 5
     call 1
     call 2
     global.set 9
-    i32.const 0
+    i32.const 30
     drop
     i32.const 8
     global.set 10
-    i32.const 0
+    i32.const 30
     drop
     i32.const 0
     call 1
     call 2
     global.set 11
-    i32.const 0
+    i32.const 30
     drop
     i32.const 9
     global.set 12
-    i32.const 0
+    i32.const 30
     drop
     i32.const 10
     global.set 13
-    i32.const 0
+    i32.const 30
     drop
     i32.const 0
     call 1
     call 2
     global.set 14
-    i32.const 0
+    i32.const 30
     drop
     i32.const 11
     global.set 15
-    i32.const 0
+    i32.const 30
     drop
     i32.const 5
     call 1
     call 2
     global.set 11
-    i32.const 0
+    i32.const 30
     drop
     i32.const 11
     call 1
@@ -155,7 +155,7 @@
     i32.const 12
     call_indirect (type 0)
     global.set 14
-    i32.const 0
+    i32.const 30
     drop)
   (table (;0;) 13 funcref)
   (export "set!-local-lambda" (func 11))

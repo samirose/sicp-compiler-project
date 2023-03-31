@@ -12,6 +12,7 @@
           (compiled-program)
           (wasm-syntax)
           (pattern-match)
+          (values)
           (expression-compiler))
 
  ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R7RS-small
@@ -92,7 +93,7 @@
             (compiled-program-with-definitions-and-value-code
              program
              (make-list (+ (length func-import-bindings) (length definitions))
-			`(global (mut i32) ,uninitialized-value))
+			`(global (mut i32) (i32.const ,uninitialized-value)))
              '()))
            (imported-func-values-init-code
             (let loop ((bindings func-import-bindings)

@@ -2,7 +2,8 @@
         (scheme read)
 	(scheme write)
 	(only (srfi srfi-1) fold)
-	(pattern-match))
+	(pattern-match)
+        (values))
 
 (define (compile-value exp)
   (cond ((boolean? exp)
@@ -27,7 +28,7 @@
   (let ((name (cadr exp))
 	(test-exp (compile-test-exp (caddr exp))))
     `(,(string-append ";; " name)
-      (assert_return ,test-exp (i32.const 0)))))
+      (assert_return ,test-exp (i32.const ,unspecified-value)))))
 
 (define (value->string exp)
   (cond ((boolean? exp)

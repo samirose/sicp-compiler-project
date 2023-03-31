@@ -44,7 +44,7 @@ $(call binaries,assert scheme-libraries scheme-syntax scheme-r7rs-syntax : compi
 $(call binaries,compiled-program : counted-set definitions-table)
 $(call binaries,definitions-table : wasm-syntax counted-set)
 $(call binaries,scheme-libraries : compiled-program)
-$(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries)
+$(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries values)
 $(call binaries,module-compiler : expression-compiler scheme-r7rs-syntax)
 $(call binaries,driver : module-compiler)
 

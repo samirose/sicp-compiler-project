@@ -93,21 +93,21 @@
       (cond ((assq 'export (filter pair? (env-get-additional-info current-binding lexical-env))) => cadr)
             (else #f)))
 
-;;;compiled-program extensions
-    (define (call-import program module name)
-      `(call ,(lookup-import program 'func module name)))
+;;;runtime function call generation
+    (define (runtime-call program name)
+      `(call ,(lookup-import program 'func "scheme base" name)))
 
 ;;;simple expressions
 
     (define (compile-number exp program)
-      (let* ((call-i32->fixnum-index (call-import program "scheme base" "i32->fixnum"))
-             (call-fixnum->i32-index (call-import program "scheme base" "fixnum->i32")))
-	(compiled-program-with-value-code
-	 program
-	 (cond ((integer? exp)
-		`((i32.const ,exp) ,call-i32->fixnum-index ,call-fixnum->i32-index))
-               (else
-		(raise-compilation-error "Unsupported number" exp))))))
+      (compiled-program-with-value-code
+       program
+       (cond ((integer? exp)
+	      `((i32.const ,exp)
+                ,(runtime-call program "i32->fixnum")
+                ,(runtime-call program "fixnum->i32")))
+              (else
+	       (raise-compilation-error "Unsupported number" exp)))))
 
     (define (compile-boolean exp program)
       (compiled-program-with-value-code

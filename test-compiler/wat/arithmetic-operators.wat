@@ -30,6 +30,8 @@
   (global (;17;) (mut i32) (i32.const 46))
   (global (;18;) (mut i32) (i32.const 46))
   (global (;19;) (mut i32) (i32.const 46))
+  (global (;20;) (mut i32) (i32.const 46))
+  (global (;21;) (mut i32) (i32.const 46))
   (func (;10;) (type 0) (result i32)
     i32.const 0
     call 1
@@ -43,11 +45,15 @@
     call 1
     call 2)
   (func (;13;) (type 0) (result i32)
-    i32.const -2
+    i32.const 1
     call 1
-    call 2)
-  (func (;14;) (type 0) (result i32)
+    call 2
     i32.const 2
+    call 1
+    call 2
+    i32.add)
+  (func (;14;) (type 0) (result i32)
+    i32.const -2
     call 1
     call 2)
   (func (;15;) (type 0) (result i32)
@@ -57,8 +63,24 @@
     i32.const 2
     call 1
     call 2
-    i32.add)
+    i32.const 3
+    call 1
+    call 2
+    i32.add
+    i32.sub)
   (func (;16;) (type 0) (result i32)
+    i32.const 2
+    call 1
+    call 2)
+  (func (;17;) (type 0) (result i32)
+    i32.const 0
+    call 1
+    call 2
+    i32.const 2
+    call 1
+    call 2
+    i32.add)
+  (func (;18;) (type 0) (result i32)
     i32.const 1
     call 1
     call 2
@@ -66,7 +88,7 @@
     call 1
     call 2
     i32.add)
-  (func (;17;) (type 0) (result i32)
+  (func (;19;) (type 0) (result i32)
     i32.const 2
     call 1
     call 2
@@ -74,7 +96,7 @@
     call 1
     call 2
     i32.add)
-  (func (;18;) (type 0) (result i32)
+  (func (;20;) (type 0) (result i32)
     i32.const 2
     call 1
     call 2
@@ -82,7 +104,7 @@
     call 1
     call 2
     i32.add)
-  (func (;19;) (type 0) (result i32)
+  (func (;21;) (type 0) (result i32)
     i32.const 2
     call 1
     call 2
@@ -90,7 +112,7 @@
     call 1
     call 2
     i32.add)
-  (func (;20;) (type 0) (result i32)
+  (func (;22;) (type 0) (result i32)
     i32.const -2
     call 1
     call 2
@@ -98,7 +120,7 @@
     call 1
     call 2
     i32.add)
-  (func (;21;) (type 0) (result i32)
+  (func (;23;) (type 0) (result i32)
     i32.const 1
     call 1
     call 2
@@ -110,7 +132,7 @@
     call 1
     call 2
     i32.add)
-  (func (;22;) (type 0) (result i32)
+  (func (;24;) (type 0) (result i32)
     i32.const 2
     call 1
     call 2
@@ -154,7 +176,7 @@
     call 2
     i32.add
     i32.add)
-  (func (;23;)
+  (func (;25;)
     i32.const 0
     global.set 2
     i32.const 1
@@ -216,23 +238,33 @@
     i32.const 17
     global.set 19
     i32.const 30
+    drop
+    i32.const 18
+    global.set 20
+    i32.const 30
+    drop
+    i32.const 19
+    global.set 21
+    i32.const 30
     drop)
-  (table (;0;) 18 funcref)
+  (table (;0;) 20 funcref)
   (export "plus-identity" (func 10))
   (export "multiply-identity" (func 11))
   (export "plus-single" (func 12))
-  (export "minus-single" (func 13))
-  (export "multiply-single" (func 14))
-  (export "plus-zero-to-positive" (func 15))
-  (export "plus-positive-result" (func 16))
-  (export "signed-plus-positive-result" (func 17))
-  (export "signed-plus-zero-result" (func 18))
-  (export "signed-plus-negative-result" (func 19))
-  (export "plus-zero-to-negative" (func 20))
-  (export "plus-multiple" (func 21))
-  (export "complex" (func 22))
-  (start 23)
-  (elem (;0;) (i32.const 0) func 3 4 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22)
+  (export "plus-single-expr" (func 13))
+  (export "minus-single" (func 14))
+  (export "minus-single-expr" (func 15))
+  (export "multiply-single" (func 16))
+  (export "plus-zero-to-positive" (func 17))
+  (export "plus-positive-result" (func 18))
+  (export "signed-plus-positive-result" (func 19))
+  (export "signed-plus-zero-result" (func 20))
+  (export "signed-plus-negative-result" (func 21))
+  (export "plus-zero-to-negative" (func 22))
+  (export "plus-multiple" (func 23))
+  (export "complex" (func 24))
+  (start 25)
+  (elem (;0;) (i32.const 0) func 3 4 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24)
   (type (;1;) (func (param i32) (result i32)))
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

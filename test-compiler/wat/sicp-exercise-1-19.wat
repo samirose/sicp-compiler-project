@@ -26,8 +26,11 @@
   (global (;11;) (mut i32) (i32.const 46))
   (func (;10;) (type 0) (param i32) (result i32)
     local.get 0
+    call 2
     local.get 0
-    i32.mul)
+    call 2
+    i32.mul
+    call 1)
   (func (;11;) (type 1) (param i32 i32) (result i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
@@ -36,7 +39,6 @@
             local.get 0
             i32.const 0
             call 1
-            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -49,7 +51,6 @@
             local.get 0
             i32.const -1
             call 1
-            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -66,13 +67,18 @@
             br 1 (;@3;)
           end
           local.get 0
+          call 2
           local.get 1
+          call 2
           i32.sub
+          call 1
           local.get 1
+          call 2
           i32.const 2
           call 1
           call 2
           i32.mul
+          call 1
           global.get 8
           call_indirect (type 1)
           br 2 (;@1;)
@@ -80,10 +86,12 @@
       end
       local.get 0
       local.get 1
+      call 2
       i32.const 2
       call 1
       call 2
       i32.div_s
+      call 1
       global.get 8
       call_indirect (type 1)
     end)
@@ -91,20 +99,20 @@
     local.get 0
     i32.const 0
     call 1
-    call 2
     i32.gt_s
     if (result i32)  ;; label = @1
       i32.const 0
       call 1
       call 2
       local.get 0
+      call 2
       i32.sub
+      call 1
     else
       local.get 0
     end
     i32.const -2
     call 1
-    call 2
     global.get 8
     call_indirect (type 1))
   (func (;13;) (type 2) (param i32 i32 i32 i32 i32) (result i32)
@@ -115,7 +123,6 @@
             local.get 4
             i32.const 0
             call 1
-            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -136,72 +143,103 @@
           local.get 2
           global.get 7
           call_indirect (type 0)
+          call 2
           local.get 3
           global.get 7
           call_indirect (type 0)
+          call 2
           i32.add
+          call 1
           i32.const 2
           call 1
           call 2
           local.get 2
+          call 2
           i32.mul
           local.get 3
+          call 2
           i32.mul
+          call 1
+          call 2
           local.get 3
           global.get 7
           call_indirect (type 0)
+          call 2
           i32.add
+          call 1
           local.get 4
+          call 2
           i32.const 2
           call 1
           call 2
           i32.div_s
+          call 1
           global.get 10
           call_indirect (type 2)
           br 2 (;@1;)
         end
       end
       local.get 1
+      call 2
       local.get 3
+      call 2
       i32.mul
+      call 1
+      call 2
       local.get 0
+      call 2
       local.get 3
+      call 2
       i32.mul
+      call 1
+      call 2
       i32.add
       local.get 0
+      call 2
       local.get 2
+      call 2
       i32.mul
+      call 1
+      call 2
       i32.add
+      call 1
       local.get 1
+      call 2
       local.get 2
+      call 2
       i32.mul
+      call 1
+      call 2
       local.get 0
+      call 2
       local.get 3
+      call 2
       i32.mul
+      call 1
+      call 2
       i32.add
+      call 1
       local.get 2
       local.get 3
       local.get 4
+      call 2
       i32.const 1
       call 1
       call 2
       i32.sub
+      call 1
       global.get 10
       call_indirect (type 2)
     end)
   (func (;14;) (type 0) (param i32) (result i32)
     i32.const 1
     call 1
-    call 2
     i32.const 0
     call 1
-    call 2
     i32.const 0
     call 1
-    call 2
     i32.const 1
     call 1
-    call 2
     local.get 0
     global.get 10
     call_indirect (type 2))

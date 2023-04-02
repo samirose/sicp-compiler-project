@@ -34,16 +34,13 @@
   (global (;21;) (mut i32) (i32.const 46))
   (func (;10;) (type 0) (result i32)
     i32.const 0
-    call 1
-    call 2)
+    call 1)
   (func (;11;) (type 0) (result i32)
     i32.const 1
-    call 1
-    call 2)
+    call 1)
   (func (;12;) (type 0) (result i32)
     i32.const 2
-    call 1
-    call 2)
+    call 1)
   (func (;13;) (type 0) (result i32)
     i32.const 1
     call 1
@@ -51,11 +48,11 @@
     i32.const 2
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;14;) (type 0) (result i32)
     i32.const -2
-    call 1
-    call 2)
+    call 1)
   (func (;15;) (type 0) (result i32)
     i32.const 0
     call 1
@@ -67,11 +64,13 @@
     call 1
     call 2
     i32.add
-    i32.sub)
+    call 1
+    call 2
+    i32.sub
+    call 1)
   (func (;16;) (type 0) (result i32)
     i32.const 2
-    call 1
-    call 2)
+    call 1)
   (func (;17;) (type 0) (result i32)
     i32.const 0
     call 1
@@ -79,7 +78,8 @@
     i32.const 2
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;18;) (type 0) (result i32)
     i32.const 1
     call 1
@@ -87,7 +87,8 @@
     i32.const 2
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;19;) (type 0) (result i32)
     i32.const 2
     call 1
@@ -95,7 +96,8 @@
     i32.const -1
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;20;) (type 0) (result i32)
     i32.const 2
     call 1
@@ -103,7 +105,8 @@
     i32.const -2
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;21;) (type 0) (result i32)
     i32.const 2
     call 1
@@ -111,7 +114,8 @@
     i32.const -3
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;22;) (type 0) (result i32)
     i32.const -2
     call 1
@@ -119,7 +123,8 @@
     i32.const 0
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;23;) (type 0) (result i32)
     i32.const 1
     call 1
@@ -131,7 +136,8 @@
     i32.const 3
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;24;) (type 0) (result i32)
     i32.const 2
     call 1
@@ -144,6 +150,8 @@
     call 1
     call 2
     i32.mul
+    call 1
+    call 2
     i32.const 3
     call 1
     call 2
@@ -152,6 +160,8 @@
     call 1
     call 2
     i32.div_s
+    call 1
+    call 2
     i32.const 0
     call 1
     call 2
@@ -166,7 +176,11 @@
     call 1
     call 2
     i32.add
+    call 1
+    call 2
     i32.sub
+    call 1
+    call 2
     i32.add
     i32.const 1
     call 1
@@ -175,7 +189,10 @@
     call 1
     call 2
     i32.add
-    i32.add)
+    call 1
+    call 2
+    i32.add
+    call 1)
   (func (;25;)
     i32.const 0
     global.set 2

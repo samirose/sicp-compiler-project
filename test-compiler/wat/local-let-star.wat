@@ -34,13 +34,14 @@
     (local i32)
     i32.const 2
     call 1
-    call 2
     local.set 0
     i32.const 40
     call 1
     call 2
     local.get 0
-    i32.add)
+    call 2
+    i32.add
+    call 1)
   (func (;11;) (type 0) (result i32)
     (local i32 i32)
     i32.const 2
@@ -50,84 +51,99 @@
     call 1
     call 2
     i32.mul
+    call 1
     local.set 0
     i32.const 5
     call 1
     call 2
     local.get 0
+    call 2
     i32.mul
+    call 1
     local.set 1
     local.get 1)
   (func (;12;) (type 0) (result i32)
     (local i32 i32 i32)
     i32.const 2
     call 1
-    call 2
     local.set 0
     i32.const 3
     call 1
-    call 2
     local.set 1
     i32.const 5
     call 1
-    call 2
     local.set 2
     local.get 0
+    call 2
     local.get 2
-    i32.mul)
+    call 2
+    i32.mul
+    call 1)
   (func (;13;) (type 1) (param i32) (result i32)
     (local i32)
     i32.const 2
     call 1
-    call 2
     local.set 1
     local.get 1
+    call 2
     local.get 0
-    i32.mul)
+    call 2
+    i32.mul
+    call 1)
   (func (;14;) (type 0) (result i32)
     i32.const 5
     call 1
-    call 2
     i32.const 8
     call_indirect (type 1))
   (func (;15;) (type 1) (param i32) (result i32)
     (local i32)
     local.get 0
+    call 2
     i32.const 2
     call 1
     call 2
     i32.mul
+    call 1
     local.set 1
     local.get 1
+    call 2
     local.get 0
-    i32.mul)
+    call 2
+    i32.mul
+    call 1)
   (func (;16;) (type 0) (result i32)
     i32.const 3
     call 1
-    call 2
     i32.const 10
     call_indirect (type 1))
   (func (;17;) (type 1) (param i32) (result i32)
     (local i32)
     local.get 0
+    call 2
     i32.const 2
     call 1
     call 2
     i32.mul
+    call 1
     local.set 1
     local.get 1
+    call 2
     local.get 1
-    i32.mul)
+    call 2
+    i32.mul
+    call 1)
   (func (;18;) (type 0) (result i32)
     i32.const 3
     call 1
-    call 2
     i32.const 12
     call_indirect (type 1))
   (func (;19;) (type 1) (param i32) (result i32)
     local.get 0
+    call 2
     local.get 0
-    i32.add)
+    call 2
+    i32.add
+    call 1)
   (func (;20;) (type 0) (result i32)
     (local i32 i32)
     i32.const 2
@@ -137,6 +153,7 @@
     call 1
     call 2
     i32.mul
+    call 1
     local.set 0
     i32.const 14
     local.set 1
@@ -147,35 +164,41 @@
     (local i32 i32 i32)
     i32.const 1
     call 1
-    call 2
     local.set 0
     i32.const 2
     call 1
-    call 2
     local.set 1
     local.get 0
+    call 2
     local.get 1
+    call 2
     i32.add
     i32.const 3
     call 1
     call 2
     i32.add
+    call 1
     local.set 2
     local.get 2
     local.set 0
     i32.const 30
     drop
     local.get 2
+    call 2
     i32.const 1
     call 1
     call 2
     i32.add
+    call 1
     local.set 2
     i32.const 30
     drop
     local.get 0
+    call 2
     local.get 2
-    i32.add)
+    call 2
+    i32.add
+    call 1)
   (func (;22;) (type 0) (result i32)
     global.get 15)
   (func (;23;) (type 0) (result i32)
@@ -226,17 +249,21 @@
     drop
     i32.const 2
     call 1
-    call 2
     local.set 0
     local.get 0
+    call 2
     i32.const 1
     call 1
     call 2
     i32.add
+    call 1
     local.set 1
     local.get 0
+    call 2
     local.get 1
+    call 2
     i32.add
+    call 1
     global.set 15
     i32.const 30
     drop
@@ -246,7 +273,6 @@
     drop
     i32.const 0
     call 1
-    call 2
     global.set 17
     i32.const 30
     drop
@@ -256,19 +282,20 @@
     drop
     i32.const 2
     call 1
-    call 2
     local.set 0
     i32.const 3
     call 1
-    call 2
     local.set 1
     local.get 0
+    call 2
     local.get 1
+    call 2
     i32.add
     i32.const 4
     call 1
     call 2
     i32.add
+    call 1
     local.set 2
     local.get 2
     global.set 17

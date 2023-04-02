@@ -32,21 +32,18 @@
     i32.const 0)
   (func (;12;) (type 0) (result i32)
     i32.const 42
-    call 1
-    call 2)
+    call 1)
   (func (;13;) (type 0) (result i32)
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
         i32.const 1
         call 1
-        call 2
         local.tee 0
         br_if 1 (;@1;)
       end
       i32.const 2
       call 1
-      call 2
       local.set 0
     end
     local.get 0)
@@ -60,7 +57,6 @@
       end
       i32.const 2
       call 1
-      call 2
       local.set 0
     end
     local.get 0
@@ -69,7 +65,6 @@
         block  ;; label = @3
           i32.const 1
           call 1
-          call 2
           local.tee 0
           br_if 1 (;@2;)
         end
@@ -110,22 +105,23 @@
         call 1
         call 2
         i32.add
+        call 1
         i32.const 2
         call 1
-        call 2
         i32.gt_s
         local.tee 0
         br_if 1 (;@1;)
       end
       i32.const 1
       call 1
-      call 2
       local.set 1
       local.get 1
+      call 2
       i32.const 2
       call 1
       call 2
       i32.mul
+      call 1
       local.set 0
     end
     local.get 0)
@@ -133,20 +129,17 @@
     (local i32 i32)
     i32.const 0
     call 1
-    call 2
     local.set 0
     block  ;; label = @1
       block  ;; label = @2
         i32.const 1
         call 1
-        call 2
         local.set 0
         i32.const 30
         drop
         local.get 0
         i32.const 1
         call 1
-        call 2
         i32.gt_s
         local.tee 1
         br_if 1 (;@1;)
@@ -154,27 +147,23 @@
       block  ;; label = @2
         i32.const 2
         call 1
-        call 2
         local.set 0
         i32.const 30
         drop
         local.get 0
         i32.const 2
         call 1
-        call 2
         i32.gt_s
         local.tee 1
         br_if 1 (;@1;)
       end
       i32.const 3
       call 1
-      call 2
       local.set 0
       i32.const 30
       drop
       i32.const 3
       call 1
-      call 2
       local.set 1
     end
     local.get 1
@@ -187,13 +176,11 @@
     (local i32 i32)
     i32.const 0
     call 1
-    call 2
     local.set 0
     block  ;; label = @1
       block  ;; label = @2
         i32.const 1
         call 1
-        call 2
         local.set 0
         i32.const 30
         drop
@@ -204,25 +191,21 @@
       block  ;; label = @2
         i32.const 2
         call 1
-        call 2
         local.set 0
         i32.const 30
         drop
         i32.const 2
         call 1
-        call 2
         local.tee 1
         br_if 1 (;@1;)
       end
       i32.const 3
       call 1
-      call 2
       local.set 0
       i32.const 30
       drop
       i32.const 3
       call 1
-      call 2
       local.set 1
     end
     local.get 1

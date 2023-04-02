@@ -25,20 +25,28 @@
   (global (;10;) (mut i32) (i32.const 46))
   (func (;10;) (type 0) (result i32)
     i32.const 42
-    call 1
-    call 2)
+    call 1)
   (func (;11;) (type 1) (param i32) (result i32)
     local.get 0
+    call 2
     local.get 0
-    i32.mul)
+    call 2
+    i32.mul
+    call 1)
   (func (;12;) (type 2) (param i32 i32) (result i32)
     local.get 0
+    call 2
     local.get 1
-    i32.sub)
+    call 2
+    i32.sub
+    call 1)
   (func (;13;) (type 1) (param i32) (result i32)
     local.get 0
+    call 2
     local.get 0
-    i32.add)
+    call 2
+    i32.add
+    call 1)
   (func (;14;)
     i32.const 0
     global.set 2

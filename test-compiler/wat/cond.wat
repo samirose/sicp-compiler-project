@@ -55,7 +55,6 @@
       end
       i32.const 2
       call 1
-      call 2
     end)
   (func (;12;) (type 0) (param i32) (result i32)
     block (result i32)  ;; label = @1
@@ -65,16 +64,17 @@
             local.get 0
             i32.const 1
             call 1
-            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
           local.get 0
+          call 2
           i32.const 1
           call 1
           call 2
           i32.add
+          call 1
           br 2 (;@1;)
         end
       end
@@ -88,24 +88,27 @@
             local.get 0
             i32.const 10
             call 1
-            call 2
             i32.lt_s
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
           local.get 0
+          call 2
           i32.const 1
           call 1
           call 2
           i32.add
+          call 1
           br 2 (;@1;)
         end
       end
       local.get 0
+      call 2
       i32.const 1
       call 1
       call 2
       i32.sub
+      call 1
     end)
   (func (;14;) (type 1) (result i32)
     block (result i32)  ;; label = @1
@@ -113,7 +116,6 @@
       end
       i32.const 42
       call 1
-      call 2
     end)
   (func (;15;) (type 0) (param i32) (result i32)
     block (result i32)  ;; label = @1
@@ -123,7 +125,6 @@
             local.get 0
             i32.const 10
             call 1
-            call 2
             i32.lt_s
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -135,37 +136,38 @@
                   local.get 0
                   i32.const 0
                   call 1
-                  call 2
                   i32.gt_s
                   br_if 0 (;@7;)
                   br 1 (;@6;)
                 end
                 local.get 0
+                call 2
                 i32.const 1
                 call 1
                 call 2
                 i32.add
+                call 1
                 br 2 (;@4;)
               end
             end
             i32.const 0
             call 1
-            call 2
           end
           br 2 (;@1;)
         end
       end
       local.get 0
+      call 2
       i32.const 1
       call 1
       call 2
       i32.sub
+      call 1
     end)
   (func (;16;) (type 0) (param i32) (result i32)
     (local i32)
     i32.const 0
     call 1
-    call 2
     local.set 1
     block (result i32)  ;; label = @1
       block  ;; label = @2
@@ -174,16 +176,17 @@
             local.get 0
             i32.const 1
             call 1
-            call 2
             i32.gt_s
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
           local.get 1
+          call 2
           i32.const 2
           call 1
           call 2
           i32.add
+          call 1
           local.set 1
           i32.const 30
           br 2 (;@1;)
@@ -193,26 +196,29 @@
             local.get 0
             i32.const 0
             call 1
-            call 2
             i32.gt_s
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
           local.get 1
+          call 2
           i32.const 1
           call 1
           call 2
           i32.add
+          call 1
           local.set 1
           i32.const 30
           br 2 (;@1;)
         end
       end
       local.get 1
+      call 2
       i32.const 3
       call 1
       call 2
       i32.add
+      call 1
       local.set 1
       i32.const 30
     end
@@ -222,7 +228,6 @@
     (local i32)
     i32.const 0
     call 1
-    call 2
     local.set 1
     block (result i32)  ;; label = @1
       block  ;; label = @2
@@ -231,16 +236,17 @@
             local.get 0
             i32.const 1
             call 1
-            call 2
             i32.gt_s
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
           local.get 1
+          call 2
           i32.const 2
           call 1
           call 2
           i32.add
+          call 1
           local.set 1
           i32.const 30
           drop
@@ -252,16 +258,17 @@
             local.get 0
             i32.const 0
             call 1
-            call 2
             i32.gt_s
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
           local.get 1
+          call 2
           i32.const 1
           call 1
           call 2
           i32.add
+          call 1
           local.set 1
           i32.const 30
           drop
@@ -270,10 +277,12 @@
         end
       end
       local.get 1
+      call 2
       i32.const 3
       call 1
       call 2
       i32.add
+      call 1
       local.set 1
       i32.const 30
       drop
@@ -281,22 +290,28 @@
     end)
   (func (;18;) (type 0) (param i32) (result i32)
     local.get 0
+    call 2
     i32.const 2
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;19;) (type 0) (param i32) (result i32)
     local.get 0
+    call 2
     i32.const 1
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;20;) (type 0) (param i32) (result i32)
     local.get 0
+    call 2
     i32.const 3
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;21;) (type 0) (param i32) (result i32)
     local.get 0
     block (result i32)  ;; label = @1
@@ -306,7 +321,6 @@
             local.get 0
             i32.const 1
             call 1
-            call 2
             i32.gt_s
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -319,7 +333,6 @@
             local.get 0
             i32.const 0
             call 1
-            call 2
             i32.gt_s
             br_if 0 (;@4;)
             br 1 (;@3;)

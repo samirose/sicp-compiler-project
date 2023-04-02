@@ -20,8 +20,7 @@
   (global (;7;) (mut i32) (i32.const 46))
   (func (;10;) (type 0) (param i32) (result i32)
     i32.const 42
-    call 1
-    call 2)
+    call 1)
   (func (;11;)
     i32.const 0
     global.set 2

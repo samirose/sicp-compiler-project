@@ -35,59 +35,59 @@
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
-      call 2
     else
       i32.const 2
       call 1
-      call 2
     end)
   (func (;11;) (type 0) (result i32)
     i32.const 1
     call 1
-    call 2
     global.set 7
     i32.const 30
     drop
     global.get 7
     i32.const 1
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       global.get 7
     else
       global.get 7
+      call 2
       i32.const 1
       call 1
       call 2
       i32.add
+      call 1
     end)
   (func (;12;) (type 0) (result i32)
     i32.const 0
     call 1
-    call 2
     global.set 7
     i32.const 30
     drop
     global.get 7
     i32.const 0
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       global.get 7
+      call 2
       i32.const 1
       call 1
       call 2
       i32.add
+      call 1
       global.set 7
       i32.const 30
     else
       global.get 7
+      call 2
       i32.const 2
       call 1
       call 2
       i32.add
+      call 1
       global.set 7
       i32.const 30
     end
@@ -96,21 +96,21 @@
   (func (;13;) (type 0) (result i32)
     i32.const 1
     call 1
-    call 2
     global.set 7
     i32.const 30
     drop
     global.get 7
     i32.const 1
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       global.get 7
+      call 2
       i32.const 2
       call 1
       call 2
       i32.add
+      call 1
       global.set 7
       i32.const 30
     else
@@ -123,59 +123,59 @@
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
-      call 2
     else
       i32.const 2
       call 1
-      call 2
     end)
   (func (;15;) (type 0) (result i32)
     i32.const 1
     call 1
-    call 2
     global.set 7
     i32.const 30
     drop
     global.get 7
     i32.const 1
     call 1
-    call 2
     i32.gt_s
     if (result i32)  ;; label = @1
       global.get 7
     else
       global.get 7
+      call 2
       i32.const 1
       call 1
       call 2
       i32.add
+      call 1
     end)
   (func (;16;) (type 0) (result i32)
     i32.const 0
     call 1
-    call 2
     global.set 7
     i32.const 30
     drop
     global.get 7
     i32.const 1
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       global.get 7
+      call 2
       i32.const 2
       call 1
       call 2
       i32.add
+      call 1
       global.set 7
       i32.const 30
     else
       global.get 7
+      call 2
       i32.const 1
       call 1
       call 2
       i32.add
+      call 1
       global.set 7
       i32.const 30
     end
@@ -184,21 +184,21 @@
   (func (;17;) (type 0) (result i32)
     i32.const 1
     call 1
-    call 2
     global.set 7
     i32.const 30
     drop
     global.get 7
     i32.const 1
     call 1
-    call 2
     i32.gt_s
     if (result i32)  ;; label = @1
       global.get 7
+      call 2
       i32.const 2
       call 1
       call 2
       i32.add
+      call 1
       global.set 7
       i32.const 30
     else
@@ -210,86 +210,80 @@
     local.get 0
     i32.const 0
     call 1
-    call 2
     i32.gt_s)
   (func (;19;) (type 0) (result i32)
     i32.const 1
     call 1
-    call 2
     i32.const 13
     call_indirect (type 1)
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
-      call 2
     else
       i32.const 2
       call 1
-      call 2
     end)
   (func (;20;) (type 1) (param i32) (result i32)
     local.get 0
     i32.const 0
     call 1
-    call 2
     i32.gt_s)
   (func (;21;) (type 1) (param i32) (result i32)
     local.get 0
+    call 2
     i32.const 1
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;22;) (type 0) (result i32)
     i32.const 1
     call 1
-    call 2
     i32.const 15
     call_indirect (type 1)
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
-      call 2
       i32.const 16
       call_indirect (type 1)
     else
       i32.const 3
       call 1
-      call 2
     end)
   (func (;23;) (type 1) (param i32) (result i32)
     local.get 0
     i32.const 0
     call 1
-    call 2
     i32.gt_s)
   (func (;24;) (type 1) (param i32) (result i32)
     local.get 0
+    call 2
     i32.const 1
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;25;) (type 1) (param i32) (result i32)
     local.get 0
+    call 2
     i32.const 2
     call 1
     call 2
-    i32.add)
+    i32.add
+    call 1)
   (func (;26;) (type 0) (result i32)
     i32.const 0
     call 1
-    call 2
     i32.const 18
     call_indirect (type 1)
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
-      call 2
       i32.const 19
       call_indirect (type 1)
     else
       i32.const 2
       call 1
-      call 2
       i32.const 20
       call_indirect (type 1)
     end)
@@ -306,7 +300,6 @@
     global.set 6
     i32.const 1
     call 1
-    call 2
     global.set 7
     i32.const 30
     drop

@@ -9,7 +9,7 @@
   (cond ((boolean? exp)
 	 `(i32.const ,(if exp 1 0)))
 	((number? exp)
-	 `(i32.const ,exp))
+	 `(i32.const ,(number->fixnum-value exp)))
 	(else (error "Unsupported value" exp))))
 
 (define (compile-test-exp exp)

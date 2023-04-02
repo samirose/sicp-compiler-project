@@ -103,9 +103,7 @@
       (compiled-program-with-value-code
        program
        (cond ((integer? exp)
-	      `((i32.const ,exp)
-                ,(runtime-call program "i32->fixnum")
-                ,(runtime-call program "fixnum->i32")))
+	      `((i32.const ,exp) ,(runtime-call program "i32->fixnum")))
               (else
 	       (raise-compilation-error "Unsupported number" exp)))))
 
@@ -189,8 +187,12 @@
 
     (define (compile-open-coded-arithmetic-exp exp operator operands program lexical-env compile)
       (let* ((instr (cadr (assq operator arithmetic-operator-map)))
+             (call-fixnum->i32 (runtime-call program "fixnum->i32"))
+             (call-i32->fixnum (runtime-call program "i32->fixnum"))
              (program-with-first-value-computing-code
-              (compile (car operands) program lexical-env)))
+              (compiled-program-append-value-code
+               (compile (car operands) program lexical-env)
+               call-fixnum->i32)))
 	(compiled-program-append-value-codes
 	 program-with-first-value-computing-code
 	 (let compile-rest-arguments
@@ -199,9 +201,11 @@
 	   (let ((program-with-next-value-computing-code
 		  (compiled-program-append-value-code
 		   (compile (car operands) program lexical-env)
-		   instr)))
+		   (append call-fixnum->i32 instr))))
              (if (null? (cdr operands))
-		 program-with-next-value-computing-code
+                 (compiled-program-append-value-code
+		  program-with-next-value-computing-code
+                  call-i32->fixnum)
 		 (compiled-program-append-value-codes
 		  program-with-next-value-computing-code
 		  (compile-rest-arguments program-with-next-value-computing-code (cdr operands)))))))))

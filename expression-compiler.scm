@@ -224,12 +224,20 @@
       (memq sym comparison-operators))
 
     (define (compile-binary-operator instr operand1 operand2 program lexical-env compile)
-      (let* ((operand1-program
-              (compile operand1 program lexical-env))
+      (let* ((call-check-fixnum (runtime-call program "check-fixnum"))
+             (operand1-program
+              (compiled-program-append-value-code
+               (compile operand1 program lexical-env)
+               ;; just a type check is enough as fixnum encoding does not affect the numeric comparison result
+               call-check-fixnum))
+             (operand2-program
+              (compiled-program-append-value-code
+               (compile operand2 operand1-program lexical-env)
+               ;; just a type check is enough as fixnum encoding does not affect the numeric comparison result
+               call-check-fixnum))
              (operands-program
               (compiled-program-append-value-codes
-               operand1-program
-               (compile operand2 operand1-program lexical-env))))
+               operand1-program operand2-program)))
 	(compiled-program-append-value-code
 	 operands-program
 	 instr)))

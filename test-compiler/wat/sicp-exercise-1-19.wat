@@ -6,14 +6,15 @@
   (import "scheme base" "uninitialized-value" (global (;1;) i32))
   (import "scheme base" "get-error-code" (func (;0;) (result i32)))
   (import "scheme base" "i32->fixnum" (func (;1;) (param i32) (result i32)))
-  (import "scheme base" "fixnum->i32" (func (;2;) (param i32) (result i32)))
-  (import "scheme base" "number?" (func (;3;) (param i32) (result i32)))
-  (import "scheme base" "zero?" (func (;4;) (param i32) (result i32)))
-  (import "scheme base" "i32->boolean" (func (;5;) (param i32) (result i32)))
-  (import "scheme base" "boolean->i32" (func (;6;) (param i32) (result i32)))
-  (import "scheme base" "boolean?" (func (;7;) (param i32) (result i32)))
-  (import "scheme base" "procedure?" (func (;8;) (param i32) (result i32)))
-  (import "scheme base" "eq?" (func (;9;) (param i32 i32) (result i32)))
+  (import "scheme base" "check-fixnum" (func (;2;) (param i32) (result i32)))
+  (import "scheme base" "fixnum->i32" (func (;3;) (param i32) (result i32)))
+  (import "scheme base" "number?" (func (;4;) (param i32) (result i32)))
+  (import "scheme base" "zero?" (func (;5;) (param i32) (result i32)))
+  (import "scheme base" "i32->boolean" (func (;6;) (param i32) (result i32)))
+  (import "scheme base" "boolean->i32" (func (;7;) (param i32) (result i32)))
+  (import "scheme base" "boolean?" (func (;8;) (param i32) (result i32)))
+  (import "scheme base" "procedure?" (func (;9;) (param i32) (result i32)))
+  (import "scheme base" "eq?" (func (;10;) (param i32 i32) (result i32)))
   (global (;2;) (mut i32) (i32.const 46))
   (global (;3;) (mut i32) (i32.const 46))
   (global (;4;) (mut i32) (i32.const 46))
@@ -24,21 +25,23 @@
   (global (;9;) (mut i32) (i32.const 46))
   (global (;10;) (mut i32) (i32.const 46))
   (global (;11;) (mut i32) (i32.const 46))
-  (func (;10;) (type 0) (param i32) (result i32)
+  (func (;11;) (type 0) (param i32) (result i32)
     local.get 0
-    call 2
+    call 3
     local.get 0
-    call 2
+    call 3
     i32.mul
     call 1)
-  (func (;11;) (type 1) (param i32 i32) (result i32)
+  (func (;12;) (type 1) (param i32 i32) (result i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
           block  ;; label = @4
             local.get 0
+            call 2
             i32.const 0
             call 1
+            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -49,8 +52,10 @@
         block  ;; label = @3
           block  ;; label = @4
             local.get 0
+            call 2
             i32.const -1
             call 1
+            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -61,22 +66,24 @@
         block  ;; label = @3
           block  ;; label = @4
             local.get 0
+            call 2
             local.get 1
+            call 2
             i32.le_s
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
           local.get 0
-          call 2
+          call 3
           local.get 1
-          call 2
+          call 3
           i32.sub
           call 1
           local.get 1
-          call 2
+          call 3
           i32.const 2
           call 1
-          call 2
+          call 3
           i32.mul
           call 1
           global.get 8
@@ -86,26 +93,28 @@
       end
       local.get 0
       local.get 1
-      call 2
+      call 3
       i32.const 2
       call 1
-      call 2
+      call 3
       i32.div_s
       call 1
       global.get 8
       call_indirect (type 1)
     end)
-  (func (;12;) (type 0) (param i32) (result i32)
+  (func (;13;) (type 0) (param i32) (result i32)
     local.get 0
+    call 2
     i32.const 0
     call 1
+    call 2
     i32.gt_s
     if (result i32)  ;; label = @1
       i32.const 0
       call 1
-      call 2
+      call 3
       local.get 0
-      call 2
+      call 3
       i32.sub
       call 1
     else
@@ -115,14 +124,16 @@
     call 1
     global.get 8
     call_indirect (type 1))
-  (func (;13;) (type 2) (param i32 i32 i32 i32 i32) (result i32)
+  (func (;14;) (type 2) (param i32 i32 i32 i32 i32) (result i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
           block  ;; label = @4
             local.get 4
+            call 2
             i32.const 0
             call 1
+            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -143,35 +154,35 @@
           local.get 2
           global.get 7
           call_indirect (type 0)
-          call 2
+          call 3
           local.get 3
           global.get 7
           call_indirect (type 0)
-          call 2
+          call 3
           i32.add
           call 1
           i32.const 2
           call 1
-          call 2
+          call 3
           local.get 2
-          call 2
+          call 3
           i32.mul
           local.get 3
-          call 2
+          call 3
           i32.mul
           call 1
-          call 2
+          call 3
           local.get 3
           global.get 7
           call_indirect (type 0)
-          call 2
+          call 3
           i32.add
           call 1
           local.get 4
-          call 2
+          call 3
           i32.const 2
           call 1
-          call 2
+          call 3
           i32.div_s
           call 1
           global.get 10
@@ -180,58 +191,58 @@
         end
       end
       local.get 1
-      call 2
+      call 3
       local.get 3
-      call 2
+      call 3
       i32.mul
       call 1
-      call 2
+      call 3
       local.get 0
-      call 2
+      call 3
       local.get 3
-      call 2
+      call 3
       i32.mul
       call 1
-      call 2
+      call 3
       i32.add
       local.get 0
-      call 2
+      call 3
       local.get 2
-      call 2
+      call 3
       i32.mul
       call 1
-      call 2
+      call 3
       i32.add
       call 1
       local.get 1
-      call 2
+      call 3
       local.get 2
-      call 2
+      call 3
       i32.mul
       call 1
-      call 2
+      call 3
       local.get 0
-      call 2
+      call 3
       local.get 3
-      call 2
+      call 3
       i32.mul
       call 1
-      call 2
+      call 3
       i32.add
       call 1
       local.get 2
       local.get 3
       local.get 4
-      call 2
+      call 3
       i32.const 1
       call 1
-      call 2
+      call 3
       i32.sub
       call 1
       global.get 10
       call_indirect (type 2)
     end)
-  (func (;14;) (type 0) (param i32) (result i32)
+  (func (;15;) (type 0) (param i32) (result i32)
     i32.const 1
     call 1
     i32.const 0
@@ -243,7 +254,7 @@
     local.get 0
     global.get 10
     call_indirect (type 2))
-  (func (;15;)
+  (func (;16;)
     i32.const 0
     global.set 2
     i32.const 1
@@ -275,8 +286,8 @@
     i32.const 30
     drop)
   (table (;0;) 10 funcref)
-  (export "fib" (func 14))
-  (start 15)
-  (elem (;0;) (i32.const 0) func 3 4 7 8 9 10 11 12 13 14)
+  (export "fib" (func 15))
+  (start 16)
+  (elem (;0;) (i32.const 0) func 4 5 8 9 10 11 12 13 14 15)
   (type (;3;) (func (result i32)))
   (type (;4;) (func)))

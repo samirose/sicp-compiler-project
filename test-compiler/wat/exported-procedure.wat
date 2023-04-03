@@ -6,14 +6,15 @@
   (import "scheme base" "uninitialized-value" (global (;1;) i32))
   (import "scheme base" "get-error-code" (func (;0;) (result i32)))
   (import "scheme base" "i32->fixnum" (func (;1;) (param i32) (result i32)))
-  (import "scheme base" "fixnum->i32" (func (;2;) (param i32) (result i32)))
-  (import "scheme base" "number?" (func (;3;) (param i32) (result i32)))
-  (import "scheme base" "zero?" (func (;4;) (param i32) (result i32)))
-  (import "scheme base" "i32->boolean" (func (;5;) (param i32) (result i32)))
-  (import "scheme base" "boolean->i32" (func (;6;) (param i32) (result i32)))
-  (import "scheme base" "boolean?" (func (;7;) (param i32) (result i32)))
-  (import "scheme base" "procedure?" (func (;8;) (param i32) (result i32)))
-  (import "scheme base" "eq?" (func (;9;) (param i32 i32) (result i32)))
+  (import "scheme base" "check-fixnum" (func (;2;) (param i32) (result i32)))
+  (import "scheme base" "fixnum->i32" (func (;3;) (param i32) (result i32)))
+  (import "scheme base" "number?" (func (;4;) (param i32) (result i32)))
+  (import "scheme base" "zero?" (func (;5;) (param i32) (result i32)))
+  (import "scheme base" "i32->boolean" (func (;6;) (param i32) (result i32)))
+  (import "scheme base" "boolean->i32" (func (;7;) (param i32) (result i32)))
+  (import "scheme base" "boolean?" (func (;8;) (param i32) (result i32)))
+  (import "scheme base" "procedure?" (func (;9;) (param i32) (result i32)))
+  (import "scheme base" "eq?" (func (;10;) (param i32 i32) (result i32)))
   (global (;2;) (mut i32) (i32.const 46))
   (global (;3;) (mut i32) (i32.const 46))
   (global (;4;) (mut i32) (i32.const 46))
@@ -23,31 +24,31 @@
   (global (;8;) (mut i32) (i32.const 46))
   (global (;9;) (mut i32) (i32.const 46))
   (global (;10;) (mut i32) (i32.const 46))
-  (func (;10;) (type 0) (result i32)
+  (func (;11;) (type 0) (result i32)
     i32.const 42
     call 1)
-  (func (;11;) (type 1) (param i32) (result i32)
+  (func (;12;) (type 1) (param i32) (result i32)
     local.get 0
-    call 2
+    call 3
     local.get 0
-    call 2
+    call 3
     i32.mul
     call 1)
-  (func (;12;) (type 2) (param i32 i32) (result i32)
+  (func (;13;) (type 2) (param i32 i32) (result i32)
     local.get 0
-    call 2
+    call 3
     local.get 1
-    call 2
+    call 3
     i32.sub
     call 1)
-  (func (;13;) (type 1) (param i32) (result i32)
+  (func (;14;) (type 1) (param i32) (result i32)
     local.get 0
-    call 2
+    call 3
     local.get 0
-    call 2
+    call 3
     i32.add
     call 1)
-  (func (;14;)
+  (func (;15;)
     i32.const 0
     global.set 2
     i32.const 1
@@ -75,10 +76,10 @@
     i32.const 30
     drop)
   (table (;0;) 9 funcref)
-  (export "value" (func 10))
-  (export "square" (func 11))
-  (export "minus" (func 12))
-  (export "double" (func 13))
-  (start 14)
-  (elem (;0;) (i32.const 0) func 3 4 7 8 9 10 11 12 13)
+  (export "value" (func 11))
+  (export "square" (func 12))
+  (export "minus" (func 13))
+  (export "double" (func 14))
+  (start 15)
+  (elem (;0;) (i32.const 0) func 4 5 8 9 10 11 12 13 14)
   (type (;3;) (func)))

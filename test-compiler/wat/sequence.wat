@@ -5,14 +5,15 @@
   (import "scheme base" "uninitialized-value" (global (;1;) i32))
   (import "scheme base" "get-error-code" (func (;0;) (result i32)))
   (import "scheme base" "i32->fixnum" (func (;1;) (param i32) (result i32)))
-  (import "scheme base" "fixnum->i32" (func (;2;) (param i32) (result i32)))
-  (import "scheme base" "number?" (func (;3;) (param i32) (result i32)))
-  (import "scheme base" "zero?" (func (;4;) (param i32) (result i32)))
-  (import "scheme base" "i32->boolean" (func (;5;) (param i32) (result i32)))
-  (import "scheme base" "boolean->i32" (func (;6;) (param i32) (result i32)))
-  (import "scheme base" "boolean?" (func (;7;) (param i32) (result i32)))
-  (import "scheme base" "procedure?" (func (;8;) (param i32) (result i32)))
-  (import "scheme base" "eq?" (func (;9;) (param i32 i32) (result i32)))
+  (import "scheme base" "check-fixnum" (func (;2;) (param i32) (result i32)))
+  (import "scheme base" "fixnum->i32" (func (;3;) (param i32) (result i32)))
+  (import "scheme base" "number?" (func (;4;) (param i32) (result i32)))
+  (import "scheme base" "zero?" (func (;5;) (param i32) (result i32)))
+  (import "scheme base" "i32->boolean" (func (;6;) (param i32) (result i32)))
+  (import "scheme base" "boolean->i32" (func (;7;) (param i32) (result i32)))
+  (import "scheme base" "boolean?" (func (;8;) (param i32) (result i32)))
+  (import "scheme base" "procedure?" (func (;9;) (param i32) (result i32)))
+  (import "scheme base" "eq?" (func (;10;) (param i32 i32) (result i32)))
   (global (;2;) (mut i32) (i32.const 46))
   (global (;3;) (mut i32) (i32.const 46))
   (global (;4;) (mut i32) (i32.const 46))
@@ -22,108 +23,108 @@
   (global (;8;) (mut i32) (i32.const 46))
   (global (;9;) (mut i32) (i32.const 46))
   (global (;10;) (mut i32) (i32.const 46))
-  (func (;10;) (type 0) (result i32)
-    i32.const 1
-    call 1
-    drop
-    i32.const 2
-    call 1
-    drop
-    i32.const 3
-    call 1)
   (func (;11;) (type 0) (result i32)
-    i32.const 0
-    call 1
-    call 2
     i32.const 1
     call 1
-    call 2
+    drop
+    i32.const 2
+    call 1
+    drop
+    i32.const 3
+    call 1)
+  (func (;12;) (type 0) (result i32)
+    i32.const 0
+    call 1
+    call 3
+    i32.const 1
+    call 1
+    call 3
     i32.add
     call 1
     drop
     i32.const 0
     call 1
-    call 2
+    call 3
     i32.const 2
     call 1
-    call 2
+    call 3
     i32.add
     call 1)
-  (func (;12;) (type 1) (param i32) (result i32)
+  (func (;13;) (type 1) (param i32) (result i32)
     local.get 0
-    call 2
+    call 3
     i32.const 1
     call 1
-    call 2
+    call 3
     i32.add
     call 1
     local.set 0
     i32.const 30
     drop
     local.get 0
-    call 2
+    call 3
     i32.const 2
     call 1
-    call 2
+    call 3
     i32.add
     call 1
     local.set 0
     i32.const 30
     drop
     local.get 0
-    call 2
+    call 3
     i32.const 3
     call 1
-    call 2
+    call 3
     i32.add
     call 1
     local.set 0
     i32.const 30
     drop
     local.get 0)
-  (func (;13;) (type 0) (result i32)
+  (func (;14;) (type 0) (result i32)
     i32.const 0
     call 1
     i32.const 7
     call_indirect (type 1))
-  (func (;14;) (type 1) (param i32) (result i32)
+  (func (;15;) (type 1) (param i32) (result i32)
     local.get 0
-    call 2
+    call 3
     i32.const 1
     call 1
-    call 2
+    call 3
     i32.add
     call 1
     local.set 0
     i32.const 30
     drop
     local.get 0
-    call 2
+    call 3
     i32.const 10
     call 1
-    call 2
+    call 3
     i32.mul
     call 1
     local.set 0
     i32.const 30
     drop
     local.get 0
-    call 2
+    call 3
     i32.const 10
     call 1
-    call 2
+    call 3
     i32.div_s
     call 1
     local.set 0
     i32.const 30
     drop
     local.get 0)
-  (func (;15;) (type 0) (result i32)
+  (func (;16;) (type 0) (result i32)
     i32.const 0
     call 1
     i32.const 9
     call_indirect (type 1))
-  (func (;16;)
+  (func (;17;)
     i32.const 0
     global.set 2
     i32.const 1
@@ -151,11 +152,11 @@
     i32.const 30
     drop)
   (table (;0;) 11 funcref)
-  (export "sequence-has-last-value" (func 10))
-  (export "sequence-has-last-expressions-value" (func 11))
-  (export "all-sequence-expressions-are-evaluated" (func 13))
-  (export "sequence-expressions-are-evaluated-in-order" (func 15))
-  (start 16)
-  (elem (;0;) (i32.const 0) func 3 4 7 8 9 10 11 12 13 14 15)
+  (export "sequence-has-last-value" (func 11))
+  (export "sequence-has-last-expressions-value" (func 12))
+  (export "all-sequence-expressions-are-evaluated" (func 14))
+  (export "sequence-expressions-are-evaluated-in-order" (func 16))
+  (start 17)
+  (elem (;0;) (i32.const 0) func 4 5 8 9 10 11 12 13 14 15 16)
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

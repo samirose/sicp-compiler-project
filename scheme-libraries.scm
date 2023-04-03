@@ -22,6 +22,7 @@
 	  (#f         "uninitialized-value" (global i32))
 	  (#f         "get-error-code"      (func (result i32)))
 	  (#f         "i32->fixnum"         (func (param i32) (result i32)))
+          (#f         "check-fixnum"        (func (param i32) (result i32)))
 	  (#f         "fixnum->i32"         (func (param i32) (result i32)))
 	  (number?    "number?"             (func (param i32) (result i32)))
 	  (zero?      "zero?"               (func (param i32) (result i32)))

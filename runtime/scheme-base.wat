@@ -51,7 +51,7 @@
     global.get $fixnum-mask
     i32.or)
 
-  (func $check-fixnum (param $obj i32) (result i32)
+  (func $check-fixnum (export "check-fixnum") (param $obj i32) (result i32)
     local.get $obj
     local.get $obj
     global.get $fixnum-mask

@@ -110,7 +110,7 @@
     (define (compile-boolean exp program)
       (compiled-program-with-value-code
        program
-       `(i32.const ,(if exp 1 0))))
+       `(i32.const ,(boolean->boolean-value exp))))
 
     (define (compile-string exp program)
       (raise-compilation-error "Strings not supported yet" exp))
@@ -225,6 +225,7 @@
 
     (define (compile-binary-operator instr operand1 operand2 program lexical-env compile)
       (let* ((call-check-fixnum (runtime-call program "check-fixnum"))
+             (call-i32->boolean (runtime-call program "i32->boolean"))
              (operand1-program
               (compiled-program-append-value-code
                (compile operand1 program lexical-env)
@@ -240,7 +241,7 @@
                operand1-program operand2-program)))
 	(compiled-program-append-value-code
 	 operands-program
-	 instr)))
+	 (append instr call-i32->boolean))))
 
     (define (compile-open-coded-comparison-exp exp operator operands program lexical-env compile)
       (cond ((null? operands)
@@ -267,10 +268,12 @@
     (define (compile-if exp test consequent alternate program lexical-env compile)
       (let* ((t-prog (compile test program lexical-env))
              (c-prog (compile consequent t-prog lexical-env))
-             (a-prog (compile alternate c-prog lexical-env)))
+             (a-prog (compile alternate c-prog lexical-env))
+             (call-boolean->i32 (runtime-call program "boolean->i32")))
 	(compiled-program-with-value-code
 	 a-prog
 	 `(,@(compiled-program-value-code t-prog)
+           ,@call-boolean->i32
 	   if (result i32)
            ,@(compiled-program-value-code c-prog)
 	   else
@@ -279,10 +282,12 @@
 
     (define (compile-if-no-alternate exp test consequent program lexical-env compile)
       (let* ((t-prog (compile test program lexical-env))
-             (c-prog (compile consequent t-prog lexical-env)))
+             (c-prog (compile consequent t-prog lexical-env))
+             (call-boolean->i32 (runtime-call program "boolean->i32")))
 	(compiled-program-with-value-code
 	 c-prog
 	 `(,@(compiled-program-value-code t-prog)
+           ,@call-boolean->i32
 	   if (result i32)
            ,@(compiled-program-value-code c-prog)
 	   else
@@ -290,8 +295,9 @@
 	   end))))
 
     (define (compile-cond exp clauses program lexical-env compile)
-      (let
-          ((clauses-prog
+      (let*
+          ((call-boolean->i32 (runtime-call program "boolean->i32"))
+           (clauses-prog
             (let generate ((clauses clauses)
                            (program program)
                            (env lexical-env)
@@ -317,6 +323,7 @@
                          ,@(if temp-var-index '((local i32)) '())
                          local.tee ,temp-var-index
                          local.get ,temp-var-index
+                         ,@call-boolean->i32
                          br_if 2
                          drop
                          end))))
@@ -343,6 +350,7 @@
 		       `(block
                          block
                          ,@(compiled-program-value-code test-prog)
+                         ,@call-boolean->i32
                          br_if 0
                          br 1
                          end
@@ -368,6 +376,7 @@
 	 `(,@(compiled-program-value-code (compile #f test-prog lexical-env))
 	   ,@(compiled-program-value-code (compile #t test-prog lexical-env))
 	   ,@(compiled-program-value-code test-prog)
+           ,@(runtime-call test-prog "boolean->i32")
 	   select))))
 
     (define (compile-and exp tests program lexical-env compile)
@@ -377,8 +386,9 @@
        ((null? (cdr tests))
 	(compile (car tests) program lexical-env))
        (else
-	(let
-            ((tests-prog
+	(let*
+            ((call-boolean->i32 (runtime-call program "boolean->i32"))
+             (tests-prog
               (let generate ((tests tests)
                              (prog program))
 		(cond
@@ -394,6 +404,7 @@
                        ,@test-code
                        (local i32)
                        local.tee ,temp-var-index
+                       ,@call-boolean->i32
                        br_if 0
                        br 1
                        end
@@ -408,6 +419,7 @@
 			 test-prog
 			 `(block
                            ,@test-code
+                           ,@call-boolean->i32
                            br_if 0
                            br 1
                            end))))
@@ -431,7 +443,8 @@
 	(compile (car tests) program lexical-env))
        (else
 	(let*
-            ((env (add-new-local-temporaries-frame lexical-env 1))
+            ((call-boolean->i32 (runtime-call program "boolean->i32"))
+             (env (add-new-local-temporaries-frame lexical-env 1))
              (temp-var-index (env-var-index-offset env))
              (tests-prog
               (let generate ((tests tests)
@@ -453,6 +466,7 @@
                            `(block
                              ,@test-code
                              local.tee ,temp-var-index
+                             ,@call-boolean->i32
                              br_if 1
                              end))))
                       (compiled-program-append-value-codes

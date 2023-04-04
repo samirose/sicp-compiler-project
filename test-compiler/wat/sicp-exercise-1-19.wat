@@ -43,10 +43,12 @@
             call 1
             call 2
             i32.eq
+            call 6
+            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
-          i32.const 1
+          i32.const 22
           br 2 (;@1;)
         end
         block  ;; label = @3
@@ -57,10 +59,12 @@
             call 1
             call 2
             i32.eq
+            call 6
+            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
-          i32.const 0
+          i32.const 6
           br 2 (;@1;)
         end
         block  ;; label = @3
@@ -70,6 +74,8 @@
             local.get 1
             call 2
             i32.le_s
+            call 6
+            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
@@ -109,6 +115,8 @@
     call 1
     call 2
     i32.gt_s
+    call 6
+    call 7
     if (result i32)  ;; label = @1
       i32.const 0
       call 1
@@ -135,6 +143,8 @@
             call 1
             call 2
             i32.eq
+            call 6
+            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
@@ -146,6 +156,7 @@
             local.get 4
             global.get 9
             call_indirect (type 0)
+            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end

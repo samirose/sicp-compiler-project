@@ -28,9 +28,9 @@
   (global (;13;) (mut i32) (i32.const 46))
   (global (;14;) (mut i32) (i32.const 46))
   (func (;11;) (type 0) (result i32)
-    i32.const 0)
+    i32.const 6)
   (func (;12;) (type 0) (result i32)
-    i32.const 0)
+    i32.const 6)
   (func (;13;) (type 0) (result i32)
     i32.const 42
     call 1)
@@ -41,6 +41,7 @@
         i32.const 1
         call 1
         local.tee 0
+        call 7
         br_if 1 (;@1;)
       end
       i32.const 2
@@ -52,8 +53,9 @@
     (local i32 i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 0
+        i32.const 6
         local.tee 0
+        call 7
         br_if 1 (;@1;)
       end
       i32.const 2
@@ -61,41 +63,46 @@
       local.set 0
     end
     local.get 0
+    call 7
     if (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
           i32.const 1
           call 1
           local.tee 0
+          call 7
           br_if 1 (;@2;)
         end
-        i32.const 0
+        i32.const 6
         local.set 0
       end
       local.get 0
+      call 7
       if (result i32)  ;; label = @2
-        i32.const 1
+        i32.const 22
       else
-        i32.const 0
+        i32.const 6
       end
     else
-      i32.const 0
+      i32.const 6
     end)
   (func (;16;) (type 1) (param i32) (result i32)
     local.get 0
+    call 7
     if (result i32)  ;; label = @1
-      i32.const 1
+      i32.const 22
     else
-      i32.const 0
+      i32.const 6
     end)
   (func (;17;) (type 0) (result i32)
     (local i32 i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 0
+        i32.const 6
         i32.const 10
         call_indirect (type 1)
         local.tee 0
+        call 7
         br_if 1 (;@1;)
       end
       block  ;; label = @2
@@ -112,7 +119,9 @@
         call 1
         call 2
         i32.gt_s
+        call 6
         local.tee 0
+        call 7
         br_if 1 (;@1;)
       end
       i32.const 1
@@ -146,7 +155,9 @@
         call 1
         call 2
         i32.gt_s
+        call 6
         local.tee 1
+        call 7
         br_if 1 (;@1;)
       end
       block  ;; label = @2
@@ -161,7 +172,9 @@
         call 1
         call 2
         i32.gt_s
+        call 6
         local.tee 1
+        call 7
         br_if 1 (;@1;)
       end
       i32.const 3
@@ -174,10 +187,11 @@
       local.set 1
     end
     local.get 1
+    call 7
     if (result i32)  ;; label = @1
       local.get 0
     else
-      i32.const 0
+      i32.const 6
     end)
   (func (;19;) (type 0) (result i32)
     (local i32 i32)
@@ -191,8 +205,9 @@
         local.set 0
         i32.const 30
         drop
-        i32.const 0
+        i32.const 6
         local.tee 1
+        call 7
         br_if 1 (;@1;)
       end
       block  ;; label = @2
@@ -204,6 +219,7 @@
         i32.const 2
         call 1
         local.tee 1
+        call 7
         br_if 1 (;@1;)
       end
       i32.const 3

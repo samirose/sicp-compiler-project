@@ -32,66 +32,76 @@
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
-          i32.const 1
+          i32.const 22
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
         block  ;; label = @3
-          i32.const 1
+          i32.const 22
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
         block  ;; label = @3
-          i32.const 1
+          i32.const 22
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
         block  ;; label = @3
-          i32.const 1
+          i32.const 22
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
         block  ;; label = @3
-          i32.const 1
+          i32.const 22
           local.tee 0
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
         local.get 0
         br 1 (;@1;)
       end
-      i32.const 0
+      i32.const 6
     end)
   (func (;12;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
-    i32.eq)
+    i32.eq
+    call 6)
   (func (;13;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
-    i32.gt_s)
+    i32.gt_s
+    call 6)
   (func (;14;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
-    i32.lt_s)
+    i32.lt_s
+    call 6)
   (func (;15;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
-    i32.ge_s)
+    i32.ge_s
+    call 6)
   (func (;16;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
-    i32.le_s)
+    i32.le_s
+    call 6)
   (func (;17;) (type 0) (result i32)
     (local i32 i32 i32 i32 i32 i32)
     block (result i32)  ;; label = @1
@@ -107,6 +117,8 @@
                 call 1
                 call 2
                 i32.eq
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -118,15 +130,18 @@
                 call 1
                 call 2
                 i32.eq
+                call 6
                 local.tee 0
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
               local.get 0
               br 1 (;@4;)
             end
-            i32.const 0
+            i32.const 6
           end
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
@@ -141,6 +156,8 @@
                 call 1
                 call 2
                 i32.lt_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -152,6 +169,8 @@
                 call 1
                 call 2
                 i32.lt_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -163,15 +182,18 @@
                 call 1
                 call 2
                 i32.lt_s
+                call 6
                 local.tee 0
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
               local.get 0
               br 1 (;@4;)
             end
-            i32.const 0
+            i32.const 6
           end
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
@@ -186,6 +208,8 @@
                 call 1
                 call 2
                 i32.gt_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -197,6 +221,8 @@
                 call 1
                 call 2
                 i32.gt_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -208,6 +234,8 @@
                 call 1
                 call 2
                 i32.gt_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -219,15 +247,18 @@
                 call 1
                 call 2
                 i32.gt_s
+                call 6
                 local.tee 0
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
               local.get 0
               br 1 (;@4;)
             end
-            i32.const 0
+            i32.const 6
           end
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
@@ -242,6 +273,8 @@
                 call 1
                 call 2
                 i32.le_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -253,6 +286,8 @@
                 call 1
                 call 2
                 i32.le_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -264,15 +299,18 @@
                 call 1
                 call 2
                 i32.le_s
+                call 6
                 local.tee 0
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
               local.get 0
               br 1 (;@4;)
             end
-            i32.const 0
+            i32.const 6
           end
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
@@ -287,6 +325,8 @@
                 call 1
                 call 2
                 i32.ge_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -298,6 +338,8 @@
                 call 1
                 call 2
                 i32.ge_s
+                call 6
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -309,23 +351,26 @@
                 call 1
                 call 2
                 i32.ge_s
+                call 6
                 local.tee 1
+                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
               local.get 1
               br 1 (;@4;)
             end
-            i32.const 0
+            i32.const 6
           end
           local.tee 0
+          call 7
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
         local.get 0
         br 1 (;@1;)
       end
-      i32.const 0
+      i32.const 6
     end)
   (func (;18;) (type 0) (result i32)
     (local i32 i32 i32 i32 i32 i32)
@@ -341,6 +386,8 @@
               call 1
               call 2
               i32.eq
+              call 6
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -352,16 +399,19 @@
               call 1
               call 2
               i32.eq
+              call 6
               local.tee 1
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
             local.get 1
             br 1 (;@3;)
           end
-          i32.const 0
+          i32.const 6
         end
         local.tee 0
+        call 7
         br_if 1 (;@1;)
       end
       block  ;; label = @2
@@ -375,6 +425,8 @@
               call 1
               call 2
               i32.lt_s
+              call 6
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -386,6 +438,8 @@
               call 1
               call 2
               i32.lt_s
+              call 6
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -397,16 +451,19 @@
               call 1
               call 2
               i32.lt_s
+              call 6
               local.tee 1
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
             local.get 1
             br 1 (;@3;)
           end
-          i32.const 0
+          i32.const 6
         end
         local.tee 0
+        call 7
         br_if 1 (;@1;)
       end
       block  ;; label = @2
@@ -420,6 +477,8 @@
               call 1
               call 2
               i32.gt_s
+              call 6
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -431,6 +490,8 @@
               call 1
               call 2
               i32.gt_s
+              call 6
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -442,6 +503,8 @@
               call 1
               call 2
               i32.gt_s
+              call 6
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -453,16 +516,19 @@
               call 1
               call 2
               i32.gt_s
+              call 6
               local.tee 1
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
             local.get 1
             br 1 (;@3;)
           end
-          i32.const 0
+          i32.const 6
         end
         local.tee 0
+        call 7
         br_if 1 (;@1;)
       end
       block  ;; label = @2
@@ -476,6 +542,8 @@
               call 1
               call 2
               i32.le_s
+              call 6
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -487,6 +555,8 @@
               call 1
               call 2
               i32.le_s
+              call 6
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -498,16 +568,19 @@
               call 1
               call 2
               i32.le_s
+              call 6
               local.tee 1
+              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
             local.get 1
             br 1 (;@3;)
           end
-          i32.const 0
+          i32.const 6
         end
         local.tee 0
+        call 7
         br_if 1 (;@1;)
       end
       block (result i32)  ;; label = @2
@@ -520,6 +593,8 @@
             call 1
             call 2
             i32.ge_s
+            call 6
+            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
@@ -531,6 +606,8 @@
             call 1
             call 2
             i32.ge_s
+            call 6
+            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
@@ -542,14 +619,16 @@
             call 1
             call 2
             i32.ge_s
+            call 6
             local.tee 1
+            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
           local.get 1
           br 1 (;@2;)
         end
-        i32.const 0
+        i32.const 6
       end
       local.set 0
     end

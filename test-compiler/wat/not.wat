@@ -26,24 +26,27 @@
   (global (;11;) (mut i32) (i32.const 46))
   (global (;12;) (mut i32) (i32.const 46))
   (func (;11;) (type 0) (result i32)
-    i32.const 0
-    i32.const 1
-    i32.const 1
+    i32.const 6
+    i32.const 22
+    i32.const 22
+    call 7
     select)
   (func (;12;) (type 0) (result i32)
-    i32.const 0
-    i32.const 1
-    i32.const 0
+    i32.const 6
+    i32.const 22
+    i32.const 6
+    call 7
     select)
   (func (;13;) (type 0) (result i32)
-    i32.const 0
-    i32.const 1
+    i32.const 6
+    i32.const 22
     i32.const 42
     call 1
+    call 7
     select)
   (func (;14;) (type 0) (result i32)
-    i32.const 0
-    i32.const 1
+    i32.const 6
+    i32.const 22
     i32.const 1
     call 1
     call 2
@@ -51,6 +54,8 @@
     call 1
     call 2
     i32.gt_s
+    call 6
+    call 7
     select)
   (func (;15;) (type 1) (param i32) (result i32)
     local.get 0
@@ -61,16 +66,17 @@
     i32.add
     call 1)
   (func (;16;) (type 0) (result i32)
-    i32.const 0
-    i32.const 1
+    i32.const 6
+    i32.const 22
     i32.const 2
     call 1
     i32.const 9
     call_indirect (type 1)
+    call 7
     select)
   (func (;17;) (type 0) (result i32)
-    i32.const 0
-    i32.const 1
+    i32.const 6
+    i32.const 22
     i32.const 0
     call 1
     call 2
@@ -78,6 +84,8 @@
     call 1
     call 2
     i32.gt_s
+    call 6
+    call 7
     select)
   (func (;18;)
     i32.const 0

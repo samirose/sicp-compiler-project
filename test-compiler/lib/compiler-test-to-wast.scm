@@ -7,7 +7,7 @@
 
 (define (compile-value exp)
   (cond ((boolean? exp)
-	 `(i32.const ,(if exp 1 0)))
+	 `(i32.const ,(boolean->boolean-value exp)))
 	((number? exp)
 	 `(i32.const ,(number->fixnum-value exp)))
 	(else (error "Unsupported value" exp))))

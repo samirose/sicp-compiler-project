@@ -32,7 +32,8 @@
   (global (;17;) (mut i32) (i32.const 46))
   (global (;18;) (mut i32) (i32.const 46))
   (func (;11;) (type 0) (result i32)
-    i32.const 1
+    i32.const 22
+    call 7
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
@@ -52,6 +53,8 @@
     call 1
     call 2
     i32.eq
+    call 6
+    call 7
     if (result i32)  ;; label = @1
       global.get 7
     else
@@ -75,6 +78,8 @@
     call 1
     call 2
     i32.eq
+    call 6
+    call 7
     if (result i32)  ;; label = @1
       global.get 7
       call 3
@@ -110,6 +115,8 @@
     call 1
     call 2
     i32.eq
+    call 6
+    call 7
     if (result i32)  ;; label = @1
       global.get 7
       call 3
@@ -126,7 +133,8 @@
     drop
     global.get 7)
   (func (;15;) (type 0) (result i32)
-    i32.const 0
+    i32.const 6
+    call 7
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
@@ -146,6 +154,8 @@
     call 1
     call 2
     i32.gt_s
+    call 6
+    call 7
     if (result i32)  ;; label = @1
       global.get 7
     else
@@ -169,6 +179,8 @@
     call 1
     call 2
     i32.eq
+    call 6
+    call 7
     if (result i32)  ;; label = @1
       global.get 7
       call 3
@@ -204,6 +216,8 @@
     call 1
     call 2
     i32.gt_s
+    call 6
+    call 7
     if (result i32)  ;; label = @1
       global.get 7
       call 3
@@ -225,12 +239,14 @@
     i32.const 0
     call 1
     call 2
-    i32.gt_s)
+    i32.gt_s
+    call 6)
   (func (;20;) (type 0) (result i32)
     i32.const 1
     call 1
     i32.const 13
     call_indirect (type 1)
+    call 7
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
@@ -244,7 +260,8 @@
     i32.const 0
     call 1
     call 2
-    i32.gt_s)
+    i32.gt_s
+    call 6)
   (func (;22;) (type 1) (param i32) (result i32)
     local.get 0
     call 3
@@ -258,6 +275,7 @@
     call 1
     i32.const 15
     call_indirect (type 1)
+    call 7
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
@@ -273,7 +291,8 @@
     i32.const 0
     call 1
     call 2
-    i32.gt_s)
+    i32.gt_s
+    call 6)
   (func (;25;) (type 1) (param i32) (result i32)
     local.get 0
     call 3
@@ -295,6 +314,7 @@
     call 1
     i32.const 18
     call_indirect (type 1)
+    call 7
     if (result i32)  ;; label = @1
       i32.const 1
       call 1

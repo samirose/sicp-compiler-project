@@ -105,7 +105,9 @@
                      (loop (cdr bindings)
                            (+ elem-index 1)
                            (+ global-index 1)
-                           (cons `(global.set ,global-index (i32.const ,elem-index))
+                           (cons `(global.set
+                                   ,global-index
+                                   (i32.const ,(funcidx->procedure-value elem-index)))
 				 init-code))))))
            (globals-init-assignments
             (map (lambda (definition)

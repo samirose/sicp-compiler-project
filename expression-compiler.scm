@@ -579,10 +579,11 @@
             (compiled-program-definitions-count func-program 'elem))
 	   (elem-program
             (compiled-program-add-definition func-program elem-definition)))
-					; Lambda expression's value is the function's index in the table
+					; Lambda expression's value is the function's index in the
+                                        ; table type-tagged as a procedure
 	(compiled-program-with-value-code
 	 elem-program
-	 `(i32.const ,elem-index))))
+	 `(i32.const ,elem-index ,@(runtime-call elem-program "funcidx->procedure")))))
 
 ;;;let expression
     (define (compile-compute-and-assign exps program lexical-env compile assign-code)
@@ -688,10 +689,13 @@
             (compiled-program-definition-index type-program func-type))
 	   (operands-program
             (compile-values operands type-program lexical-env compile))
+           (operator-program
+            (compiled-program-append-value-code
+             (compile operator operands-program lexical-env)
+             (runtime-call operands-program "procedure->funcidx")))
 	   (operands-and-operator-program
             (compiled-program-append-value-codes
-             operands-program
-             (compile operator operands-program lexical-env))))
+             operands-program operator-program)))
 	(compiled-program-append-value-code
 	 operands-and-operator-program
 	 `(call_indirect (type ,type-index)))))

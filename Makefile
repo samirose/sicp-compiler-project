@@ -72,7 +72,7 @@ test-compiler-host : $(COMPILER_TEST_HOST_LOGS) ## Executes the compiler integra
 
 $(COMPILER_TEST_HOST_TARGETS) : $(TEST_COMPILER_DIR)%-host : $(TEST_COMPILER_DIR)host-log/%.log
 
-$(COMPILER_TEST_HOST_LOGS) : $(TEST_COMPILER_DIR)host-log/%.log : $(TEST_COMPILER_DIR)%.scm $(TEST_COMPILER_DIR)test/%.scm | $(TEST_COMPILER_DIR)host-log/
+$(COMPILER_TEST_HOST_LOGS) : $(TEST_COMPILER_DIR)host-log/%.log : $(TEST_COMPILER_DIR)%.scm $(TEST_COMPILER_DIR)test/%.scm $(TEST_COMPILER_DIR)/lib/compiler-test.scm | $(TEST_COMPILER_DIR)host-log/
 	cd $(TEST_COMPILER_DIR)host-log ; \
 	rm -f $(notdir $(@:%.log=%.fail.log)) ; \
 	$(RUN_COMPILER_TEST_HOST) ../test/$(notdir $<) || \

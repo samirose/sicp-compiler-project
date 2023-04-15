@@ -1,8 +1,7 @@
 (define-library (expression-compiler)
 
   (export compile
-          compile-sequence
-          uninitialized-value)
+          compile-sequence)
 
   (import (scheme base)
 	  (scheme cxr)

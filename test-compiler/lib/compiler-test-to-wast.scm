@@ -1,7 +1,7 @@
 (import (scheme base)
         (scheme read)
 	(scheme write)
-	(only (srfi srfi-1) fold)
+	(only (srfi srfi-1) fold for-each)
 	(pattern-match)
         (values))
 
@@ -30,11 +30,24 @@
     `(,(string-append ";; " name)
       (assert_return ,test-exp (i32.const ,unspecified-value)))))
 
+(define error-to-error-code
+  '((no-error 0)
+    (expected-number 1)
+    (expected-procedure 2)
+    (uninitialized 3)))
+
 (define (compile-test-error exp)
-  (let ((name (cadr exp))
-	(test-exp (compile-test-exp (caddr exp))))
+  (let* ((name (cadr exp))
+	 (test-exp (compile-test-exp (caddr exp)))
+         (expected-error (cadddr exp))
+         (expected-error-code-entry (assq expected-error error-to-error-code))
+         (expected-error-code
+          (if expected-error-code-entry
+              (cadr expected-error-code-entry)
+              (error "Unknown runtime error type" expected-error))))
     `(,(string-append ";; " name)
-      (assert_trap ,test-exp "unreachable"))))
+      (assert_trap ,test-exp "unreachable")
+      (assert_return (invoke $scheme-base "get-error-code") (i32.const ,expected-error-code)))))
 
 (define (value->string exp)
   (cond ((boolean? exp)
@@ -68,7 +81,7 @@
 	 (compile-test-invoke exp))
 	((pattern-match? `(compiler-test-unspecified ,?? ,??*) exp)
 	 (compile-test-unspecified exp))
-        ((pattern-match? `(compiler-test-error ,?? ,??) exp)
+        ((pattern-match? `(compiler-test-error ,?? ,?? ,??) exp)
          (compile-test-error exp))
 	(else 'UNKNOWN)))
 
@@ -78,8 +91,11 @@
 (define (emit-wast wast-ast)
   (write-string (car wast-ast))
   (newline)
-  (write (cadr wast-ast))
-  (newline))
+  (for-each
+   (lambda (wast-ast)
+     (write wast-ast)
+     (newline))
+   (cdr wast-ast)))
 
 (let compile-next ((exp (read)))
   (cond ((eof-object? exp) (newline))

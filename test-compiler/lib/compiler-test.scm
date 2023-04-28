@@ -32,7 +32,7 @@
 
     (define-syntax compiler-test-error
       (syntax-rules ()
-        ((compiler-test-error test-name test-expr)
+        ((compiler-test-error test-name test-expr expected-error)
          (test-error test-name #t test-expr))))
 
     (define (compiler-test-end name)

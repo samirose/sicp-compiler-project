@@ -168,24 +168,33 @@
 	(* (i32.mul) 1 ,(lambda (x) x))
 	(/ (i32.div_s) #f ,(lambda (x) (raise-compilation-error "No rational number support" `(/ ,x))))))
 
-    (define arithmetic-operators
-      (map car arithmetic-operator-map))
-
     (define (arithmetic-operator? sym)
-      (memq sym arithmetic-operators))
+      (if (assq sym arithmetic-operator-map) #t #f))
+
+    (define (arithmetic-operator-properties operator)
+      (cdr (assq operator arithmetic-operator-map)))
+
+    (define (arithmetic-operator-instruction operator)
+      (car (arithmetic-operator-properties operator)))
+
+    (define (arithmetic-operator-identity-value operator)
+      (cadr (arithmetic-operator-properties operator)))
+
+    (define (arithmetic-operator-single-value-converter operator)
+      (caddr (arithmetic-operator-properties operator)))
 
     (define (compile-open-coded-arithmetic-identity exp operator program lexical-env compile)
-      (let ((identity-value (caddr (assq operator arithmetic-operator-map))))
+      (let ((identity-value (arithmetic-operator-identity-value operator)))
 	(if identity-value
             (compile identity-value program lexical-env)
             (raise-compilation-error "Expected at least one operand" exp))))
 
     (define (compile-open-coded-arithmetic-single-operand exp operator operand program lexical-env compile)
-      (let ((value-converter (cadddr (assq operator arithmetic-operator-map))))
+      (let ((value-converter (arithmetic-operator-single-value-converter operator)))
 	(compile (value-converter operand) program lexical-env)))
 
     (define (compile-open-coded-arithmetic-exp exp operator operands program lexical-env compile)
-      (let* ((instr (cadr (assq operator arithmetic-operator-map)))
+      (let* ((instr (arithmetic-operator-instruction operator))
              (call-fixnum->i32 (runtime-call program "fixnum->i32"))
              (call-i32->fixnum (runtime-call program "i32->fixnum"))
              (program-with-first-value-computing-code

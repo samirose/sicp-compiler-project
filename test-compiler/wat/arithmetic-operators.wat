@@ -46,11 +46,7 @@
     call 1)
   (func (;16;) (type 0) (result i32)
     i32.const 1
-    call 1
-    call 3
     i32.const 2
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;17;) (type 0) (result i32)
@@ -58,17 +54,9 @@
     call 1)
   (func (;18;) (type 0) (result i32)
     i32.const 0
-    call 1
-    call 3
     i32.const 2
-    call 1
-    call 3
     i32.const 3
-    call 1
-    call 3
     i32.add
-    call 1
-    call 3
     i32.sub
     call 1)
   (func (;19;) (type 0) (result i32)
@@ -76,124 +64,62 @@
     call 1)
   (func (;20;) (type 0) (result i32)
     i32.const 0
-    call 1
-    call 3
     i32.const 2
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;21;) (type 0) (result i32)
     i32.const 1
-    call 1
-    call 3
     i32.const 2
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;22;) (type 0) (result i32)
     i32.const 2
-    call 1
-    call 3
     i32.const -1
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;23;) (type 0) (result i32)
     i32.const 2
-    call 1
-    call 3
     i32.const -2
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;24;) (type 0) (result i32)
     i32.const 2
-    call 1
-    call 3
     i32.const -3
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;25;) (type 0) (result i32)
     i32.const -2
-    call 1
-    call 3
     i32.const 0
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;26;) (type 0) (result i32)
     i32.const 1
-    call 1
-    call 3
     i32.const 2
-    call 1
-    call 3
     i32.add
     i32.const 3
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;27;) (type 0) (result i32)
     i32.const 2
-    call 1
-    call 3
     i32.const -6
-    call 1
-    call 3
     i32.mul
     i32.const 2
-    call 1
-    call 3
     i32.mul
-    call 1
-    call 3
     i32.const 3
-    call 1
-    call 3
     i32.div_s
     i32.const 2
-    call 1
-    call 3
     i32.div_s
-    call 1
-    call 3
     i32.const 0
-    call 1
-    call 3
     i32.const 1
-    call 1
-    call 3
     i32.const 2
-    call 1
-    call 3
     i32.add
     i32.const 3
-    call 1
-    call 3
     i32.add
-    call 1
-    call 3
     i32.sub
-    call 1
-    call 3
     i32.add
     i32.const 1
-    call 1
-    call 3
     i32.const 1
-    call 1
-    call 3
     i32.add
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;28;)
@@ -210,73 +136,45 @@
     i32.const 5
     call 8
     global.set 7
-    i32.const 30
-    drop
     i32.const 6
     call 8
     global.set 8
-    i32.const 30
-    drop
     i32.const 7
     call 8
     global.set 9
-    i32.const 30
-    drop
     i32.const 8
     call 8
     global.set 10
-    i32.const 30
-    drop
     i32.const 9
     call 8
     global.set 11
-    i32.const 30
-    drop
     i32.const 10
     call 8
     global.set 12
-    i32.const 30
-    drop
     i32.const 11
     call 8
     global.set 13
-    i32.const 30
-    drop
     i32.const 12
     call 8
     global.set 14
-    i32.const 30
-    drop
     i32.const 13
     call 8
     global.set 15
-    i32.const 30
-    drop
     i32.const 14
     call 8
     global.set 16
-    i32.const 30
-    drop
     i32.const 15
     call 8
     global.set 17
-    i32.const 30
-    drop
     i32.const 16
     call 8
     global.set 18
-    i32.const 30
-    drop
     i32.const 17
     call 8
     global.set 19
-    i32.const 30
-    drop
     i32.const 18
     call 8
     global.set 20
-    i32.const 30
-    drop
     i32.const 19
     call 8
     global.set 21

@@ -64,8 +64,6 @@
       local.get 1
       call 3
       i32.const 1
-      call 1
-      call 3
       i32.sub
       call 1
       local.get 0
@@ -98,11 +96,7 @@
     call_indirect (type 0))
   (func (;19;) (type 1) (result i32)
     i32.const 40
-    call 1
-    call 3
     i32.const 2
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;20;) (type 1) (result i32)
@@ -133,8 +127,6 @@
     call 1)
   (func (;24;) (type 0) (param i32) (result i32)
     i32.const 2
-    call 1
-    call 3
     i32.const 3
     call 1
     i32.const 15
@@ -153,8 +145,6 @@
     call_indirect (type 0))
   (func (;26;) (type 0) (param i32) (result i32)
     i32.const 2
-    call 1
-    call 3
     local.get 0
     call 3
     i32.mul
@@ -184,43 +174,27 @@
     i32.const 6
     call 8
     global.set 7
-    i32.const 30
-    drop
     i32.const 10
     call 8
     global.set 8
-    i32.const 30
-    drop
     i32.const 12
     call 8
     global.set 9
-    i32.const 30
-    drop
     i32.const 2
     call 1
     global.set 10
-    i32.const 30
-    drop
     i32.const 3
     call 1
     global.set 11
-    i32.const 30
-    drop
     i32.const 14
     call 8
     global.set 12
-    i32.const 30
-    drop
     i32.const 17
     call 8
     global.set 13
-    i32.const 30
-    drop
     i32.const 19
     call 8
     global.set 14
-    i32.const 30
-    drop
     i32.const 20
     call 8
     global.set 15

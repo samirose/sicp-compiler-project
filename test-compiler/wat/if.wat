@@ -47,8 +47,6 @@
     i32.const 1
     call 1
     global.set 7
-    i32.const 30
-    drop
     global.get 7
     call 2
     i32.const 1
@@ -63,8 +61,6 @@
       global.get 7
       call 3
       i32.const 1
-      call 1
-      call 3
       i32.add
       call 1
     end)
@@ -72,8 +68,6 @@
     i32.const 0
     call 1
     global.set 7
-    i32.const 30
-    drop
     global.get 7
     call 2
     i32.const 0
@@ -86,8 +80,6 @@
       global.get 7
       call 3
       i32.const 1
-      call 1
-      call 3
       i32.add
       call 1
       global.set 7
@@ -96,8 +88,6 @@
       global.get 7
       call 3
       i32.const 2
-      call 1
-      call 3
       i32.add
       call 1
       global.set 7
@@ -109,8 +99,6 @@
     i32.const 1
     call 1
     global.set 7
-    i32.const 30
-    drop
     global.get 7
     call 2
     i32.const 1
@@ -123,8 +111,6 @@
       global.get 7
       call 3
       i32.const 2
-      call 1
-      call 3
       i32.add
       call 1
       global.set 7
@@ -148,8 +134,6 @@
     i32.const 1
     call 1
     global.set 7
-    i32.const 30
-    drop
     global.get 7
     call 2
     i32.const 1
@@ -164,8 +148,6 @@
       global.get 7
       call 3
       i32.const 1
-      call 1
-      call 3
       i32.add
       call 1
     end)
@@ -173,8 +155,6 @@
     i32.const 0
     call 1
     global.set 7
-    i32.const 30
-    drop
     global.get 7
     call 2
     i32.const 1
@@ -187,8 +167,6 @@
       global.get 7
       call 3
       i32.const 2
-      call 1
-      call 3
       i32.add
       call 1
       global.set 7
@@ -197,8 +175,6 @@
       global.get 7
       call 3
       i32.const 1
-      call 1
-      call 3
       i32.add
       call 1
       global.set 7
@@ -210,8 +186,6 @@
     i32.const 1
     call 1
     global.set 7
-    i32.const 30
-    drop
     global.get 7
     call 2
     i32.const 1
@@ -224,8 +198,6 @@
       global.get 7
       call 3
       i32.const 2
-      call 1
-      call 3
       i32.add
       call 1
       global.set 7
@@ -270,8 +242,6 @@
     local.get 0
     call 3
     i32.const 1
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;25;) (type 0) (result i32)
@@ -305,16 +275,12 @@
     local.get 0
     call 3
     i32.const 1
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;28;) (type 1) (param i32) (result i32)
     local.get 0
     call 3
     i32.const 2
-    call 1
-    call 3
     i32.add
     call 1)
   (func (;29;) (type 0) (result i32)
@@ -354,58 +320,36 @@
     i32.const 1
     call 1
     global.set 7
-    i32.const 30
-    drop
     i32.const 5
     call 8
     global.set 8
-    i32.const 30
-    drop
     i32.const 6
     call 8
     global.set 9
-    i32.const 30
-    drop
     i32.const 7
     call 8
     global.set 10
-    i32.const 30
-    drop
     i32.const 8
     call 8
     global.set 11
-    i32.const 30
-    drop
     i32.const 9
     call 8
     global.set 12
-    i32.const 30
-    drop
     i32.const 10
     call 8
     global.set 13
-    i32.const 30
-    drop
     i32.const 11
     call 8
     global.set 14
-    i32.const 30
-    drop
     i32.const 12
     call 8
     global.set 15
-    i32.const 30
-    drop
     i32.const 14
     call 8
     global.set 16
-    i32.const 30
-    drop
     i32.const 17
     call 8
     global.set 17
-    i32.const 30
-    drop
     i32.const 21
     call 8
     global.set 18

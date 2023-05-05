@@ -64,18 +64,12 @@
     i32.const 5
     call 8
     global.set 7
-    i32.const 30
-    drop
     i32.const 6
     call 8
     global.set 8
-    i32.const 30
-    drop
     i32.const 7
     call 8
     global.set 9
-    i32.const 30
-    drop
     i32.const 8
     call 8
     global.set 10

@@ -111,11 +111,7 @@
       end
       block  ;; label = @2
         i32.const 0
-        call 1
-        call 3
         i32.const 1
-        call 1
-        call 3
         i32.add
         call 1
         call 2
@@ -134,8 +130,6 @@
       local.get 1
       call 3
       i32.const 2
-      call 1
-      call 3
       i32.mul
       call 1
       local.set 0
@@ -151,8 +145,6 @@
         i32.const 1
         call 1
         local.set 0
-        i32.const 30
-        drop
         local.get 0
         call 2
         i32.const 1
@@ -168,8 +160,6 @@
         i32.const 2
         call 1
         local.set 0
-        i32.const 30
-        drop
         local.get 0
         call 2
         i32.const 2
@@ -184,8 +174,6 @@
       i32.const 3
       call 1
       local.set 0
-      i32.const 30
-      drop
       i32.const 3
       call 1
       local.set 1
@@ -207,8 +195,6 @@
         i32.const 1
         call 1
         local.set 0
-        i32.const 30
-        drop
         i32.const 6
         local.tee 1
         call 7
@@ -218,8 +204,6 @@
         i32.const 2
         call 1
         local.set 0
-        i32.const 30
-        drop
         i32.const 2
         call 1
         local.tee 1
@@ -229,8 +213,6 @@
       i32.const 3
       call 1
       local.set 0
-      i32.const 30
-      drop
       i32.const 3
       call 1
       local.set 1
@@ -252,38 +234,24 @@
     i32.const 5
     call 8
     global.set 7
-    i32.const 30
-    drop
     i32.const 6
     call 8
     global.set 8
-    i32.const 30
-    drop
     i32.const 7
     call 8
     global.set 9
-    i32.const 30
-    drop
     i32.const 8
     call 8
     global.set 10
-    i32.const 30
-    drop
     i32.const 9
     call 8
     global.set 11
-    i32.const 30
-    drop
     i32.const 11
     call 8
     global.set 12
-    i32.const 30
-    drop
     i32.const 12
     call 8
     global.set 13
-    i32.const 30
-    drop
     i32.const 13
     call 8
     global.set 14

@@ -90,8 +90,6 @@
           local.get 1
           call 3
           i32.const 2
-          call 1
-          call 3
           i32.mul
           call 1
           global.get 8
@@ -104,8 +102,6 @@
       local.get 1
       call 3
       i32.const 2
-      call 1
-      call 3
       i32.div_s
       call 1
       global.get 8
@@ -123,8 +119,6 @@
     call 7
     if (result i32)  ;; label = @1
       i32.const 0
-      call 1
-      call 3
       local.get 0
       call 3
       i32.sub
@@ -181,16 +175,12 @@
           i32.add
           call 1
           i32.const 2
-          call 1
-          call 3
           local.get 2
           call 3
           i32.mul
           local.get 3
           call 3
           i32.mul
-          call 1
-          call 3
           local.get 3
           global.get 7
           call 9
@@ -201,8 +191,6 @@
           local.get 4
           call 3
           i32.const 2
-          call 1
-          call 3
           i32.div_s
           call 1
           global.get 10
@@ -216,23 +204,17 @@
       local.get 3
       call 3
       i32.mul
-      call 1
-      call 3
       local.get 0
       call 3
       local.get 3
       call 3
       i32.mul
-      call 1
-      call 3
       i32.add
       local.get 0
       call 3
       local.get 2
       call 3
       i32.mul
-      call 1
-      call 3
       i32.add
       call 1
       local.get 1
@@ -240,15 +222,11 @@
       local.get 2
       call 3
       i32.mul
-      call 1
-      call 3
       local.get 0
       call 3
       local.get 3
       call 3
       i32.mul
-      call 1
-      call 3
       i32.add
       call 1
       local.get 2
@@ -256,8 +234,6 @@
       local.get 4
       call 3
       i32.const 1
-      call 1
-      call 3
       i32.sub
       call 1
       global.get 10
@@ -291,23 +267,15 @@
     i32.const 5
     call 8
     global.set 7
-    i32.const 30
-    drop
     i32.const 6
     call 8
     global.set 8
-    i32.const 30
-    drop
     i32.const 7
     call 8
     global.set 9
-    i32.const 30
-    drop
     i32.const 8
     call 8
     global.set 10
-    i32.const 30
-    drop
     i32.const 9
     call 8
     global.set 11

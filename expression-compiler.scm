@@ -531,14 +531,14 @@
 
     (define (compile-proc-to-func context-exp formals body program lexical-env exported-name compile)
       (let*
-					; Compile the procedure body
+	  ;; Compile the procedure body
 	  ((body-env
             (if (null? (first-duplicate formals))
 		(add-new-lexical-frame lexical-env formals '())
 		(raise-compilation-error "Duplicate parameter in" context-exp)))
            (body-program
             (compile-procedure-body body program body-env compile))
-					; Add function type, if needed, and look up its index
+	   ;; Add function type, if needed, and look up its index
            (func-type (scheme-procedure-type-definition (length formals)))
            (type-program
             (if (compiled-program-contains-definition body-program func-type)
@@ -546,7 +546,7 @@
 		(compiled-program-add-definition body-program func-type)))
            (type-index
             (compiled-program-definition-index type-program func-type))
-					; Add function definition and look up its index
+	   ;; Add function definition and look up its index
            (func-definition
             `(func (type ,type-index)
                    ,@(compiled-program-value-code body-program)))
@@ -557,7 +557,7 @@
              type-program
              func-definition
              '())))
-					; Add export definition for the function if exported name is defined
+	;; Add export definition for the function if exported name is defined
 	(if exported-name
             (compiled-program-add-definition
              func-program
@@ -578,7 +578,7 @@
              lexical-env
              exported-name
              compile))
-					; Add table element for the function for indirect calling
+	   ;; Add table element for the function for indirect calling
 	   (func-index
             (- (compiled-program-definitions-count func-program 'func) 1))
 	   (elem-definition
@@ -587,8 +587,7 @@
             (compiled-program-definitions-count func-program 'elem))
 	   (elem-program
             (compiled-program-add-definition func-program elem-definition)))
-					; Lambda expression's value is the function's index in the
-                                        ; table type-tagged as a procedure
+	;; Lambda expression's value is the function's index in the table type-tagged as a procedure
 	(compiled-program-with-value-code
 	 elem-program
 	 `(i32.const ,elem-index ,@(runtime-call elem-program "funcidx->procedure")))))

@@ -7,10 +7,12 @@
          flatten-n
          all?
 	 filter
+         filter-seqs
 	 find
 	 fold)
 
- (import (scheme  base)
+ (import (scheme base)
+         (scheme cxr)
 	 (only (srfi srfi-1) filter find fold))
 
  (begin
@@ -50,5 +52,24 @@
      (cond ((null? l))
            ((p? (car l)) (all? p? (cdr l)))
            (else #f)))
+
+   (define (filter-seqs seq l)
+     (let ((es
+            (fold (lambda (x s)
+                    (cond ((null? (car s))
+                           (let ((r (cons x (cadr s))))
+                             (list seq r r)))
+                          ((eq? x (caar s))
+                           (let ((a (cons x (caddr s))))
+                             (list (cdar s) (cadr s) a)))
+                          (else
+                           (let ((r (cons x (caddr s))))
+                             (list seq r r)))))
+                  (list seq '() '())
+                  l)))
+       (reverse
+        (if (null? (car es))
+            (cadr es)
+            (caddr es)))))
 
    ))

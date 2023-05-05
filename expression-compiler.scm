@@ -491,21 +491,33 @@
 ;;; sequences
 
     (define (compile-sequence seq program lexical-env compile)
-      (let ((program-with-next-exp
-             (compile (car seq) program lexical-env)))
-	(if (null? (cdr seq))
-            program-with-next-exp
-            (let ((program-with-next-exp-result-discarded
-		   (compiled-program-append-value-code
-                    program-with-next-exp
-                    '(drop))))
-              (compiled-program-append-value-codes
-               program-with-next-exp-result-discarded
-               (compile-sequence
-		(cdr seq)
-		program-with-next-exp-result-discarded
-		lexical-env
-		compile))))))
+      (let* ((program-with-next-exp
+              (compile (car seq) program lexical-env))
+             (sequence-program
+	      (if (null? (cdr seq))
+                  program-with-next-exp
+                  (let ((program-with-next-exp-result-discarded
+		         (compiled-program-append-value-code
+                          program-with-next-exp
+                          '(drop))))
+                    (compiled-program-append-value-codes
+                     program-with-next-exp-result-discarded
+                     (compile-sequence
+		      (cdr seq)
+		      program-with-next-exp-result-discarded
+		      lexical-env
+		      compile)))))
+             (call-i32->fixnum (runtime-call sequence-program "i32->fixnum"))
+             (call-fixnum->i32 (runtime-call sequence-program "fixnum->i32"))
+             (nop-sequences `((,@call-i32->fixnum ,@call-fixnum->i32)
+                              (,@call-fixnum->i32 ,@call-i32->fixnum)
+                              (i32.const ,unspecified-value drop))))
+        (fold (lambda (seq program)
+                (compiled-program-with-value-code
+                 program
+                 (filter-seqs seq (compiled-program-value-code program))))
+              sequence-program
+              nop-sequences)))
 
 ;;;lambda expressions
 

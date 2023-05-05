@@ -114,3 +114,59 @@
 (assert-equal
  #f (all? number? '(1 2 'foo 3))
  "all is false for a list where the predicate is false for any item")
+
+(assert-equal
+ '() (filter-seqs '() '())
+ "filter-seq an empty sequence from an empty list is empty list")
+
+(assert-equal
+ '() (filter-seqs '(x y) '())
+ "filter-seq any sequence from an empty list is empty list")
+
+(assert-equal
+ '(x) (filter-seqs '() '(x))
+ "filter-seq an empty sequence from any list results to the list")
+
+(assert-equal
+ '(1 2) (filter-seqs '() '(1 2))
+ "filter-seq an empty sequence from any list results to the list")
+
+(assert-equal
+ '(2 3) (filter-seqs '(1) '(1 2 3))
+ "filter-seq a sequence from start of a list results in rest of the list")
+
+(assert-equal
+ '(3) (filter-seqs '(1 2) '(1 2 3))
+ "filter-seq a sequence from start of a list results in rest of the list")
+
+(assert-equal
+ '() (filter-seqs '(1 2 3) '(1 2 3))
+ "filter-seq a sequence from start of a list results in rest of the list")
+
+(assert-equal
+ '(1 2) (filter-seqs '(3) '(1 2 3))
+ "filter-seq a sequence from end of a list results in head of the list")
+
+(assert-equal
+ '(1) (filter-seqs '(2 3) '(1 2 3))
+ "filter-seq a sequence from end of a list results in head of the list")
+
+(assert-equal
+ '() (filter-seqs '(1 2 3) '(1 2 3))
+ "filter-seq a sequence equal to the list results in empty list")
+
+(assert-equal
+ '(1 2 3) (filter-seqs '(0 1) '(1 2 3))
+ "filter-seq a sequence not in the list results in the original list")
+
+(assert-equal
+ '(1 2 3) (filter-seqs '(3 4) '(1 2 3))
+ "filter-seq a sequence not in the list results in the original list")
+
+(assert-equal
+ '(1 2 3) (filter-seqs '(5) '(1 2 3))
+ "filter-seq a sequence not in the list results in the original list")
+
+(assert-equal
+ '(1 4 5 2) (filter-seqs '(2 3) '(1 2 3 4 2 3 5 2 3 2))
+ "filter-seq a sequence removes all occurences of it from the list")

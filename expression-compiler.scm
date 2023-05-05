@@ -102,7 +102,7 @@
       (compiled-program-with-value-code
        program
        (cond ((integer? exp)
-	      `((i32.const ,exp) ,(runtime-call program "i32->fixnum")))
+	      `(i32.const ,exp ,@(runtime-call program "i32->fixnum")))
               (else
 	       (raise-compilation-error "Unsupported number" exp)))))
 

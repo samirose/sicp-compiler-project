@@ -1,19 +1,18 @@
 (define-library (lists)
 
- (export partition-list
-         index-of-equal
-         first-duplicate
-         make-list
-         flatten-n
-         all?
-	 filter
-         filter-seqs
-	 find
-	 fold)
+  (export
+   partition-list
+   index-of-equal
+   first-duplicate
+   flatten-n
+   all?
+   filter-seqs
+   filter find fold)
 
- (import (scheme base)
-         (scheme cxr)
-	 (only (srfi srfi-1) filter find fold))
+  (import
+   (scheme base)
+   (scheme cxr)
+   (only (srfi srfi-1) filter find fold))
 
  (begin
    (define (partition-list p l)

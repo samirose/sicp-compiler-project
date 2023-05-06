@@ -52,23 +52,19 @@
            ((p? (car l)) (all? p? (cdr l)))
            (else #f)))
 
-   (define (filter-seqs seq l)
-     (let ((es
-            (fold (lambda (x s)
-                    (cond ((null? (car s))
-                           (let ((r (cons x (cadr s))))
-                             (list seq r r)))
-                          ((eq? x (caar s))
-                           (let ((a (cons x (caddr s))))
-                             (list (cdar s) (cadr s) a)))
-                          (else
-                           (let ((r (cons x (caddr s))))
-                             (list seq r r)))))
-                  (list seq '() '())
-                  l)))
-       (reverse
-        (if (null? (car es))
-            (cadr es)
-            (caddr es)))))
+   (define (filter-seqs seq lst)
+     (if (null? seq)
+         lst
+         (let reduce ((s seq) (f '()) (a '()) (l lst))
+           (cond ((null? l)
+                  (reverse (if (null? s) f a)))
+                 ((null? s)
+                  (reduce seq f f l))
+                 ((eq? (car l) (car s))
+                  (let ((a' (cons (car l) a)))
+                    (reduce (cdr s) f a' (cdr l))))
+                 (else
+                  (let ((a' (cons (car l) a)))
+                    (reduce seq a' a' (cdr l))))))))
 
    ))

@@ -170,3 +170,7 @@
 (assert-equal
  '(1 4 5 2) (filter-seqs '(2 3) '(1 2 3 4 2 3 5 2 3 2))
  "filter-seq a sequence removes all occurences of it from the list")
+
+(assert-equal
+ '() (filter-seqs '(1 2) '(1 2 1 2))
+ "filter-seq a sequence removes all occurences of it from the list")

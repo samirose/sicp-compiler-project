@@ -1,15 +1,15 @@
-(define-library
-  (import)
+(define-library (import)
 
   (import (scheme base))
 
-  ; should export the re-defined number?
+  ;; should export the re-defined number?
   (export number?)
 
-  ; should export the original zero?
+  ;; should export the original zero?
   (export zero?)
 
   (begin
-    ; re-define import
-    (define (number? x) 42))
-)
+    ;; re-define import
+    (define (number? x) 42)
+
+    ))

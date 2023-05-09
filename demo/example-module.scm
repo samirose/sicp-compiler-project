@@ -1,14 +1,23 @@
 (define-library (example-module)
-  (export square get-value)
 
-;;  (import (scheme base))
+  (export
+   square square-4 get-square-4
+   abs abs-3 abs-minus-5)
+
+  (import (scheme base))
 
   (begin
     (define (square x) (* x x))
 
-    (define a (square 4))
+    (define square-4 (square 4))
 
-    (define (get-value) a)
+    (define (get-square-4) square-4)
+
+    (define (abs x)
+      (if (< x 0) (- x) x))
+
+    (define (abs-3) (abs 3))
+    (define (abs-minus-5) (abs -5))
     ))
 
 ;; Compiling
@@ -22,7 +31,7 @@
 
 ;; Examining Wasm binary
 ;; file demo/example-module.wasm
-;; hexdump demo/example-module.wasm
+;; hexdump -C demo/example-module.wasm
 ;; wasm2wat demo/example-module.wasm
 
 ;; Piping

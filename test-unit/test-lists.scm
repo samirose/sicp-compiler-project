@@ -116,61 +116,73 @@
  "all is false for a list where the predicate is false for any item")
 
 (assert-equal
- '() (filter-seqs '() '())
- "filter-seq an empty sequence from an empty list is empty list")
+ '() (replace-seqs '() '() '())
+ "replace-seqs of an empty sequence with empty sequence from an empty list is empty list")
 
 (assert-equal
- '() (filter-seqs '(x y) '())
- "filter-seq any sequence from an empty list is empty list")
+ '() (replace-seqs '() '(a b) '())
+ "replace-seqs of an empty sequence with any sequence from an empty list is empty list")
 
 (assert-equal
- '(x) (filter-seqs '() '(x))
- "filter-seq an empty sequence from any list results to the list")
+ '() (replace-seqs '(x y) '(a b) '())
+ "replace-seqs of any sequence with any sequence from an empty list is empty list")
 
 (assert-equal
- '(1 2) (filter-seqs '() '(1 2))
- "filter-seq an empty sequence from any list results to the list")
+ '(x) (replace-seqs '() '(a b) '(x))
+ "replace-seqs an empty sequence with any sequence from any list results to the list")
 
 (assert-equal
- '(2 3) (filter-seqs '(1) '(1 2 3))
- "filter-seq a sequence from start of a list results in rest of the list")
+ '(2 3) (replace-seqs '(1) '() '(1 2 3))
+ "replace-seqs a sequence from start of a list with empty list results in rest of the list")
 
 (assert-equal
- '(3) (filter-seqs '(1 2) '(1 2 3))
- "filter-seq a sequence from start of a list results in rest of the list")
+ '(3) (replace-seqs '(1 2) '() '(1 2 3))
+ "replace-seqs a sequence from start of a list with empty list results in rest of the list")
 
 (assert-equal
- '() (filter-seqs '(1 2 3) '(1 2 3))
- "filter-seq a sequence from start of a list results in rest of the list")
+ '() (replace-seqs '(1 2 3) '() '(1 2 3))
+ "replace-seqs the whole list with empty list results in empty list")
 
 (assert-equal
- '(1 2) (filter-seqs '(3) '(1 2 3))
- "filter-seq a sequence from end of a list results in head of the list")
+ '(1 2) (replace-seqs '(3) '() '(1 2 3))
+ "replace-seqs a sequence from end of a list with empty list results in head of the list")
 
 (assert-equal
- '(1) (filter-seqs '(2 3) '(1 2 3))
- "filter-seq a sequence from end of a list results in head of the list")
+ '(1) (replace-seqs '(2 3) '() '(1 2 3))
+ "replace-seqs a sequence from end of a list with empty list results in head of the list")
 
 (assert-equal
- '() (filter-seqs '(1 2 3) '(1 2 3))
- "filter-seq a sequence equal to the list results in empty list")
+ '(a b c) (replace-seqs '(1 2 3) '(a b c) '(1 2 3))
+ "replace-seqs a sequence equal to the list results in the replacement list")
 
 (assert-equal
- '(1 2 3) (filter-seqs '(0 1) '(1 2 3))
- "filter-seq a sequence not in the list results in the original list")
+ '(1 2 3) (replace-seqs '(0 1) '(a b) '(1 2 3))
+ "replace-seqs a sequence not in the list results in the original list")
 
 (assert-equal
- '(1 2 3) (filter-seqs '(3 4) '(1 2 3))
- "filter-seq a sequence not in the list results in the original list")
+ '(1 2 3) (replace-seqs '(3 4) '(x y) '(1 2 3))
+ "replace-seqs a sequence not in the list results in the original list")
 
 (assert-equal
- '(1 2 3) (filter-seqs '(5) '(1 2 3))
- "filter-seq a sequence not in the list results in the original list")
+ '(1 2 3) (replace-seqs '(5) '(a)  '(1 2 3))
+ "replace-seqs a sequence not in the list results in the original list")
 
 (assert-equal
- '(1 4 5 2) (filter-seqs '(2 3) '(1 2 3 4 2 3 5 2 3 2))
- "filter-seq a sequence removes all occurences of it from the list")
+ '(1 a 4 a 5 a 2) (replace-seqs '(2 3) '(a) '(1 2 3 4 2 3 5 2 3 2))
+ "replace-seqs a sequence replaces all occurences of it from the list")
 
 (assert-equal
- '() (filter-seqs '(1 2) '(1 2 1 2))
- "filter-seq a sequence removes all occurences of it from the list")
+ '(a b c a b c) (replace-seqs '(1 2) '(a b c) '(1 2 1 2))
+ "replace-seqs a sequence replaces all occurences of it from the list")
+
+(assert-equal
+ '(a b a b) (replace-seqs '(1 2) '(a b) '(1 2 1 2))
+ "replace-seqs a sequence replaces all occurences of it from the list")
+
+(assert-equal
+ '(1 4 5 2) (replace-seqs '(2 3) '() '(1 2 3 4 2 3 5 2 3 2))
+ "replace-seqs a sequence with empty list removes all occurences of sequence from the list")
+
+(assert-equal
+ '() (replace-seqs '(1 2) '() '(1 2 1 2))
+ "replace-seqs a sequence with empty list removes all occurences of sequence from the list")

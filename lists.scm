@@ -6,13 +6,14 @@
    first-duplicate
    flatten-n
    all?
-   filter-seqs
+   replace-seqs
+   ;; from srfi-1
    filter find fold)
 
   (import
    (scheme base)
    (scheme cxr)
-   (only (srfi srfi-1) filter find fold))
+   (srfi srfi-1))
 
  (begin
    (define (partition-list p l)
@@ -52,19 +53,19 @@
            ((p? (car l)) (all? p? (cdr l)))
            (else #f)))
 
-   (define (filter-seqs seq lst)
+   (define (replace-seqs seq with-seq lst)
      (if (null? seq)
          lst
          (let reduce ((s seq) (f '()) (a '()) (l lst))
-           (cond ((null? l)
+           (cond ((null? s)
+                  (let ((f' (append-reverse with-seq f)))
+                    (reduce seq f' f' l)))
+                 ((null? l)
                   (reverse (if (null? s) f a)))
-                 ((null? s)
-                  (reduce seq f f l))
                  ((eq? (car l) (car s))
                   (let ((a' (cons (car l) a)))
                     (reduce (cdr s) f a' (cdr l))))
                  (else
                   (let ((a' (cons (car l) a)))
                     (reduce seq a' a' (cdr l))))))))
-
    ))

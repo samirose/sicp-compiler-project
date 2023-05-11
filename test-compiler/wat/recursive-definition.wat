@@ -94,7 +94,6 @@
     call 2
     i32.const 0
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       local.get 0
@@ -115,7 +114,6 @@
     call 2
     i32.const 0
     call 1
-    call 2
     i32.lt_s
     if (result i32)  ;; label = @1
       i32.const 0
@@ -131,7 +129,6 @@
     call 2
     i32.const 0
     call 1
-    call 2
     i32.lt_s
     if (result i32)  ;; label = @1
       i32.const 0

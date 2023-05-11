@@ -51,7 +51,6 @@
     call 2
     i32.const 1
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       global.get 7
@@ -70,7 +69,6 @@
     call 2
     i32.const 0
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       global.get 7
@@ -99,7 +97,6 @@
     call 2
     i32.const 1
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       global.get 7
@@ -132,7 +129,6 @@
     call 2
     i32.const 1
     call 1
-    call 2
     i32.gt_s
     if (result i32)  ;; label = @1
       global.get 7
@@ -151,7 +147,6 @@
     call 2
     i32.const 1
     call 1
-    call 2
     i32.eq
     if (result i32)  ;; label = @1
       global.get 7
@@ -180,7 +175,6 @@
     call 2
     i32.const 1
     call 1
-    call 2
     i32.gt_s
     if (result i32)  ;; label = @1
       global.get 7
@@ -200,7 +194,6 @@
     call 2
     i32.const 0
     call 1
-    call 2
     i32.gt_s
     call 6)
   (func (;22;) (type 0) (result i32)
@@ -223,7 +216,6 @@
     call 2
     i32.const 0
     call 1
-    call 2
     i32.gt_s
     call 6)
   (func (;24;) (type 1) (param i32) (result i32)
@@ -256,7 +248,6 @@
     call 2
     i32.const 0
     call 1
-    call 2
     i32.gt_s
     call 6)
   (func (;27;) (type 1) (param i32) (result i32)

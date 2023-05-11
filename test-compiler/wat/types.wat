@@ -115,10 +115,8 @@
         block  ;; label = @3
           i32.const 1
           call 1
-          call 2
           i32.const 2
           call 1
-          call 2
           i32.lt_s
           call 6
           global.get 4
@@ -131,10 +129,8 @@
         block  ;; label = @3
           i32.const 2
           call 1
-          call 2
           i32.const 1
           call 1
-          call 2
           i32.lt_s
           call 6
           global.get 4
@@ -147,10 +143,8 @@
         block  ;; label = @3
           i32.const 1
           call 1
-          call 2
           i32.const 2
           call 1
-          call 2
           i32.le_s
           call 6
           global.get 4
@@ -163,10 +157,8 @@
         block  ;; label = @3
           i32.const 2
           call 1
-          call 2
           i32.const 1
           call 1
-          call 2
           i32.le_s
           call 6
           global.get 4
@@ -179,10 +171,8 @@
         block  ;; label = @3
           i32.const 1
           call 1
-          call 2
           i32.const 1
           call 1
-          call 2
           i32.eq
           call 6
           global.get 4
@@ -195,10 +185,8 @@
         block  ;; label = @3
           i32.const 2
           call 1
-          call 2
           i32.const 1
           call 1
-          call 2
           i32.gt_s
           call 6
           global.get 4
@@ -211,10 +199,8 @@
         block  ;; label = @3
           i32.const 1
           call 1
-          call 2
           i32.const 2
           call 1
-          call 2
           i32.gt_s
           call 6
           global.get 4
@@ -227,10 +213,8 @@
         block  ;; label = @3
           i32.const 2
           call 1
-          call 2
           i32.const 1
           call 1
-          call 2
           i32.ge_s
           call 6
           global.get 4
@@ -243,10 +227,8 @@
         block  ;; label = @3
           i32.const 1
           call 1
-          call 2
           i32.const 2
           call 1
-          call 2
           i32.ge_s
           call 6
           global.get 4

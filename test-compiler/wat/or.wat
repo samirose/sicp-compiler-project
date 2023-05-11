@@ -114,10 +114,8 @@
         i32.const 1
         i32.add
         call 1
-        call 2
         i32.const 2
         call 1
-        call 2
         i32.gt_s
         call 6
         local.tee 0
@@ -149,7 +147,6 @@
         call 2
         i32.const 1
         call 1
-        call 2
         i32.gt_s
         call 6
         local.tee 1
@@ -164,7 +161,6 @@
         call 2
         i32.const 2
         call 1
-        call 2
         i32.gt_s
         call 6
         local.tee 1

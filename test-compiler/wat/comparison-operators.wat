@@ -114,10 +114,8 @@
               block  ;; label = @6
                 i32.const 1
                 call 1
-                call 2
                 i32.const 1
                 call 1
-                call 2
                 i32.eq
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -125,10 +123,8 @@
               block  ;; label = @6
                 i32.const 1
                 call 1
-                call 2
                 i32.const 1
                 call 1
-                call 2
                 i32.eq
                 call 6
                 local.tee 0
@@ -151,10 +147,8 @@
               block  ;; label = @6
                 i32.const 1
                 call 1
-                call 2
                 i32.const 2
                 call 1
-                call 2
                 i32.lt_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -162,10 +156,8 @@
               block  ;; label = @6
                 i32.const 2
                 call 1
-                call 2
                 i32.const 3
                 call 1
-                call 2
                 i32.lt_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -173,10 +165,8 @@
               block  ;; label = @6
                 i32.const 3
                 call 1
-                call 2
                 i32.const 4
                 call 1
-                call 2
                 i32.lt_s
                 call 6
                 local.tee 0
@@ -199,10 +189,8 @@
               block  ;; label = @6
                 i32.const 3
                 call 1
-                call 2
                 i32.const 2
                 call 1
-                call 2
                 i32.gt_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -210,10 +198,8 @@
               block  ;; label = @6
                 i32.const 2
                 call 1
-                call 2
                 i32.const 1
                 call 1
-                call 2
                 i32.gt_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -221,10 +207,8 @@
               block  ;; label = @6
                 i32.const 1
                 call 1
-                call 2
                 i32.const 0
                 call 1
-                call 2
                 i32.gt_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -232,10 +216,8 @@
               block  ;; label = @6
                 i32.const 0
                 call 1
-                call 2
                 i32.const -1
                 call 1
-                call 2
                 i32.gt_s
                 call 6
                 local.tee 0
@@ -258,10 +240,8 @@
               block  ;; label = @6
                 i32.const 1
                 call 1
-                call 2
                 i32.const 2
                 call 1
-                call 2
                 i32.le_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -269,10 +249,8 @@
               block  ;; label = @6
                 i32.const 2
                 call 1
-                call 2
                 i32.const 2
                 call 1
-                call 2
                 i32.le_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -280,10 +258,8 @@
               block  ;; label = @6
                 i32.const 2
                 call 1
-                call 2
                 i32.const 3
                 call 1
-                call 2
                 i32.le_s
                 call 6
                 local.tee 0
@@ -306,10 +282,8 @@
               block  ;; label = @6
                 i32.const 3
                 call 1
-                call 2
                 i32.const 2
                 call 1
-                call 2
                 i32.ge_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -317,10 +291,8 @@
               block  ;; label = @6
                 i32.const 2
                 call 1
-                call 2
                 i32.const 2
                 call 1
-                call 2
                 i32.ge_s
                 br_if 0 (;@6;)
                 br 1 (;@5;)
@@ -328,10 +300,8 @@
               block  ;; label = @6
                 i32.const 2
                 call 1
-                call 2
                 i32.const 1
                 call 1
-                call 2
                 i32.ge_s
                 call 6
                 local.tee 1
@@ -363,10 +333,8 @@
             block  ;; label = @5
               i32.const 1
               call 1
-              call 2
               i32.const 1
               call 1
-              call 2
               i32.eq
               br_if 0 (;@5;)
               br 1 (;@4;)
@@ -374,10 +342,8 @@
             block  ;; label = @5
               i32.const 1
               call 1
-              call 2
               i32.const 0
               call 1
-              call 2
               i32.eq
               call 6
               local.tee 1
@@ -400,10 +366,8 @@
             block  ;; label = @5
               i32.const 1
               call 1
-              call 2
               i32.const 2
               call 1
-              call 2
               i32.lt_s
               br_if 0 (;@5;)
               br 1 (;@4;)
@@ -411,10 +375,8 @@
             block  ;; label = @5
               i32.const 2
               call 1
-              call 2
               i32.const 4
               call 1
-              call 2
               i32.lt_s
               br_if 0 (;@5;)
               br 1 (;@4;)
@@ -422,10 +384,8 @@
             block  ;; label = @5
               i32.const 4
               call 1
-              call 2
               i32.const 3
               call 1
-              call 2
               i32.lt_s
               call 6
               local.tee 1
@@ -448,10 +408,8 @@
             block  ;; label = @5
               i32.const 3
               call 1
-              call 2
               i32.const 2
               call 1
-              call 2
               i32.gt_s
               br_if 0 (;@5;)
               br 1 (;@4;)
@@ -459,10 +417,8 @@
             block  ;; label = @5
               i32.const 2
               call 1
-              call 2
               i32.const 1
               call 1
-              call 2
               i32.gt_s
               br_if 0 (;@5;)
               br 1 (;@4;)
@@ -470,10 +426,8 @@
             block  ;; label = @5
               i32.const 1
               call 1
-              call 2
               i32.const -1
               call 1
-              call 2
               i32.gt_s
               br_if 0 (;@5;)
               br 1 (;@4;)
@@ -481,10 +435,8 @@
             block  ;; label = @5
               i32.const -1
               call 1
-              call 2
               i32.const 0
               call 1
-              call 2
               i32.gt_s
               call 6
               local.tee 1
@@ -507,10 +459,8 @@
             block  ;; label = @5
               i32.const 1
               call 1
-              call 2
               i32.const 2
               call 1
-              call 2
               i32.le_s
               br_if 0 (;@5;)
               br 1 (;@4;)
@@ -518,10 +468,8 @@
             block  ;; label = @5
               i32.const 2
               call 1
-              call 2
               i32.const 0
               call 1
-              call 2
               i32.le_s
               br_if 0 (;@5;)
               br 1 (;@4;)
@@ -529,10 +477,8 @@
             block  ;; label = @5
               i32.const 0
               call 1
-              call 2
               i32.const 2
               call 1
-              call 2
               i32.le_s
               call 6
               local.tee 1
@@ -554,10 +500,8 @@
           block  ;; label = @4
             i32.const 3
             call 1
-            call 2
             i32.const 2
             call 1
-            call 2
             i32.ge_s
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -565,10 +509,8 @@
           block  ;; label = @4
             i32.const 2
             call 1
-            call 2
             i32.const 3
             call 1
-            call 2
             i32.ge_s
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -576,10 +518,8 @@
           block  ;; label = @4
             i32.const 3
             call 1
-            call 2
             i32.const 2
             call 1
-            call 2
             i32.ge_s
             call 6
             local.tee 1

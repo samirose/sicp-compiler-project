@@ -51,10 +51,8 @@
     i32.const 22
     i32.const 1
     call 1
-    call 2
     i32.const 0
     call 1
-    call 2
     i32.gt_s
     select)
   (func (;17;) (type 1) (param i32) (result i32)
@@ -79,10 +77,8 @@
     i32.const 22
     i32.const 0
     call 1
-    call 2
     i32.const 1
     call 1
-    call 2
     i32.gt_s
     select)
   (func (;20;)

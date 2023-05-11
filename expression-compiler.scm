@@ -509,19 +509,24 @@
 		      compile)))))
              (call-i32->fixnum (runtime-call sequence-program "i32->fixnum"))
              (call-fixnum->i32 (runtime-call sequence-program "fixnum->i32"))
+             (call-check-fixnum (runtime-call sequence-program "check-fixnum"))
              (call-i32->boolean (runtime-call sequence-program "i32->boolean"))
              (call-boolean->i32 (runtime-call sequence-program "boolean->i32"))
-             (nop-sequences `((,@call-i32->fixnum ,@call-fixnum->i32)
-                              (,@call-fixnum->i32 ,@call-i32->fixnum)
-                              (,@call-i32->boolean ,@call-boolean->i32)
-                              (,@call-boolean->i32 ,@call-i32->boolean)
-                              (i32.const ,unspecified-value drop))))
+             (instruction-sequence-transforms
+              `(((,@call-i32->fixnum ,@call-fixnum->i32) ())
+                ((,@call-i32->fixnum ,@call-check-fixnum) ,call-i32->fixnum)
+                ((,@call-fixnum->i32 ,@call-i32->fixnum) ())
+                ((,@call-i32->boolean ,@call-boolean->i32) ())
+                ((,@call-boolean->i32 ,@call-i32->boolean) ())
+                ((i32.const ,unspecified-value drop) ()))))
         (fold (lambda (seq program)
                 (compiled-program-with-value-code
                  program
-                 (filter-seqs seq (compiled-program-value-code program))))
+                 (replace-seqs
+                  (car seq) (cadr seq)
+                  (compiled-program-value-code program))))
               sequence-program
-              nop-sequences)))
+              instruction-sequence-transforms)))
 
 ;;;lambda expressions
 

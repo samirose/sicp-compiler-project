@@ -43,7 +43,6 @@
             call 2
             i32.const 0
             call 1
-            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -57,7 +56,6 @@
             call 2
             i32.const -1
             call 1
-            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)
@@ -107,7 +105,6 @@
     call 2
     i32.const 0
     call 1
-    call 2
     i32.gt_s
     if (result i32)  ;; label = @1
       i32.const 0
@@ -132,7 +129,6 @@
             call 2
             i32.const 0
             call 1
-            call 2
             i32.eq
             br_if 0 (;@4;)
             br 1 (;@3;)

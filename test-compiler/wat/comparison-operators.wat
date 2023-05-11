@@ -119,8 +119,6 @@
                 call 1
                 call 2
                 i32.eq
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -158,8 +156,6 @@
                 call 1
                 call 2
                 i32.lt_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -171,8 +167,6 @@
                 call 1
                 call 2
                 i32.lt_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -210,8 +204,6 @@
                 call 1
                 call 2
                 i32.gt_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -223,8 +215,6 @@
                 call 1
                 call 2
                 i32.gt_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -236,8 +226,6 @@
                 call 1
                 call 2
                 i32.gt_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -275,8 +263,6 @@
                 call 1
                 call 2
                 i32.le_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -288,8 +274,6 @@
                 call 1
                 call 2
                 i32.le_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -327,8 +311,6 @@
                 call 1
                 call 2
                 i32.ge_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -340,8 +322,6 @@
                 call 1
                 call 2
                 i32.ge_s
-                call 6
-                call 7
                 br_if 0 (;@6;)
                 br 1 (;@5;)
               end
@@ -388,8 +368,6 @@
               call 1
               call 2
               i32.eq
-              call 6
-              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -427,8 +405,6 @@
               call 1
               call 2
               i32.lt_s
-              call 6
-              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -440,8 +416,6 @@
               call 1
               call 2
               i32.lt_s
-              call 6
-              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -479,8 +453,6 @@
               call 1
               call 2
               i32.gt_s
-              call 6
-              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -492,8 +464,6 @@
               call 1
               call 2
               i32.gt_s
-              call 6
-              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -505,8 +475,6 @@
               call 1
               call 2
               i32.gt_s
-              call 6
-              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -544,8 +512,6 @@
               call 1
               call 2
               i32.le_s
-              call 6
-              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -557,8 +523,6 @@
               call 1
               call 2
               i32.le_s
-              call 6
-              call 7
               br_if 0 (;@5;)
               br 1 (;@4;)
             end
@@ -595,8 +559,6 @@
             call 1
             call 2
             i32.ge_s
-            call 6
-            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
@@ -608,8 +570,6 @@
             call 1
             call 2
             i32.ge_s
-            call 6
-            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end

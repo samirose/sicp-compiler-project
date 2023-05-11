@@ -53,8 +53,6 @@
     call 1
     call 2
     i32.eq
-    call 6
-    call 7
     if (result i32)  ;; label = @1
       global.get 7
     else
@@ -74,8 +72,6 @@
     call 1
     call 2
     i32.eq
-    call 6
-    call 7
     if (result i32)  ;; label = @1
       global.get 7
       call 3
@@ -105,8 +101,6 @@
     call 1
     call 2
     i32.eq
-    call 6
-    call 7
     if (result i32)  ;; label = @1
       global.get 7
       call 3
@@ -140,8 +134,6 @@
     call 1
     call 2
     i32.gt_s
-    call 6
-    call 7
     if (result i32)  ;; label = @1
       global.get 7
     else
@@ -161,8 +153,6 @@
     call 1
     call 2
     i32.eq
-    call 6
-    call 7
     if (result i32)  ;; label = @1
       global.get 7
       call 3
@@ -192,8 +182,6 @@
     call 1
     call 2
     i32.gt_s
-    call 6
-    call 7
     if (result i32)  ;; label = @1
       global.get 7
       call 3

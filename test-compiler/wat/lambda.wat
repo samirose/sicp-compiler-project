@@ -52,8 +52,6 @@
     call 1
     call 2
     i32.eq
-    call 6
-    call 7
     if (result i32)  ;; label = @1
       i32.const 1
       call 1

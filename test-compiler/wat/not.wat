@@ -56,8 +56,6 @@
     call 1
     call 2
     i32.gt_s
-    call 6
-    call 7
     select)
   (func (;17;) (type 1) (param i32) (result i32)
     local.get 0
@@ -86,8 +84,6 @@
     call 1
     call 2
     i32.gt_s
-    call 6
-    call 7
     select)
   (func (;20;)
     i32.const 2

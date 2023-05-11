@@ -45,8 +45,6 @@
             call 1
             call 2
             i32.eq
-            call 6
-            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
@@ -61,8 +59,6 @@
             call 1
             call 2
             i32.eq
-            call 6
-            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
@@ -76,8 +72,6 @@
             local.get 1
             call 2
             i32.le_s
-            call 6
-            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end
@@ -115,8 +109,6 @@
     call 1
     call 2
     i32.gt_s
-    call 6
-    call 7
     if (result i32)  ;; label = @1
       i32.const 0
       local.get 0
@@ -142,8 +134,6 @@
             call 1
             call 2
             i32.eq
-            call 6
-            call 7
             br_if 0 (;@4;)
             br 1 (;@3;)
           end

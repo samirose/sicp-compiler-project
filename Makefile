@@ -63,7 +63,8 @@ RUN_COMPILER_TEST_HOST = $(HOST_SCHEME_RUN_PROGRAM) -L .. -L ../lib
 $(TEST_COMPILER_DIR)build/ \
 $(TEST_COMPILER_DIR)log/ \
 $(TEST_COMPILER_DIR)host-log/ \
-$(TEST_COMPILER_DIR)wast-log/ :
+$(TEST_COMPILER_DIR)wast-log/ \
+$(TEST_COMPILER_DIR)wat :
 	mkdir -p $@
 
 .PHONY : test-compiler-host $(COMPILER_TEST_HOST_TARGETS)
@@ -82,9 +83,11 @@ COMPILER_TEST_WAST_TESTS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.
 COMPILER_TEST_WAST_LOGS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)wast-log/%.log)
 COMPILER_TEST_WAST_COMPILER := $(TEST_COMPILER_DIR)lib/compiler-test-to-wast.scm
 COMPILER_TEST_TO_WAST := $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) $(COMPILER_TEST_WAST_COMPILER)
+COMPILER_TEST_SCM_MODULES := $(wildcard $(TEST_COMPILER_DIR)*.scm)
+COMPILER_TEST_WAT_MODULES := $(COMPILER_TEST_SCM_MODULES:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)wat/%.wat)
 
 .PHONY : test-compiler-wast $(COMPILER_TEST_WAST_TARGETS)
-test-compiler-wast : $(COMPILER_TEST_WAST_LOGS) ## Compiles the compiler tests to WAST scripts and executes them
+test-compiler-wast : $(COMPILER_TEST_WAST_LOGS) $(COMPILER_TEST_WAT_MODULES) ## Compiles the compiler tests to WAST scripts and executes them
 
 $(COMPILER_TEST_WAST_TARGETS) : $(TEST_COMPILER_DIR)%-wast : $(TEST_COMPILER_DIR)wast-log/%.log
 
@@ -103,6 +106,8 @@ $(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)build/%-test.wast : $(TEST_COM
 	$(COMPILER_TEST_TO_WAST) < $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
+$(COMPILER_TEST_WAT_MODULES) : $(TEST_COMPILER_DIR)wat/%.wat : $(TEST_COMPILER_DIR)build/%.wat | $(TEST_COMPILER_DIR)wat
+	wat-desugar $< -o $@
 
 COMPILER_TEST_DIRECT_TESTS := $(wildcard $(TEST_COMPILER_DIR)wast/*.wast)
 COMPILER_TEST_DIRECT_TARGETS := $(COMPILER_TEST_DIRECT_TESTS:%.wast=%)

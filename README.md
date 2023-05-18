@@ -85,7 +85,7 @@ as my main machine.)
   * ~~add type tagging to all values with the runtime library tagging functions~~
   * ~~normalise compiler test modules compiled WAT code with wat-desugar and store the code into version control. The motivation is to make changes in code generation visible and checking the changes part of committing changes to version control.~~
   * optimise out unnecessary type coercion and checking instructions from generated Wasm code to keep the generated code minimal and more readable.
-  * Use immutable globals for imported function values
+  * ~~Use immutable globals for imported function values~~
   * Generate runtime library WAT with a Scheme program to enable sharing of values between the runtime library and the compiler.
 
 ## Known issues

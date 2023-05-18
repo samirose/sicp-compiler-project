@@ -16,11 +16,11 @@
   (import "scheme base" "boolean?" (func (;10;) (param i32) (result i32)))
   (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
   (import "scheme base" "eq?" (func (;12;) (param i32 i32) (result i32)))
-  (global (;2;) (mut i32) (i32.const 46))
-  (global (;3;) (mut i32) (i32.const 46))
-  (global (;4;) (mut i32) (i32.const 46))
-  (global (;5;) (mut i32) (i32.const 46))
-  (global (;6;) (mut i32) (i32.const 46))
+  (global (;2;) i32 (i32.const 2))
+  (global (;3;) i32 (i32.const 18))
+  (global (;4;) i32 (i32.const 34))
+  (global (;5;) i32 (i32.const 50))
+  (global (;6;) i32 (i32.const 66))
   (global (;7;) (mut i32) (i32.const 46))
   (global (;8;) (mut i32) (i32.const 46))
   (global (;9;) (mut i32) (i32.const 46))
@@ -536,16 +536,6 @@
     end
     local.get 0)
   (func (;21;)
-    i32.const 2
-    global.set 2
-    i32.const 18
-    global.set 3
-    i32.const 34
-    global.set 4
-    i32.const 50
-    global.set 5
-    i32.const 66
-    global.set 6
     i32.const 5
     call 8
     global.set 7

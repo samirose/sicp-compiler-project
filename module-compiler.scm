@@ -89,41 +89,41 @@
              program
              bound-import-func-definitions
              '()))
-           (program
-            (compiled-program-with-definitions-and-value-code
-             program
-             (make-list (+ (length func-import-bindings) (length definitions))
-			`(global (mut i32) (i32.const ,uninitialized-value)))
-             '()))
-           (imported-func-values-init-code
+           (imported-func-value-definitions
             (let loop ((bindings func-import-bindings)
                        (elem-index 0)
-                       (global-index (length global-import-bindings))
-                       (init-code '()))
-              (cond ((null? bindings) (reverse init-code))
+                       (definitions '()))
+              (cond ((null? bindings) (reverse definitions))
                     (else
                      (loop (cdr bindings)
                            (+ elem-index 1)
-                           (+ global-index 1)
-                           (cons `(global.set
-                                   ,global-index
+                           (cons `(global i32
                                    (i32.const ,(funcidx->procedure-value elem-index)))
-				 init-code))))))
-           (globals-init-assignments
+				 definitions))))))
+           (program
+            (compiled-program-with-definitions-and-value-code
+             program
+             imported-func-value-definitions
+             '()))
+           (program
+            (compiled-program-with-definitions-and-value-code
+             program
+             (make-list (length definitions)
+			`(global (mut i32) (i32.const ,uninitialized-value)))
+             '()))
+           (definitions-init-assignments
             (map (lambda (definition)
                    `(set! ,(definition-variable definition) ,(definition-value definition)))
 		 definitions))
            (non-definitions
-            (append globals-init-assignments non-definitions))
+            (append definitions-init-assignments non-definitions))
            (program
             (if (null? non-definitions)
 		program
 		(let* ((program
 			(compile-sequence non-definitions program lexical-env compile))
                        (global-init-code
-			(append
-			 imported-func-values-init-code
-			 (compiled-program-value-code program)))
+			 (compiled-program-value-code program))
                        (global-init-func-index
 			(compiled-program-definitions-count program 'func)))
 		  (compiled-program-with-definitions-and-value-code

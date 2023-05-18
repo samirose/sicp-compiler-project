@@ -89,22 +89,17 @@
              program
              bound-import-func-definitions
              '()))
-           (imported-func-value-definitions
+           (program
             (let loop ((bindings func-import-bindings)
                        (elem-index 0)
-                       (definitions '()))
-              (cond ((null? bindings) (reverse definitions))
+                       (program program))
+              (cond ((null? bindings) program)
                     (else
                      (loop (cdr bindings)
                            (+ elem-index 1)
-                           (cons `(global i32
-                                   (i32.const ,(funcidx->procedure-value elem-index)))
-				 definitions))))))
-           (program
-            (compiled-program-with-definitions-and-value-code
-             program
-             imported-func-value-definitions
-             '()))
+                           (compiled-program-add-definition
+                            program
+                            `(global i32 (i32.const ,(funcidx->procedure-value elem-index)))))))))
            (program
             (compiled-program-with-definitions-and-value-code
              program

@@ -17,6 +17,15 @@ RUN_COMPILER = $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) dr
 compile : $(COMPILER_BINARIES) ## Compiles a scheme file from standard input and outputs WAT to standard output
 	$(RUN_COMPILER) $<
 
+.PHONY : generate-runtime
+generate-runtime : runtime/scheme-base.wat ## Generates the runtime library WAT
+
+runtime/generate-scheme-base-wat.scm : values.scm
+
+runtime/scheme-base.wat : runtime/generate-scheme-base-wat.scm
+	$(HOST_SCHEME_RUN_PROGRAM) -L . $< | wat-desugar - > $@.tmp \
+	  && mv -f $@.tmp $@
+
 .PHONY : test-runtime
 test-runtime : runtime/test/test-runtime.log ## Executes tests for the runtime library
 
@@ -177,6 +186,7 @@ clean-compiler : ## Forces compiler re-compilation
 clean-test : ## Removes test build artefacts and results
 	-rm -rf \
 	  runtime/test \
+	  runtime/scheme-base.wat \
 	  $(TEST_UNIT_DIR)log \
 	  $(TEST_UNIT_DIR)compiled \
 	  $(TEST_COMPILER_DIR)build \

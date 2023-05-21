@@ -1,11 +1,15 @@
 (define-library (values)
 
   (export
-   uninitialized-value
-   unspecified-value
+   fixnum-mask fixnum-shift
+   immediate-mask immediate-shift
+   procedure-tag
+   boolean-tag false-value true-value
+   special-tag uninitialized-value unspecified-value
    number->fixnum-value
    boolean->boolean-value
-   funcidx->procedure-value)
+   funcidx->procedure-value
+   error-no-error error-expected-number error-expected-procedure error-uninitialized)
 
   (import
    (scheme base)

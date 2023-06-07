@@ -26,11 +26,20 @@ runtime/scheme-base.wat : runtime/generate-scheme-base-wat.scm
 	$(HOST_SCHEME_RUN_PROGRAM) -L . $< | wat-desugar - > $@.tmp \
 	  && mv -f $@.tmp $@
 
-.PHONY : test-runtime
-test-runtime : runtime/test/test-runtime.log ## Executes tests for the runtime library
+.PHONY : generate-runtime-test
+generate-runtime-test : runtime/test/scheme-base.wast ## Generates the runtime library test script
 
 runtime/test/ :
 	mkdir -p runtime/test
+
+runtime/generate-scheme-base-wast.scm : values.scm
+
+runtime/test/scheme-base.wast : runtime/generate-scheme-base-wast.scm | runtime/test/
+	$(HOST_SCHEME_RUN_PROGRAM) -L . $< > $@.tmp \
+	  && mv -f $@.tmp $@
+
+.PHONY : test-runtime
+test-runtime : runtime/test/test-runtime.log ## Executes tests for the runtime library
 
 runtime/test/test-runtime.log : runtime/test/test-runtime.json | runtime/test/
 	spectest-interp $< | tee $@.tmp \
@@ -39,7 +48,7 @@ runtime/test/test-runtime.log : runtime/test/test-runtime.json | runtime/test/
 runtime/test/test-runtime.json : runtime/test/test-runtime.wast | runtime/test/
 	wast2json $< -o $@
 
-runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/runtime.wast | runtime/test/
+runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/test/scheme-base.wast | runtime/test/
 	cat $^ > $@
 
 .PHONY : compile-compiler

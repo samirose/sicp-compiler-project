@@ -1,8 +1,6 @@
 (module
   (type (;0;) (func (result i32)))
   (type (;1;) (func (param i32) (result i32)))
-  (import "scheme base" "unspecified-value" (global (;0;) i32))
-  (import "scheme base" "uninitialized-value" (global (;1;) i32))
   (import "scheme base" "get-error-code" (func (;0;) (result i32)))
   (import "scheme base" "i32->fixnum" (func (;1;) (param i32) (result i32)))
   (import "scheme base" "check-fixnum" (func (;2;) (param i32) (result i32)))
@@ -16,11 +14,13 @@
   (import "scheme base" "boolean?" (func (;10;) (param i32) (result i32)))
   (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
   (import "scheme base" "eq?" (func (;12;) (param i32 i32) (result i32)))
-  (global (;2;) i32 (i32.const 2))
-  (global (;3;) i32 (i32.const 18))
-  (global (;4;) i32 (i32.const 34))
-  (global (;5;) i32 (i32.const 50))
-  (global (;6;) i32 (i32.const 66))
+  (global (;0;) i32 (i32.const 2))
+  (global (;1;) i32 (i32.const 18))
+  (global (;2;) i32 (i32.const 34))
+  (global (;3;) i32 (i32.const 50))
+  (global (;4;) i32 (i32.const 66))
+  (global (;5;) (mut i32) (i32.const 46))
+  (global (;6;) (mut i32) (i32.const 46))
   (global (;7;) (mut i32) (i32.const 46))
   (global (;8;) (mut i32) (i32.const 46))
   (global (;9;) (mut i32) (i32.const 46))
@@ -31,8 +31,6 @@
   (global (;14;) (mut i32) (i32.const 46))
   (global (;15;) (mut i32) (i32.const 46))
   (global (;16;) (mut i32) (i32.const 46))
-  (global (;17;) (mut i32) (i32.const 46))
-  (global (;18;) (mut i32) (i32.const 46))
   (func (;13;) (type 0) (result i32)
     i32.const 22
     call 7
@@ -46,16 +44,16 @@
   (func (;14;) (type 0) (result i32)
     i32.const 1
     call 1
-    global.set 7
-    global.get 7
+    global.set 5
+    global.get 5
     call 2
     i32.const 1
     call 1
     i32.eq
     if (result i32)  ;; label = @1
-      global.get 7
+      global.get 5
     else
-      global.get 7
+      global.get 5
       call 3
       i32.const 1
       i32.add
@@ -64,53 +62,53 @@
   (func (;15;) (type 0) (result i32)
     i32.const 0
     call 1
-    global.set 7
-    global.get 7
+    global.set 5
+    global.get 5
     call 2
     i32.const 0
     call 1
     i32.eq
     if (result i32)  ;; label = @1
-      global.get 7
+      global.get 5
       call 3
       i32.const 1
       i32.add
       call 1
-      global.set 7
+      global.set 5
       i32.const 30
     else
-      global.get 7
+      global.get 5
       call 3
       i32.const 2
       i32.add
       call 1
-      global.set 7
+      global.set 5
       i32.const 30
     end
     drop
-    global.get 7)
+    global.get 5)
   (func (;16;) (type 0) (result i32)
     i32.const 1
     call 1
-    global.set 7
-    global.get 7
+    global.set 5
+    global.get 5
     call 2
     i32.const 1
     call 1
     i32.eq
     if (result i32)  ;; label = @1
-      global.get 7
+      global.get 5
       call 3
       i32.const 2
       i32.add
       call 1
-      global.set 7
+      global.set 5
       i32.const 30
     else
       i32.const 30
     end
     drop
-    global.get 7)
+    global.get 5)
   (func (;17;) (type 0) (result i32)
     i32.const 6
     call 7
@@ -124,16 +122,16 @@
   (func (;18;) (type 0) (result i32)
     i32.const 1
     call 1
-    global.set 7
-    global.get 7
+    global.set 5
+    global.get 5
     call 2
     i32.const 1
     call 1
     i32.gt_s
     if (result i32)  ;; label = @1
-      global.get 7
+      global.get 5
     else
-      global.get 7
+      global.get 5
       call 3
       i32.const 1
       i32.add
@@ -142,53 +140,53 @@
   (func (;19;) (type 0) (result i32)
     i32.const 0
     call 1
-    global.set 7
-    global.get 7
+    global.set 5
+    global.get 5
     call 2
     i32.const 1
     call 1
     i32.eq
     if (result i32)  ;; label = @1
-      global.get 7
+      global.get 5
       call 3
       i32.const 2
       i32.add
       call 1
-      global.set 7
+      global.set 5
       i32.const 30
     else
-      global.get 7
+      global.get 5
       call 3
       i32.const 1
       i32.add
       call 1
-      global.set 7
+      global.set 5
       i32.const 30
     end
     drop
-    global.get 7)
+    global.get 5)
   (func (;20;) (type 0) (result i32)
     i32.const 1
     call 1
-    global.set 7
-    global.get 7
+    global.set 5
+    global.get 5
     call 2
     i32.const 1
     call 1
     i32.gt_s
     if (result i32)  ;; label = @1
-      global.get 7
+      global.get 5
       call 3
       i32.const 2
       i32.add
       call 1
-      global.set 7
+      global.set 5
       i32.const 30
     else
       i32.const 30
     end
     drop
-    global.get 7)
+    global.get 5)
   (func (;21;) (type 1) (param i32) (result i32)
     local.get 0
     call 2
@@ -288,40 +286,40 @@
   (func (;30;)
     i32.const 1
     call 1
-    global.set 7
+    global.set 5
     i32.const 5
     call 8
-    global.set 8
+    global.set 6
     i32.const 6
     call 8
-    global.set 9
+    global.set 7
     i32.const 7
     call 8
-    global.set 10
+    global.set 8
     i32.const 8
     call 8
-    global.set 11
+    global.set 9
     i32.const 9
     call 8
-    global.set 12
+    global.set 10
     i32.const 10
     call 8
-    global.set 13
+    global.set 11
     i32.const 11
     call 8
-    global.set 14
+    global.set 12
     i32.const 12
     call 8
-    global.set 15
+    global.set 13
     i32.const 14
     call 8
-    global.set 16
+    global.set 14
     i32.const 17
     call 8
-    global.set 17
+    global.set 15
     i32.const 21
     call 8
-    global.set 18
+    global.set 16
     i32.const 30
     drop)
   (table (;0;) 22 funcref)

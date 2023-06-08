@@ -4,42 +4,39 @@
 
 (define scheme-base-wast
   `(
-    (assert_return (invoke "i32->boolean" (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->boolean" (i32.const 1)) (i32.const #x00000016))
-    (assert_return (invoke "boolean->i32" (i32.const #x00000006)) (i32.const 0))
-    (assert_return (invoke "boolean->i32" (i32.const #x00000016)) (i32.const 1))
-    (assert_return (invoke "boolean?" (i32.const #x00000006)) (i32.const #x00000016))
-    (assert_return (invoke "boolean?" (i32.const #x00000016)) (i32.const #x00000016))
-    (assert_return (invoke "boolean?" (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "boolean?" (i32.const 1)) (i32.const #x00000006))
+    (assert_return (invoke "i32->boolean" (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->boolean" (i32.const 1)) (i32.const ,true-value))
+    (assert_return (invoke "boolean->i32" (i32.const ,false-value)) (i32.const 0))
+    (assert_return (invoke "boolean->i32" (i32.const ,true-value)) (i32.const 1))
+    (assert_return (invoke "boolean?" (i32.const ,false-value)) (i32.const ,true-value))
+    (assert_return (invoke "boolean?" (i32.const ,true-value)) (i32.const ,true-value))
+    (assert_return (invoke "boolean?" (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "boolean?" (i32.const 1)) (i32.const ,false-value))
 
-    (assert_return (invoke "number?" (i32.const #x00000006)) (i32.const #x00000006))
-    (assert_return (invoke "number?" (i32.const #x00000016)) (i32.const #x00000006))
+    (assert_return (invoke "number?" (i32.const ,false-value)) (i32.const ,false-value))
+    (assert_return (invoke "number?" (i32.const ,true-value)) (i32.const ,false-value))
 
-    ;; error-code is initially zero
-    (assert_return (get "error-no-error") (i32.const 0))
-    (assert_return (invoke "get-error-code") (i32.const 0))
+    ;; error-code is initially no error
+    (assert_return (invoke "get-error-code") (i32.const ,error-no-error))
 
     ;; raise-error sets error code and traps
-    (assert_trap (invoke "raise-error" (i32.const 1)) "unreachable")
-    (assert_return (invoke "get-error-code") (i32.const 1))
+    (assert_trap (invoke "raise-error" (i32.const 99)) "unreachable")
+    (assert_return (invoke "get-error-code") (i32.const 99))
 
     ;; Converting a non-fixnum with fixnum->i32 causes a trap and error-code being set
-    (assert_return (get "error-expected-number") (i32.const 1))
     (assert_trap (invoke "fixnum->i32" (i32.const 0)) "unreachable")
-    (assert_return (invoke "get-error-code") (i32.const 1))
+    (assert_return (invoke "get-error-code") (i32.const ,error-expected-number))
 
     ;; Error code is reset after reading it with get-error-code
-    (assert_return (invoke "get-error-code") (i32.const 0))
+    (assert_return (invoke "get-error-code") (i32.const ,error-no-error))
 
     ;; Calling zero? on non-fixum causes a trap and error-code being set
     (assert_trap (invoke "zero?" (i32.const 0)) "unreachable")
-    (assert_return (invoke "get-error-code") (i32.const 1))
+    (assert_return (invoke "get-error-code") (i32.const ,error-expected-number))
 
     ;; Converting a non-procedure with procedure->funcidx causes a trap and error-code being set
-    (assert_return (get "error-expected-procedure") (i32.const 2))
-    (assert_trap (invoke "procedure->funcidx" (i32.const #x00000006)) "unreachable")
-    (assert_return (invoke "get-error-code") (i32.const 2))
+    (assert_trap (invoke "procedure->funcidx" (i32.const ,false-value)) "unreachable")
+    (assert_return (invoke "get-error-code") (i32.const ,error-expected-procedure))
 
     ;; helper module for testing conversions
     (module
@@ -54,8 +51,6 @@
      (import "scheme base" "procedure->funcidx" (func $procedure->funcidx  (param i32) (result i32)))
      (import "scheme base" "procedure?"         (func $procedure?          (param i32) (result i32)))
      (import "scheme base" "eq?" (func $eq? (param i32) (param i32) (result i32)))
-     (import "scheme base" "unspecified-value"   (global $unspecified-value i32))
-     (import "scheme base" "uninitialized-value" (global $uninitialized-value i32))
      (import "scheme base" "check-initialized"   (func $check-initialized (param i32) (result i32)))
 
      (func (export "i32->fixnum->i32") (param $value i32) (result i32)
@@ -142,15 +137,15 @@
            call $procedure->funcidx)
 
      (func (export "unspecified-value->number?") (result i32)
-           global.get $unspecified-value
+           i32.const ,unspecified-value
            call $number?)
 
      (func (export "unspecified-value->boolean?") (result i32)
-           global.get $unspecified-value
+           i32.const ,unspecified-value
            call $boolean?)
 
      (func (export "unspecified-value->procedure?") (result i32)
-           global.get $unspecified-value
+           i32.const ,unspecified-value
            call $procedure?)
 
      (func (export "i32->fixnum-i32->fixnum-eq?") (param i32) (param i32) (result i32)
@@ -182,11 +177,11 @@
            call $eq?)
 
      (func (export "unspecified-value->check-initialized") (result i32)
-           global.get $unspecified-value
+           i32.const ,unspecified-value
            call $check-initialized)
 
      (func (export "uninitialized-value->check-initialized") (result i32)
-           global.get $uninitialized-value
+           i32.const ,uninitialized-value
            call $check-initialized)
      )
 
@@ -196,25 +191,25 @@
     (assert_return (invoke "i32->fixnum->i32" (i32.const  42)) (i32.const  42))
     (assert_return (invoke "i32->fixnum->i32" (i32.const -42)) (i32.const -42))
 
-    (assert_return (invoke "i32->fixnum->number?" (i32.const  0)) (i32.const #x00000016))
-    (assert_return (invoke "i32->fixnum->number?" (i32.const  1)) (i32.const #x00000016))
-    (assert_return (invoke "i32->fixnum->number?" (i32.const -1)) (i32.const #x00000016))
-    (assert_return (invoke "i32->fixnum->number?" (i32.const 42)) (i32.const #x00000016))
+    (assert_return (invoke "i32->fixnum->number?" (i32.const  0)) (i32.const ,true-value))
+    (assert_return (invoke "i32->fixnum->number?" (i32.const  1)) (i32.const ,true-value))
+    (assert_return (invoke "i32->fixnum->number?" (i32.const -1)) (i32.const ,true-value))
+    (assert_return (invoke "i32->fixnum->number?" (i32.const 42)) (i32.const ,true-value))
 
-    (assert_return (invoke "i32->fixnum->zero?" (i32.const  0)) (i32.const #x00000016))
-    (assert_return (invoke "i32->fixnum->zero?" (i32.const  1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum->zero?" (i32.const -1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum->zero?" (i32.const 42)) (i32.const #x00000006))
+    (assert_return (invoke "i32->fixnum->zero?" (i32.const  0)) (i32.const ,true-value))
+    (assert_return (invoke "i32->fixnum->zero?" (i32.const  1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum->zero?" (i32.const -1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum->zero?" (i32.const 42)) (i32.const ,false-value))
 
-    (assert_return (invoke "i32->fixnum->boolean?" (i32.const   0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum->boolean?" (i32.const   1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum->boolean?" (i32.const  -1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum->boolean?" (i32.const  42)) (i32.const #x00000006))
+    (assert_return (invoke "i32->fixnum->boolean?" (i32.const   0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum->boolean?" (i32.const   1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum->boolean?" (i32.const  -1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum->boolean?" (i32.const  42)) (i32.const ,false-value))
 
-    (assert_return (invoke "i32->fixnum->procedure?" (i32.const   0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum->procedure?" (i32.const   1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum->procedure?" (i32.const  -1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum->procedure?" (i32.const  42)) (i32.const #x00000006))
+    (assert_return (invoke "i32->fixnum->procedure?" (i32.const   0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum->procedure?" (i32.const   1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum->procedure?" (i32.const  -1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum->procedure?" (i32.const  42)) (i32.const ,false-value))
 
     (assert_return (invoke "i32->fixnum->check-initialized" (i32.const  0)) (i32.const  0))
     (assert_return (invoke "i32->fixnum->check-initialized" (i32.const  1)) (i32.const  1))
@@ -225,14 +220,14 @@
     (assert_return (invoke "i32->boolean->i32" (i32.const -1)) (i32.const 1))
     (assert_return (invoke "i32->boolean->i32" (i32.const 42)) (i32.const 1))
 
-    (assert_return (invoke "i32->boolean->boolean?" (i32.const 0)) (i32.const #x00000016))
-    (assert_return (invoke "i32->boolean->boolean?" (i32.const 1)) (i32.const #x00000016))
+    (assert_return (invoke "i32->boolean->boolean?" (i32.const 0)) (i32.const ,true-value))
+    (assert_return (invoke "i32->boolean->boolean?" (i32.const 1)) (i32.const ,true-value))
 
-    (assert_return (invoke "i32->boolean->number?" (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->boolean->number?" (i32.const 1)) (i32.const #x00000006))
+    (assert_return (invoke "i32->boolean->number?" (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->boolean->number?" (i32.const 1)) (i32.const ,false-value))
 
-    (assert_return (invoke "i32->boolean->procedure?" (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->boolean->procedure?" (i32.const 1)) (i32.const #x00000006))
+    (assert_return (invoke "i32->boolean->procedure?" (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->boolean->procedure?" (i32.const 1)) (i32.const ,false-value))
 
     (assert_return (invoke "i32->boolean->check-initialized" (i32.const 0)) (i32.const 0))
     (assert_return (invoke "i32->boolean->check-initialized" (i32.const 1)) (i32.const 1))
@@ -241,58 +236,56 @@
     (assert_return (invoke "funcidx->procedure->funcidx" (i32.const 1)) (i32.const 1))
     (assert_return (invoke "funcidx->procedure->funcidx" (i32.const 42)) (i32.const 42))
 
-    (assert_return (invoke "funcidx->procedure->procedure?" (i32.const 0))  (i32.const #x00000016))
-    (assert_return (invoke "funcidx->procedure->procedure?" (i32.const 1))  (i32.const #x00000016))
-    (assert_return (invoke "funcidx->procedure->procedure?" (i32.const 42)) (i32.const #x00000016))
+    (assert_return (invoke "funcidx->procedure->procedure?" (i32.const 0))  (i32.const ,true-value))
+    (assert_return (invoke "funcidx->procedure->procedure?" (i32.const 1))  (i32.const ,true-value))
+    (assert_return (invoke "funcidx->procedure->procedure?" (i32.const 42)) (i32.const ,true-value))
 
-    (assert_return (invoke "funcidx->procedure->number?" (i32.const 0))  (i32.const #x00000006))
-    (assert_return (invoke "funcidx->procedure->number?" (i32.const 1))  (i32.const #x00000006))
-    (assert_return (invoke "funcidx->procedure->number?" (i32.const 42)) (i32.const #x00000006))
+    (assert_return (invoke "funcidx->procedure->number?" (i32.const 0))  (i32.const ,false-value))
+    (assert_return (invoke "funcidx->procedure->number?" (i32.const 1))  (i32.const ,false-value))
+    (assert_return (invoke "funcidx->procedure->number?" (i32.const 42)) (i32.const ,false-value))
 
-    (assert_return (invoke "funcidx->procedure->number?" (i32.const 0))  (i32.const #x00000006))
-    (assert_return (invoke "funcidx->procedure->number?" (i32.const 1))  (i32.const #x00000006))
-    (assert_return (invoke "funcidx->procedure->number?" (i32.const 42)) (i32.const #x00000006))
+    (assert_return (invoke "funcidx->procedure->number?" (i32.const 0))  (i32.const ,false-value))
+    (assert_return (invoke "funcidx->procedure->number?" (i32.const 1))  (i32.const ,false-value))
+    (assert_return (invoke "funcidx->procedure->number?" (i32.const 42)) (i32.const ,false-value))
 
-    (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 0))  (i32.const #x00000006))
-    (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 1))  (i32.const #x00000006))
-    (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 42)) (i32.const #x00000006))
+    (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 0))  (i32.const ,false-value))
+    (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 1))  (i32.const ,false-value))
+    (assert_return (invoke "funcidx->procedure->boolean?" (i32.const 42)) (i32.const ,false-value))
 
     (assert_return (invoke "funcidx->procedure->check-initialized" (i32.const  0)) (i32.const 0))
     (assert_return (invoke "funcidx->procedure->check-initialized" (i32.const  1)) (i32.const 1))
     (assert_return (invoke "funcidx->procedure->check-initialized" (i32.const 42)) (i32.const 42))
 
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 1) (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 0)) (i32.const #x00000016))
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 1) (i32.const 1)) (i32.const #x00000016))
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 42) (i32.const 42)) (i32.const #x00000016))
+    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 0)) (i32.const ,true-value))
+    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 1) (i32.const 1)) (i32.const ,true-value))
+    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 42) (i32.const 42)) (i32.const ,true-value))
 
-    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 0) (i32.const 1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const #x00000016))
-    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const #x00000016))
+    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const ,true-value))
+    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const ,true-value))
 
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 0) (i32.const 1)) (i32.const #x00000006))
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 1) (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 0) (i32.const 0)) (i32.const #x00000016))
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 1) (i32.const 1)) (i32.const #x00000016))
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 42) (i32.const 42)) (i32.const #x00000016))
+    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
+    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 0) (i32.const 0)) (i32.const ,true-value))
+    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 1) (i32.const 1)) (i32.const ,true-value))
+    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 42) (i32.const 42)) (i32.const ,true-value))
 
-    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 1)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const #x00000006))
-    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const #x00000006))
+    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const ,false-value))
+    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const ,false-value))
 
-    (assert_return (invoke "unspecified-value->number?") (i32.const #x00000006))
-    (assert_return (invoke "unspecified-value->boolean?") (i32.const #x00000006))
-    (assert_return (invoke "unspecified-value->procedure?") (i32.const #x00000006))
-    (assert_return (get $scheme-base "unspecified-value") (i32.const #x0000001e))
-    (assert_return (invoke "unspecified-value->check-initialized") (i32.const #x0000001e))
+    (assert_return (invoke "unspecified-value->number?") (i32.const ,false-value))
+    (assert_return (invoke "unspecified-value->boolean?") (i32.const ,false-value))
+    (assert_return (invoke "unspecified-value->procedure?") (i32.const ,false-value))
+    (assert_return (invoke "unspecified-value->check-initialized") (i32.const ,unspecified-value))
 
-    (assert_return (invoke $scheme-base "get-error-code") (i32.const 0))
-    (assert_return (get $scheme-base "error-uninitialized") (i32.const 3))
+    (assert_return (invoke $scheme-base "get-error-code") (i32.const ,error-no-error))
     (assert_trap (invoke "uninitialized-value->check-initialized") "unreachable")
-    (assert_return (invoke $scheme-base "get-error-code") (i32.const 3))
+    (assert_return (invoke $scheme-base "get-error-code") (i32.const ,error-uninitialized))
     ))
 
 (let emit ((statements scheme-base-wast))

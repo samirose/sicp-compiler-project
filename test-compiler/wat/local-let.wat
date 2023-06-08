@@ -1,8 +1,6 @@
 (module
   (type (;0;) (func (result i32)))
   (type (;1;) (func (param i32) (result i32)))
-  (import "scheme base" "unspecified-value" (global (;0;) i32))
-  (import "scheme base" "uninitialized-value" (global (;1;) i32))
   (import "scheme base" "get-error-code" (func (;0;) (result i32)))
   (import "scheme base" "i32->fixnum" (func (;1;) (param i32) (result i32)))
   (import "scheme base" "check-fixnum" (func (;2;) (param i32) (result i32)))
@@ -16,11 +14,13 @@
   (import "scheme base" "boolean?" (func (;10;) (param i32) (result i32)))
   (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
   (import "scheme base" "eq?" (func (;12;) (param i32 i32) (result i32)))
-  (global (;2;) i32 (i32.const 2))
-  (global (;3;) i32 (i32.const 18))
-  (global (;4;) i32 (i32.const 34))
-  (global (;5;) i32 (i32.const 50))
-  (global (;6;) i32 (i32.const 66))
+  (global (;0;) i32 (i32.const 2))
+  (global (;1;) i32 (i32.const 18))
+  (global (;2;) i32 (i32.const 34))
+  (global (;3;) i32 (i32.const 50))
+  (global (;4;) i32 (i32.const 66))
+  (global (;5;) (mut i32) (i32.const 46))
+  (global (;6;) (mut i32) (i32.const 46))
   (global (;7;) (mut i32) (i32.const 46))
   (global (;8;) (mut i32) (i32.const 46))
   (global (;9;) (mut i32) (i32.const 46))
@@ -34,8 +34,6 @@
   (global (;17;) (mut i32) (i32.const 46))
   (global (;18;) (mut i32) (i32.const 46))
   (global (;19;) (mut i32) (i32.const 46))
-  (global (;20;) (mut i32) (i32.const 46))
-  (global (;21;) (mut i32) (i32.const 46))
   (func (;13;) (type 0) (result i32)
     (local i32)
     i32.const 2
@@ -232,44 +230,44 @@
     i32.add
     call 1)
   (func (;28;) (type 0) (result i32)
-    global.get 18)
+    global.get 16)
   (func (;29;) (type 0) (result i32)
-    global.get 20)
+    global.get 18)
   (func (;30;)
     (local i32 i32 i32 i32 i32)
     i32.const 5
     call 8
-    global.set 7
+    global.set 5
     i32.const 6
     call 8
-    global.set 8
+    global.set 6
     i32.const 7
     call 8
-    global.set 9
+    global.set 7
     i32.const 8
     call 8
-    global.set 10
+    global.set 8
     i32.const 9
     call 8
-    global.set 11
+    global.set 9
     i32.const 10
     call 8
-    global.set 12
+    global.set 10
     i32.const 12
     call 8
-    global.set 13
+    global.set 11
     i32.const 14
     call 8
-    global.set 14
+    global.set 12
     i32.const 16
     call 8
-    global.set 15
+    global.set 13
     i32.const 18
     call 8
-    global.set 16
+    global.set 14
     i32.const 19
     call 8
-    global.set 17
+    global.set 15
     i32.const 2
     call 1
     local.set 0
@@ -282,16 +280,16 @@
     call 3
     i32.add
     call 1
-    global.set 18
+    global.set 16
     i32.const 20
     call 8
-    global.set 19
+    global.set 17
     i32.const 0
     call 1
-    global.set 20
+    global.set 18
     i32.const 21
     call 8
-    global.set 21
+    global.set 19
     i32.const 2
     call 1
     local.set 0
@@ -310,7 +308,7 @@
     call 3
     i32.add
     call 1
-    global.set 20
+    global.set 18
     i32.const 30
     drop)
   (table (;0;) 22 funcref)

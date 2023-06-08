@@ -18,8 +18,6 @@
     (define library-import-table
       '(((scheme base)
 	 ("scheme base"
-	  (#f         "unspecified-value"   (global i32))
-	  (#f         "uninitialized-value" (global i32))
 	  (#f         "get-error-code"      (func (result i32)))
 	  (#f         "i32->fixnum"         (func (param i32) (result i32)))
           (#f         "check-fixnum"        (func (param i32) (result i32)))

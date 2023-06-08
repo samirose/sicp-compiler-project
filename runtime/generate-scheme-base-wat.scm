@@ -7,10 +7,6 @@
     $scheme-base
 
     (global $error-code (mut i32) (i32.const ,error-no-error))
-    (global $error-no-error (export "error-no-error") i32 (i32.const ,error-no-error))
-    (global $error-expected-number (export "error-expected-number") i32 (i32.const ,error-expected-number))
-    (global $error-expected-procedure (export "error-expected-procedure") i32 (i32.const ,error-expected-procedure))
-    (global $error-uninitialized (export "error-uninitialized") i32 (i32.const ,error-uninitialized))
 
     (func (export "get-error-code") (result i32)
           global.get $error-code
@@ -21,23 +17,6 @@
           local.get $error-code
           global.set $error-code
           unreachable)
-
-    (global $fixnum-mask         i32 (i32.const ,fixnum-mask))
-    (global $fixnum-shift        i32 (i32.const ,fixnum-shift))
-    (global $immediate-mask      i32 (i32.const ,immediate-mask))
-    (global $immediate-shift     i32 (i32.const ,immediate-shift))
-    (global $procedure-tag       i32 (i32.const ,procedure-tag))
-    (global $boolean-tag         i32 (i32.const ,boolean-tag))
-    (global $false-value         i32 (i32.const ,false-value))
-    (global $true-value          i32 (i32.const ,true-value))
-    (global $special-tag         i32 (i32.const ,special-tag))
-    (global $unspecified-value   i32 (i32.const ,unspecified-value))
-    (global $uninitialized-value i32 (i32.const ,uninitialized-value))
-
-    (export "false-value" (global $false-value))
-    (export "true-value"  (global $true-value))
-    (export "unspecified-value" (global $unspecified-value))
-    (export "uninitialized-value" (global $uninitialized-value))
 
     (func (export "i32->fixnum") (param $value i32) (result i32)
           local.get $value

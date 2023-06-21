@@ -1,7 +1,7 @@
 (define-library (values)
 
   (export
-   fixnum-mask fixnum-shift
+   fixnum-mask fixnum-shift fixnum-max fixnum-min
    immediate-mask immediate-shift
    procedure-tag
    boolean-tag false-value true-value
@@ -19,6 +19,8 @@
     ;; fixnums are encoded with least signigicant bit set
     (define fixnum-mask #x00000001)     ; 00000001
     (define fixnum-shift 1)
+    (define fixnum-max #x3fffffff)
+    (define fixnum-min (- (+ fixnum-max 1)))
 
     ;; Other immediate value types are encoded in the least significant 4 bits
     ;; Note that the least significant two bits need to non-zero for all immediate type tags to

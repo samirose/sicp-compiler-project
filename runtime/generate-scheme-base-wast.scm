@@ -2,8 +2,52 @@
 (import (scheme write))
 (import (values))
 
+(define fixnum-nonzero-test-values
+  (list 1 -1 42 -42 fixnum-max fixnum-min))
+
+(define fixnum-test-values
+  (cons 0 fixnum-nonzero-test-values))
+
 (define scheme-base-wast
   `(
+    ;; fixnum tests
+    ,@(map
+       (lambda (n)
+         `(assert_return (invoke "i32->fixnum" (i32.const ,n)) (i32.const ,(number->fixnum-value n))))
+       fixnum-test-values)
+
+    ,@(map
+       (lambda (n)
+         `(assert_return (invoke "fixnum->i32" (i32.const ,(number->fixnum-value n))) (i32.const ,n)))
+       fixnum-test-values)
+
+    ,@(map
+       (lambda (n)
+         `(assert_return (invoke "number?" (i32.const ,(number->fixnum-value n))) (i32.const ,true-value)))
+       fixnum-test-values)
+
+    ,@(map
+       (lambda (n)
+         `(assert_return (invoke "boolean?" (i32.const ,(number->fixnum-value n))) (i32.const ,false-value)))
+       fixnum-test-values)
+
+    ,@(map
+       (lambda (n)
+         `(assert_return (invoke "procedure?" (i32.const ,(number->fixnum-value n))) (i32.const ,false-value)))
+       fixnum-test-values)
+
+    ,@(map
+       (lambda (n)
+         `(assert_return (invoke "check-initialized" (i32.const ,(number->fixnum-value n))) (i32.const ,(number->fixnum-value n))))
+       fixnum-test-values)
+
+    ,@(map
+       (lambda (n)
+         `(assert_return (invoke "zero?" (i32.const ,(number->fixnum-value n))) (i32.const ,false-value)))
+       fixnum-nonzero-test-values)
+
+    (assert_return (invoke "zero?" (i32.const ,(number->fixnum-value 0))) (i32.const ,true-value))
+
     (assert_return (invoke "i32->boolean" (i32.const 0)) (i32.const ,false-value))
     (assert_return (invoke "i32->boolean" (i32.const 1)) (i32.const ,true-value))
     (assert_return (invoke "boolean->i32" (i32.const ,false-value)) (i32.const 0))
@@ -41,9 +85,7 @@
     ;; helper module for testing conversions
     (module
      (import "scheme base" "i32->fixnum"  (func $i32->fixnum  (param i32) (result i32)))
-     (import "scheme base" "fixnum->i32"  (func $fixnum->i32  (param i32) (result i32)))
      (import "scheme base" "number?"      (func $number?      (param i32) (result i32)))
-     (import "scheme base" "zero?"        (func $zero?        (param i32) (result i32)))
      (import "scheme base" "i32->boolean" (func $i32->boolean (param i32) (result i32)))
      (import "scheme base" "boolean->i32" (func $boolean->i32 (param i32) (result i32)))
      (import "scheme base" "boolean?"     (func $boolean?     (param i32) (result i32)))
@@ -52,37 +94,6 @@
      (import "scheme base" "procedure?"         (func $procedure?          (param i32) (result i32)))
      (import "scheme base" "eq?" (func $eq? (param i32) (param i32) (result i32)))
      (import "scheme base" "check-initialized"   (func $check-initialized (param i32) (result i32)))
-
-     (func (export "i32->fixnum->i32") (param $value i32) (result i32)
-           local.get $value
-           call $i32->fixnum
-           call $fixnum->i32)
-
-     (func (export "i32->fixnum->number?") (param $value i32) (result i32)
-           local.get $value
-           call $i32->fixnum
-           call $number?)
-
-     (func (export "i32->fixnum->zero?") (param $value i32) (result i32)
-           local.get $value
-           call $i32->fixnum
-           call $zero?)
-
-     (func (export "i32->fixnum->boolean?") (param $value i32) (result i32)
-           local.get $value
-           call $i32->fixnum
-           call $boolean?)
-
-     (func (export "i32->fixnum->procedure?") (param $value i32) (result i32)
-           local.get $value
-           call $i32->fixnum
-           call $procedure?)
-
-     (func (export "i32->fixnum->check-initialized") (param $value i32) (result i32)
-           local.get $value
-           call $i32->fixnum
-           call $check-initialized
-           call $fixnum->i32)
 
      (func (export "i32->boolean->i32") (param $value i32) (result i32)
            local.get $value
@@ -184,36 +195,6 @@
            i32.const ,uninitialized-value
            call $check-initialized)
      )
-
-    (assert_return (invoke "i32->fixnum->i32" (i32.const  0))  (i32.const  0))
-    (assert_return (invoke "i32->fixnum->i32" (i32.const  1))  (i32.const  1))
-    (assert_return (invoke "i32->fixnum->i32" (i32.const -1))  (i32.const -1))
-    (assert_return (invoke "i32->fixnum->i32" (i32.const  42)) (i32.const  42))
-    (assert_return (invoke "i32->fixnum->i32" (i32.const -42)) (i32.const -42))
-
-    (assert_return (invoke "i32->fixnum->number?" (i32.const  0)) (i32.const ,true-value))
-    (assert_return (invoke "i32->fixnum->number?" (i32.const  1)) (i32.const ,true-value))
-    (assert_return (invoke "i32->fixnum->number?" (i32.const -1)) (i32.const ,true-value))
-    (assert_return (invoke "i32->fixnum->number?" (i32.const 42)) (i32.const ,true-value))
-
-    (assert_return (invoke "i32->fixnum->zero?" (i32.const  0)) (i32.const ,true-value))
-    (assert_return (invoke "i32->fixnum->zero?" (i32.const  1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum->zero?" (i32.const -1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum->zero?" (i32.const 42)) (i32.const ,false-value))
-
-    (assert_return (invoke "i32->fixnum->boolean?" (i32.const   0)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum->boolean?" (i32.const   1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum->boolean?" (i32.const  -1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum->boolean?" (i32.const  42)) (i32.const ,false-value))
-
-    (assert_return (invoke "i32->fixnum->procedure?" (i32.const   0)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum->procedure?" (i32.const   1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum->procedure?" (i32.const  -1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum->procedure?" (i32.const  42)) (i32.const ,false-value))
-
-    (assert_return (invoke "i32->fixnum->check-initialized" (i32.const  0)) (i32.const  0))
-    (assert_return (invoke "i32->fixnum->check-initialized" (i32.const  1)) (i32.const  1))
-    (assert_return (invoke "i32->fixnum->check-initialized" (i32.const -1)) (i32.const -1))
 
     (assert_return (invoke "i32->boolean->i32" (i32.const  0)) (i32.const 0))
     (assert_return (invoke "i32->boolean->i32" (i32.const  1)) (i32.const 1))

@@ -111,6 +111,12 @@
          `(assert_return (invoke "check-initialized" (i32.const ,(funcidx->procedure-value i))) (i32.const ,(funcidx->procedure-value i))))
        funcidx-test-values)
 
+    ;; unpsecified value tests
+    (assert_return (invoke "number?" (i32.const ,unspecified-value)) (i32.const ,false-value))
+    (assert_return (invoke "boolean?" (i32.const ,unspecified-value)) (i32.const ,false-value))
+    (assert_return (invoke "procedure?" (i32.const ,unspecified-value)) (i32.const ,false-value))
+    (assert_return (invoke "check-initialized" (i32.const ,unspecified-value)) (i32.const ,unspecified-value))
+
     ;; error-code is initially no error
     (assert_return (invoke "get-error-code") (i32.const ,error-no-error))
 
@@ -144,18 +150,6 @@
      (import "scheme base" "eq?" (func $eq? (param i32) (param i32) (result i32)))
      (import "scheme base" "check-initialized"   (func $check-initialized (param i32) (result i32)))
 
-     (func (export "unspecified-value->number?") (result i32)
-           i32.const ,unspecified-value
-           call $number?)
-
-     (func (export "unspecified-value->boolean?") (result i32)
-           i32.const ,unspecified-value
-           call $boolean?)
-
-     (func (export "unspecified-value->procedure?") (result i32)
-           i32.const ,unspecified-value
-           call $procedure?)
-
      (func (export "i32->fixnum-i32->fixnum-eq?") (param i32) (param i32) (result i32)
            local.get 0
            call $i32->fixnum
@@ -184,10 +178,6 @@
            call $i32->boolean
            call $eq?)
 
-     (func (export "unspecified-value->check-initialized") (result i32)
-           i32.const ,unspecified-value
-           call $check-initialized)
-
      (func (export "uninitialized-value->check-initialized") (result i32)
            i32.const ,uninitialized-value
            call $check-initialized)
@@ -214,11 +204,6 @@
     (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
     (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const ,false-value))
     (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const ,false-value))
-
-    (assert_return (invoke "unspecified-value->number?") (i32.const ,false-value))
-    (assert_return (invoke "unspecified-value->boolean?") (i32.const ,false-value))
-    (assert_return (invoke "unspecified-value->procedure?") (i32.const ,false-value))
-    (assert_return (invoke "unspecified-value->check-initialized") (i32.const ,unspecified-value))
 
     (assert_return (invoke $scheme-base "get-error-code") (i32.const ,error-no-error))
     (assert_trap (invoke "uninitialized-value->check-initialized") "unreachable")

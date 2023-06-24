@@ -117,6 +117,11 @@
     (assert_return (invoke "procedure?" (i32.const ,unspecified-value)) (i32.const ,false-value))
     (assert_return (invoke "check-initialized" (i32.const ,unspecified-value)) (i32.const ,unspecified-value))
 
+    ;; uninitialized value tests
+    (assert_return (invoke $scheme-base "get-error-code") (i32.const ,error-no-error))
+    (assert_trap (invoke "check-initialized" (i32.const ,uninitialized-value)) "unreachable")
+    (assert_return (invoke $scheme-base "get-error-code") (i32.const ,error-uninitialized))
+
     ;; error-code is initially no error
     (assert_return (invoke "get-error-code") (i32.const ,error-no-error))
 
@@ -148,7 +153,6 @@
      (import "scheme base" "funcidx->procedure" (func $funcidx->procedure  (param i32) (result i32)))
      (import "scheme base" "procedure?"         (func $procedure?          (param i32) (result i32)))
      (import "scheme base" "eq?" (func $eq? (param i32) (param i32) (result i32)))
-     (import "scheme base" "check-initialized"   (func $check-initialized (param i32) (result i32)))
 
      (func (export "i32->fixnum-i32->fixnum-eq?") (param i32) (param i32) (result i32)
            local.get 0
@@ -177,10 +181,6 @@
            local.get 1
            call $i32->boolean
            call $eq?)
-
-     (func (export "uninitialized-value->check-initialized") (result i32)
-           i32.const ,uninitialized-value
-           call $check-initialized)
      )
 
     (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
@@ -204,10 +204,6 @@
     (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
     (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const ,false-value))
     (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const ,false-value))
-
-    (assert_return (invoke $scheme-base "get-error-code") (i32.const ,error-no-error))
-    (assert_trap (invoke "uninitialized-value->check-initialized") "unreachable")
-    (assert_return (invoke $scheme-base "get-error-code") (i32.const ,error-uninitialized))
     ))
 
 (let emit ((statements scheme-base-wast))

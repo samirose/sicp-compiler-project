@@ -11,6 +11,41 @@
 (define funcidx-test-values
   '(0 1 42))
 
+(define eq?-test-cases
+  (list
+   ;; number
+   (list (number->fixnum-value 0) (number->fixnum-value 1) false-value)
+   (list (number->fixnum-value 0) (number->fixnum-value 0) true-value)
+   (list (number->fixnum-value 1) (number->fixnum-value 1) true-value)
+   (list (number->fixnum-value 42) (number->fixnum-value 42) true-value)
+   (list (number->fixnum-value fixnum-max) (number->fixnum-value fixnum-min) false-value)
+   (list (number->fixnum-value fixnum-max) (number->fixnum-value fixnum-max) true-value)
+   (list (number->fixnum-value fixnum-min) (number->fixnum-value fixnum-min) true-value)
+   ;; boolean
+   (list false-value true-value false-value)
+   (list true-value true-value true-value)
+   (list false-value false-value true-value)
+   ;; procedure
+   (list (funcidx->procedure-value 0) (funcidx->procedure-value 1) false-value)
+   (list (funcidx->procedure-value 0) (funcidx->procedure-value 0) true-value)
+   (list (funcidx->procedure-value 1) (funcidx->procedure-value 1) true-value)
+   (list (funcidx->procedure-value 42) (funcidx->procedure-value 42) true-value)
+   ;; mixed
+   (list (number->fixnum-value 1) true-value false-value)
+   (list (number->fixnum-value 0) false-value false-value)
+   (list (number->fixnum-value 42) true-value false-value)
+   (list (number->fixnum-value 42) false-value false-value)
+   (list (number->fixnum-value 42) (funcidx->procedure-value 42) false-value)
+   (list (number->fixnum-value 42) unspecified-value false-value)
+   (list false-value (funcidx->procedure-value 0) false-value)
+   (list true-value (funcidx->procedure-value 1) false-value)
+   (list false-value (funcidx->procedure-value 42) false-value)
+   (list true-value (funcidx->procedure-value 42) false-value)
+   (list false-value unspecified-value false-value)
+   (list true-value unspecified-value false-value)
+   ))
+
+
 (define scheme-base-wast
   `(
     ;; fixnum tests
@@ -144,66 +179,16 @@
     (assert_trap (invoke "procedure->funcidx" (i32.const ,false-value)) "unreachable")
     (assert_return (invoke "get-error-code") (i32.const ,error-expected-procedure))
 
-    ;; helper module for testing conversions
-    (module
-     (import "scheme base" "i32->fixnum"  (func $i32->fixnum  (param i32) (result i32)))
-     (import "scheme base" "number?"      (func $number?      (param i32) (result i32)))
-     (import "scheme base" "i32->boolean" (func $i32->boolean (param i32) (result i32)))
-     (import "scheme base" "boolean?"     (func $boolean?     (param i32) (result i32)))
-     (import "scheme base" "funcidx->procedure" (func $funcidx->procedure  (param i32) (result i32)))
-     (import "scheme base" "procedure?"         (func $procedure?          (param i32) (result i32)))
-     (import "scheme base" "eq?" (func $eq? (param i32) (param i32) (result i32)))
+    ;; eq? tests
+    ,@(map
+       (lambda (t)
+         `(assert_return (invoke "eq?" (i32.const ,(car t)) (i32.const ,(cadr t))) (i32.const ,(caddr t))))
+       eq?-test-cases)
 
-     (func (export "i32->fixnum-i32->fixnum-eq?") (param i32) (param i32) (result i32)
-           local.get 0
-           call $i32->fixnum
-           local.get 1
-           call $i32->fixnum
-           call $eq?)
-
-     (func (export "i32->boolean-i32->boolean-eq?") (param i32) (param i32) (result i32)
-           local.get 0
-           call $i32->boolean
-           local.get 1
-           call $i32->boolean
-           call $eq?)
-
-     (func (export "funcidx->procedure-funcidx->procedure-eq?") (param i32) (param i32) (result i32)
-           local.get 0
-           call $funcidx->procedure
-           local.get 1
-           call $funcidx->procedure
-           call $eq?)
-
-     (func (export "i32->fixnum-i32->boolean-eq?") (param i32) (param i32) (result i32)
-           local.get 0
-           call $i32->fixnum
-           local.get 1
-           call $i32->boolean
-           call $eq?)
-     )
-
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 0) (i32.const 0)) (i32.const ,true-value))
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 1) (i32.const 1)) (i32.const ,true-value))
-    (assert_return (invoke "i32->fixnum-i32->fixnum-eq?" (i32.const 42) (i32.const 42)) (i32.const ,true-value))
-
-    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
-    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const ,true-value))
-    (assert_return (invoke "i32->boolean-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const ,true-value))
-
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 0) (i32.const 0)) (i32.const ,true-value))
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 1) (i32.const 1)) (i32.const ,true-value))
-    (assert_return (invoke "funcidx->procedure-funcidx->procedure-eq?" (i32.const 42) (i32.const 42)) (i32.const ,true-value))
-
-    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 1)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 0)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 0) (i32.const 0)) (i32.const ,false-value))
-    (assert_return (invoke "i32->fixnum-i32->boolean-eq?" (i32.const 1) (i32.const 1)) (i32.const ,false-value))
+    ,@(map
+       (lambda (t)
+         `(assert_return (invoke "eq?" (i32.const ,(cadr t)) (i32.const ,(car t))) (i32.const ,(caddr t))))
+       eq?-test-cases)
     ))
 
 (let emit ((statements scheme-base-wast))

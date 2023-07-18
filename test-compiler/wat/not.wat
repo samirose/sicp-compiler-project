@@ -65,8 +65,6 @@
     i32.const 2
     call 1
     i32.const 9
-    call 8
-    call 9
     call_indirect (type 1)
     call 7
     select)

@@ -512,12 +512,16 @@
              (call-check-fixnum (runtime-call sequence-program "check-fixnum"))
              (call-i32->boolean (runtime-call sequence-program "i32->boolean"))
              (call-boolean->i32 (runtime-call sequence-program "boolean->i32"))
+             (call-funcidx->procedure (runtime-call sequence-program "funcidx->procedure"))
+             (call-procedure->funcidx (runtime-call sequence-program "procedure->funcidx"))
              (instruction-sequence-transforms
               `(((,@call-i32->fixnum ,@call-fixnum->i32) ())
                 ((,@call-i32->fixnum ,@call-check-fixnum) ,call-i32->fixnum)
                 ((,@call-fixnum->i32 ,@call-i32->fixnum) ())
                 ((,@call-i32->boolean ,@call-boolean->i32) ())
                 ((,@call-boolean->i32 ,@call-i32->boolean) ())
+                ((,@call-funcidx->procedure ,@call-procedure->funcidx) ())
+                ((,@call-procedure->funcidx ,@call-funcidx->procedure) ())
                 ((i32.const ,unspecified-value drop) ()))))
         (fold (lambda (seq program)
                 (compiled-program-with-value-code

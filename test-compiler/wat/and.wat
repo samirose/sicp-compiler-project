@@ -137,8 +137,6 @@
         block  ;; label = @3
           i32.const 6
           i32.const 10
-          call 8
-          call 9
           call_indirect (type 1)
           call 7
           br_if 0 (;@3;)

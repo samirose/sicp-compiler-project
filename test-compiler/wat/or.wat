@@ -100,8 +100,6 @@
       block  ;; label = @2
         i32.const 6
         i32.const 10
-        call 8
-        call 9
         call_indirect (type 1)
         local.tee 0
         call 7

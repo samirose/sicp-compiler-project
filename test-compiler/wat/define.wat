@@ -101,8 +101,6 @@
     i32.const 11
     call 1
     i32.const 7
-    call 8
-    call 9
     call_indirect (type 1)
     global.set 11
     i32.const 8

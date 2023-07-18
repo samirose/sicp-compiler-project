@@ -198,8 +198,6 @@
     i32.const 1
     call 1
     i32.const 13
-    call 8
-    call 9
     call_indirect (type 1)
     call 7
     if (result i32)  ;; label = @1
@@ -226,16 +224,12 @@
     i32.const 1
     call 1
     i32.const 15
-    call 8
-    call 9
     call_indirect (type 1)
     call 7
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
       i32.const 16
-      call 8
-      call 9
       call_indirect (type 1)
     else
       i32.const 3
@@ -264,23 +258,17 @@
     i32.const 0
     call 1
     i32.const 18
-    call 8
-    call 9
     call_indirect (type 1)
     call 7
     if (result i32)  ;; label = @1
       i32.const 1
       call 1
       i32.const 19
-      call 8
-      call 9
       call_indirect (type 1)
     else
       i32.const 2
       call 1
       i32.const 20
-      call 8
-      call 9
       call_indirect (type 1)
     end)
   (func (;30;)

@@ -87,8 +87,6 @@
     i32.const 5
     call 1
     i32.const 8
-    call 8
-    call 9
     call_indirect (type 1))
   (func (;18;) (type 1) (param i32) (result i32)
     (local i32)
@@ -108,8 +106,6 @@
     i32.const 3
     call 1
     i32.const 10
-    call 8
-    call 9
     call_indirect (type 1))
   (func (;20;) (type 1) (param i32) (result i32)
     (local i32)
@@ -129,8 +125,6 @@
     i32.const 3
     call 1
     i32.const 12
-    call 8
-    call 9
     call_indirect (type 1))
   (func (;22;) (type 1) (param i32) (result i32)
     local.get 0

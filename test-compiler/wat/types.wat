@@ -426,7 +426,7 @@
   (export "numeric-exp-is-number?" (func 16))
   (export "is-boolean?" (func 17))
   (export "eq?-evaluates-to-boolean-value" (func 18))
-  (export "arithmetic-operators-evaluate-to-boolean-values" (func 19))
+  (export "arithmetic-comparison-operators-evaluate-to-boolean-values" (func 19))
   (export "is-procedure?" (func 20))
   (export "lambda-is-procedure?" (func 22))
   (export "defined-procedure-is-procedure?" (func 23))

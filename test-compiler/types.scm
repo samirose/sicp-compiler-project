@@ -8,7 +8,7 @@
    numeric-exp-is-number?
    is-boolean?
    eq?-evaluates-to-boolean-value
-   arithmetic-operators-evaluate-to-boolean-values
+   arithmetic-comparison-operators-evaluate-to-boolean-values
    is-procedure?
    lambda-is-procedure?
    defined-procedure-is-procedure?
@@ -41,7 +41,7 @@
       (and (boolean? (eq? 1 1))
            (boolean? (eq? 1 2))))
 
-    (define (arithmetic-operators-evaluate-to-boolean-values)
+    (define (arithmetic-comparison-operators-evaluate-to-boolean-values)
       (and (boolean? (< 1 2))
            (boolean? (< 2 1))
            (boolean? (<= 1 2))

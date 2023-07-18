@@ -109,7 +109,7 @@
 
 (compiler-test-eq
  "arithmetic comparison operators return boolean values"
- #t (arithmetic-operators-evaluate-to-boolean-values))
+ #t (arithmetic-comparison-operators-evaluate-to-boolean-values))
 
 (compiler-test-eq
  "lambda is procedure"

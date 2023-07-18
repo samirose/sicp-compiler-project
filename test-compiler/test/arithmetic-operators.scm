@@ -16,8 +16,16 @@
  2 (plus-single))
 
 (compiler-test-eq
+ "plus single expression equals the value of the expression"
+ 3 (plus-single-expr))
+
+(compiler-test-eq
  "minus single number equals the number negated"
  -2 (minus-single))
+
+(compiler-test-eq
+ "minus single expression equals the value of the expression negated"
+ -5 (minus-single-expr))
 
 (compiler-test-eq
  "multiply single number equals the number"

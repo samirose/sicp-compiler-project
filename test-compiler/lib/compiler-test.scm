@@ -4,7 +4,8 @@
 	  compiler-test-end
 	  compiler-test-eq
 	  compiler-test-unspecified
-	  compiler-test-invoke)
+	  compiler-test-invoke
+          compiler-test-error)
 
   (import (scheme base)
 	  (scheme process-context)
@@ -28,6 +29,11 @@
       (syntax-rules ()
 	((compiler-test-invoke proc args ...)
 	 (proc args ...))))
+
+    (define-syntax compiler-test-error
+      (syntax-rules ()
+        ((compiler-test-error test-name test-expr expected-error)
+         (test-error test-name #t test-expr))))
 
     (define (compiler-test-end name)
       (let ((fail-count (test-runner-fail-count (test-runner-current))))

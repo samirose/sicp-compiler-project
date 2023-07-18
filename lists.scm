@@ -1,17 +1,19 @@
 (define-library (lists)
 
- (export partition-list
-         index-of-equal
-         first-duplicate
-         make-list
-         flatten-n
-         all?
-	 filter
-	 find
-	 fold)
+  (export
+   partition-list
+   index-of-equal
+   first-duplicate
+   flatten-n
+   all?
+   replace-seqs
+   ;; from srfi-1
+   filter find fold)
 
- (import (scheme  base)
-	 (only (srfi srfi-1) filter find fold))
+  (import
+   (scheme base)
+   (scheme cxr)
+   (srfi srfi-1))
 
  (begin
    (define (partition-list p l)
@@ -51,4 +53,19 @@
            ((p? (car l)) (all? p? (cdr l)))
            (else #f)))
 
+   (define (replace-seqs seq with-seq lst)
+     (if (null? seq)
+         lst
+         (let reduce ((s seq) (f '()) (a '()) (l lst))
+           (cond ((null? s)
+                  (let ((f' (append-reverse with-seq f)))
+                    (reduce seq f' f' l)))
+                 ((null? l)
+                  (reverse (if (null? s) f a)))
+                 ((eq? (car l) (car s))
+                  (let ((a' (cons (car l) a)))
+                    (reduce (cdr s) f a' (cdr l))))
+                 (else
+                  (let ((a' (cons (car l) a)))
+                    (reduce seq a' a' (cdr l))))))))
    ))

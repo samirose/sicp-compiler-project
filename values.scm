@@ -1,0 +1,59 @@
+(define-library (values)
+
+  (export
+   fixnum-mask fixnum-shift fixnum-max fixnum-min
+   immediate-mask immediate-shift
+   procedure-tag
+   boolean-tag false-value true-value
+   special-tag uninitialized-value unspecified-value
+   number->fixnum-value
+   boolean->boolean-value
+   funcidx->procedure-value
+   error-no-error error-expected-number error-expected-procedure error-uninitialized)
+
+  (import
+   (scheme base)
+   (srfi srfi-60))
+
+  (begin
+    ;; fixnums are encoded with least signigicant bit set
+    (define fixnum-mask #x00000001)     ; 00000001
+    (define fixnum-shift 1)
+    (define fixnum-max #x3fffffff)
+    (define fixnum-min (- (+ fixnum-max 1)))
+
+    ;; Other immediate value types are encoded in the least significant 4 bits
+    ;; Note that the least significant two bits need to non-zero for all immediate type tags to
+    ;; enable detecting 32-bit aligned pointers from immediates.
+    (define immediate-mask  #x0000000f) ; 00001111
+    (define immediate-shift 4)
+
+    ;; Type tag for procedure values.
+    ;; Wasm function index of the procedure is encoded in the 3 most significant bytes
+    (define procedure-tag #x00000002)   ; 00000010
+
+    ;; Type tag and values for boolean values
+    (define boolean-tag #x00000006)     ; 00000110
+    (define false-value #x00000006)     ; 00000110
+    (define true-value  #x00000016)     ; 00010110
+
+    ;; Special type tag and values
+    (define special-tag         #x0000000e) ; 00001110
+    (define uninitialized-value #x0000002e) ; 00011110
+    (define unspecified-value   #x0000001e) ; 00101110
+
+    (define (number->fixnum-value n)
+      (bitwise-ior (arithmetic-shift n fixnum-shift) fixnum-mask))
+
+    (define (boolean->boolean-value b)
+      (if b true-value false-value))
+
+    (define (funcidx->procedure-value i)
+      (bitwise-ior (arithmetic-shift i immediate-shift) procedure-tag))
+
+    (define error-no-error 0)
+    (define error-expected-number 1)
+    (define error-expected-procedure 2)
+    (define error-uninitialized 3)
+    )
+  )

@@ -1,1 +1,1 @@
-(register "scheme base")
+(register "scheme base" $scheme-base)

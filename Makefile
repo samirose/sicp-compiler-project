@@ -17,11 +17,29 @@ RUN_COMPILER = $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) dr
 compile : $(COMPILER_BINARIES) ## Compiles a scheme file from standard input and outputs WAT to standard output
 	$(RUN_COMPILER) $<
 
-.PHONY : test-runtime
-test-runtime : runtime/test/test-runtime.log ## Executes tests for the runtime library
+.PHONY : generate-runtime
+generate-runtime : runtime/scheme-base.wat ## Generates the runtime library WAT
+
+runtime/generate-scheme-base-wat.scm : values.scm
+
+runtime/scheme-base.wat : runtime/generate-scheme-base-wat.scm
+	$(HOST_SCHEME_RUN_PROGRAM) -L . $< | wat-desugar - > $@.tmp \
+	  && mv -f $@.tmp $@
+
+.PHONY : generate-runtime-test
+generate-runtime-test : runtime/test/scheme-base.wast ## Generates the runtime library test script
 
 runtime/test/ :
 	mkdir -p runtime/test
+
+runtime/generate-scheme-base-wast.scm : values.scm
+
+runtime/test/scheme-base.wast : runtime/generate-scheme-base-wast.scm | runtime/test/
+	$(HOST_SCHEME_RUN_PROGRAM) -L . $< > $@.tmp \
+	  && mv -f $@.tmp $@
+
+.PHONY : test-runtime
+test-runtime : runtime/test/test-runtime.log ## Executes tests for the runtime library
 
 runtime/test/test-runtime.log : runtime/test/test-runtime.json | runtime/test/
 	spectest-interp $< | tee $@.tmp \
@@ -30,7 +48,7 @@ runtime/test/test-runtime.log : runtime/test/test-runtime.json | runtime/test/
 runtime/test/test-runtime.json : runtime/test/test-runtime.wast | runtime/test/
 	wast2json $< -o $@
 
-runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/runtime.wast | runtime/test/
+runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/test/scheme-base.wast | runtime/test/
 	cat $^ > $@
 
 .PHONY : compile-compiler
@@ -44,7 +62,7 @@ $(call binaries,assert scheme-libraries scheme-syntax scheme-r7rs-syntax : compi
 $(call binaries,compiled-program : counted-set definitions-table)
 $(call binaries,definitions-table : wasm-syntax counted-set)
 $(call binaries,scheme-libraries : compiled-program)
-$(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries)
+$(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries values)
 $(call binaries,module-compiler : expression-compiler scheme-r7rs-syntax)
 $(call binaries,driver : module-compiler)
 
@@ -63,7 +81,8 @@ RUN_COMPILER_TEST_HOST = $(HOST_SCHEME_RUN_PROGRAM) -L .. -L ../lib
 $(TEST_COMPILER_DIR)build/ \
 $(TEST_COMPILER_DIR)log/ \
 $(TEST_COMPILER_DIR)host-log/ \
-$(TEST_COMPILER_DIR)wast-log/ :
+$(TEST_COMPILER_DIR)wast-log/ \
+$(TEST_COMPILER_DIR)wat :
 	mkdir -p $@
 
 .PHONY : test-compiler-host $(COMPILER_TEST_HOST_TARGETS)
@@ -71,7 +90,7 @@ test-compiler-host : $(COMPILER_TEST_HOST_LOGS) ## Executes the compiler integra
 
 $(COMPILER_TEST_HOST_TARGETS) : $(TEST_COMPILER_DIR)%-host : $(TEST_COMPILER_DIR)host-log/%.log
 
-$(COMPILER_TEST_HOST_LOGS) : $(TEST_COMPILER_DIR)host-log/%.log : $(TEST_COMPILER_DIR)%.scm $(TEST_COMPILER_DIR)test/%.scm | $(TEST_COMPILER_DIR)host-log/
+$(COMPILER_TEST_HOST_LOGS) : $(TEST_COMPILER_DIR)host-log/%.log : $(TEST_COMPILER_DIR)%.scm $(TEST_COMPILER_DIR)test/%.scm $(TEST_COMPILER_DIR)/lib/compiler-test.scm | $(TEST_COMPILER_DIR)host-log/
 	cd $(TEST_COMPILER_DIR)host-log ; \
 	rm -f $(notdir $(@:%.log=%.fail.log)) ; \
 	$(RUN_COMPILER_TEST_HOST) ../test/$(notdir $<) || \
@@ -82,9 +101,11 @@ COMPILER_TEST_WAST_TESTS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.
 COMPILER_TEST_WAST_LOGS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)wast-log/%.log)
 COMPILER_TEST_WAST_COMPILER := $(TEST_COMPILER_DIR)lib/compiler-test-to-wast.scm
 COMPILER_TEST_TO_WAST := $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) $(COMPILER_TEST_WAST_COMPILER)
+COMPILER_TEST_SCM_MODULES := $(wildcard $(TEST_COMPILER_DIR)*.scm)
+COMPILER_TEST_WAT_MODULES := $(COMPILER_TEST_SCM_MODULES:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)wat/%.wat)
 
 .PHONY : test-compiler-wast $(COMPILER_TEST_WAST_TARGETS)
-test-compiler-wast : $(COMPILER_TEST_WAST_LOGS) ## Compiles the compiler tests to WAST scripts and executes them
+test-compiler-wast : $(COMPILER_TEST_WAST_LOGS) $(COMPILER_TEST_WAT_MODULES) ## Compiles the compiler tests to WAST scripts and executes them
 
 $(COMPILER_TEST_WAST_TARGETS) : $(TEST_COMPILER_DIR)%-wast : $(TEST_COMPILER_DIR)wast-log/%.log
 
@@ -103,6 +124,8 @@ $(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)build/%-test.wast : $(TEST_COM
 	$(COMPILER_TEST_TO_WAST) < $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
+$(COMPILER_TEST_WAT_MODULES) : $(TEST_COMPILER_DIR)wat/%.wat : $(TEST_COMPILER_DIR)build/%.wat | $(TEST_COMPILER_DIR)wat
+	wat-desugar $< -o $@
 
 COMPILER_TEST_DIRECT_TESTS := $(wildcard $(TEST_COMPILER_DIR)wast/*.wast)
 COMPILER_TEST_DIRECT_TARGETS := $(COMPILER_TEST_DIRECT_TESTS:%.wast=%)
@@ -172,6 +195,7 @@ clean-compiler : ## Forces compiler re-compilation
 clean-test : ## Removes test build artefacts and results
 	-rm -rf \
 	  runtime/test \
+	  runtime/scheme-base.wat \
 	  $(TEST_UNIT_DIR)log \
 	  $(TEST_UNIT_DIR)compiled \
 	  $(TEST_COMPILER_DIR)build \

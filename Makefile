@@ -117,7 +117,8 @@ $(TEST_COMPILER_DIR)build/%-test.json : $(TEST_COMPILER_DIR)build/test-prelude.w
                                         $(TEST_COMPILER_DIR)build/%.wat \
                                         $(TEST_COMPILER_DIR)build/%-test.wast \
                                         | $(TEST_COMPILER_DIR)build/
-	cat $^ | wast2json - -o $@
+	cat $^ | wast2json - -o $@.tmp \
+	  && mv -f $@.tmp $@
 
 $(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)lib/compiler-test-to-wast.scm
 $(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)build/%-test.wast : $(TEST_COMPILER_DIR)test/%.scm | $(TEST_COMPILER_DIR)build/
@@ -144,7 +145,8 @@ $(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/test-prelude.wast \
                                    $(TEST_COMPILER_DIR)build/%.wat \
                                    $(TEST_COMPILER_DIR)wast/%.wast \
                                    | $(TEST_COMPILER_DIR)build/
-	cat $^ | wast2json - -o $@
+	cat $^ | wast2json - -o $@.tmp \
+	  && mv -f $@.tmp $@
 
 $(TEST_COMPILER_DIR)build/test-prelude.wast : runtime/scheme-base.wat \
                                               runtime/register-scheme-base.wast \
@@ -152,7 +154,8 @@ $(TEST_COMPILER_DIR)build/test-prelude.wast : runtime/scheme-base.wat \
 	cat $^ > $@
 
 $(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILER_BINARIES) | $(TEST_COMPILER_DIR)build/
-	$(RUN_COMPILER) < $< > $@
+	$(RUN_COMPILER) < $< > $@.tmp \
+	  && mv -f $@.tmp $@
 
 .PRECIOUS : $(TEST_COMPILER_DIR)build/%.json $(TEST_COMPILER_DIR)build/%.wast $(TEST_COMPILER_DIR)build/%.wat
 

@@ -30,15 +30,60 @@
  "String values are not yet supported")
 
 (assert-expression-raises-compilation-error
+ (quote "a string")
+ "Strings not supported yet" "a string"
+ "Quoted string compiles to the string")
+
+(assert-expression-raises-compilation-error
+ #\A
+ "Unknown expression type" #\A
+ "Character values are not yet supported")
+
+(assert-expression-raises-compilation-error
+ (quote #\A)
+ "Unknown expression type" #\A
+ "Quoted character compiles to the character")
+
+(assert-expression-raises-compilation-error
  3.14
  "Unsupported number" 3.14
  "Floating-point values are not yet supported")
 
-;; quote
 (assert-expression-raises-compilation-error
- '(quote x)
- "Quote not supported yet" '(quote x)
- "Quoted values are not yet supported")
+ (quote 3.14)
+ "Unsupported number" 3.14
+ "Quoted number compiles to the number")
+
+(assert-expression-raises-compilation-error
+ #(1 2 3)
+ "Unknown expression type" #(1 2 3)
+ "Vector values are not yet supported")
+
+(assert-expression-raises-compilation-error
+ (quote #(1 2 3))
+ "Unknown expression type" #(1 2 3)
+ "Quoted vector compiles to the vector")
+
+(assert-expression-raises-compilation-error
+ #u8(1 2 3)
+ "Unknown expression type" #u8(1 2 3)
+ "Bytevector values are not yet supported")
+
+(assert-expression-raises-compilation-error
+ (quote #u8(1 2 3))
+ "Unknown expression type" #u8(1 2 3)
+ "Quoted bytevector compiles to the bytevector")
+
+;; pair and list literals
+(assert-expression-raises-compilation-error
+ '(quote (1 . 2))
+ "Quote not supported yet for" '(quote (1 . 2))
+ "Pair literals are not supported yet")
+
+(assert-expression-raises-compilation-error
+ '(quote (a b c))
+ "Quote not supported yet for" '(quote (a b c))
+ "List literals are not supported yet")
 
 ;; arithmetic expressions
 (assert-expression-raises-compilation-error

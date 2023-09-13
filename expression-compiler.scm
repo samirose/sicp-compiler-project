@@ -30,7 +30,7 @@
             ((pattern-match? `(,(lambda (x) (find-variable x lexical-env)) ,??*) exp)
              (compile-application exp (car exp) (cdr exp) program lexical-env compile))
             ((pattern-match? `(quote ,??) exp)
-             (compile-quoted exp (cadr exp) program))
+             (compile-quoted exp (cadr exp) program lexical-env compile))
             ((variable? exp)
              (compile-variable exp program lexical-env))
             ((pattern-match? `(set! ,variable? ,??) exp)
@@ -98,6 +98,14 @@
 
 ;;;simple expressions
 
+    (define (self-evaluating? exp)
+      (or (number? exp)
+          (boolean? exp)
+          (char? exp)
+          (string? exp)
+          (vector? exp)
+          (bytevector? exp)))
+
     (define (compile-number exp program)
       (compiled-program-with-value-code
        program
@@ -114,8 +122,10 @@
     (define (compile-string exp program)
       (raise-compilation-error "Strings not supported yet" exp))
 
-    (define (compile-quoted exp value program)
-      (raise-compilation-error "Quote not supported yet" exp))
+    (define (compile-quoted exp value program lexical-env compile)
+      (if (self-evaluating? value)
+          (compile value program lexical-env)
+          (raise-compilation-error "Quote not supported yet for" exp)))
 
     (define (compile-variable exp program lexical-env)
       (let* ((lexical-address

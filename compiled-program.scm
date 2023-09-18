@@ -7,6 +7,7 @@
           compiled-program-append-value-code
           compiled-program-append-value-codes
           compiled-program-add-definition
+          compiled-program-last-definition
           compiled-program-get-definitions
           compiled-program-contains-definition
           compiled-program-definition-index
@@ -56,6 +57,11 @@
 	(compiled-program-module-definitions cp)
 	definition)
        (compiled-program-value-code cp)))
+
+    (define (compiled-program-last-definition cp type)
+      (last-definition
+       (compiled-program-module-definitions cp)
+       type))
 
     (define (compiled-program-get-definitions cp type)
       (get-definitions

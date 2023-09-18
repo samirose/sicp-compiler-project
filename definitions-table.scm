@@ -3,6 +3,7 @@
   (export make-empty-definitions-table
           definitions-count
           add-definition
+          last-definition
           contains-definition
           lookup-definition-index
           definition-index
@@ -32,6 +33,9 @@
       (make-definitions-table
        (cons def (definitions defs))
        (counted-set-add (definition-counts defs) (car def) 1)))
+
+    (define (last-definition defs type)
+      (assq type (definitions defs)))
 
     (define (contains-definition defs def)
       (if (member def (definitions defs)) #t #f))

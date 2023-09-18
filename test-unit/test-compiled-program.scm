@@ -92,7 +92,17 @@
       (assert-equal
        '((global (mut i32) (i32.const 42)))
        (compiled-program-get-definitions cp 'global)
-       "compiled-program-with-definition-and-value-code retains the program's existing definitions"))))
+       "compiled-program-with-definition-and-value-code retains the program's existing definitions")
+
+      (assert-equal
+       '(func (result i32) (i32.const 53))
+       (compiled-program-last-definition cp 'func)
+       "compiled-program-last-definition returns the last defintion of specified type added to the program")
+
+      (assert-equal
+       '(global (mut i32) (i32.const 42))
+       (compiled-program-last-definition cp 'global)
+       "compiled-program-last-definition returns the last defintion of specified type added to the program"))))
 
   (let ((cp (compiled-program-with-definitions-and-value-code
              cp
@@ -107,6 +117,7 @@
      '((func (result i32) global.get 1))
      (compiled-program-get-definitions cp 'func)
      "compiled-program-with-definitions-and-value-code adds the definitions to the program")
+
     (assert-equal
      '(call 0)
      (compiled-program-value-code cp)

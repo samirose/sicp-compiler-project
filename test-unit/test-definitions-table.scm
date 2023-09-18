@@ -66,6 +66,16 @@
      (get-definitions ds 'func)
      "Definitions table with single func added contains the func definition")
 
+    (assert-equal
+     '(func $f (result i32))
+     (last-definition ds 'func)
+     "Defintions table with single func added has the definition as last func definition")
+
+    (assert-equal
+     #f
+     (last-definition ds 'global)
+     "Defintions table with single func added does not have a global last definition")
+
     (let ((ds (add-definition ds '(func $g (param i32) (result i32)))))
       (assert-equal
        0
@@ -86,6 +96,11 @@
        '((func $f (result i32)) (func $g (param i32) (result i32)))
        (get-definitions ds 'func)
        "Definitions table with two funcs added contains the func definitions in addition order")
+
+      (assert-equal
+       '(func $g (param i32) (result i32))
+       (last-definition ds 'func)
+       "Definitions table with two funcs added has the one added last as the last func definition")
 
       (let ((ds (add-definition ds '(global $glob (mut i32)))))
         (assert-equal
@@ -142,4 +157,15 @@
          '((func $f (result i32)) (func $g (param i32) (result i32)))
          (get-definitions ds 'func)
          "Definitions table with two funcs and one global added contains the func definitions in addition order")
+
+        (assert-equal
+         '(func $g (param i32) (result i32))
+         (last-definition ds 'func)
+         "Definitions table with two funcs and one global added has the func definition  added last as the last func definition")
+
+        (assert-equal
+         '(global $glob (mut i32))
+         (last-definition ds 'global)
+         "Definitions table with two funcs and one global added has the global as last global definition")
+
         ))))

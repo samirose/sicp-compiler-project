@@ -102,7 +102,17 @@
       (assert-equal
        '(global (mut i32) (i32.const 42))
        (compiled-program-last-definition cp 'global)
-       "compiled-program-last-definition returns the last defintion of specified type added to the program"))))
+       "compiled-program-last-definition returns the last definition of specified type added to the program")
+
+      (assert-equal
+       '(func (result i32) (i32.const 53))
+       (compiled-program-lookup-definition cp (lambda (d) (eq? (car d) 'func)))
+       "compiled-program-lookup-definition returns the last defintion that matches the predicate")
+
+      (assert-equal
+       #f
+       (compiled-program-lookup-definition cp (lambda (d) #f))
+       "compiled-program-lookup-definition returns false when predicate returns false for all definitions"))))
 
   (let ((cp (compiled-program-with-definitions-and-value-code
              cp

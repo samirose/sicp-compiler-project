@@ -114,6 +114,20 @@
          "Definitions table with two funcs and one global added contains the global definition")
 
         (assert-equal
+         '(func $g (param i32) (result i32))
+         (lookup-definition
+          ds
+          (lambda (d) (eq? (car d) 'func)))
+         "lookup-definition returns the last added matching definition")
+
+        (assert-equal
+         #f
+         (lookup-definition
+          ds
+          (lambda (d) #f))
+         "lookup-definition returns false when predicate returns false for all definitions")
+
+        (assert-equal
          0
          (definition-index ds '(global $glob (mut i32)))
          "Definitions table with two funcs and one global added has index 0 for the global definition")

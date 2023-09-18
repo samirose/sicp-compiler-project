@@ -8,6 +8,7 @@
           compiled-program-append-value-codes
           compiled-program-add-definition
           compiled-program-last-definition
+          compiled-program-lookup-definition
           compiled-program-get-definitions
           compiled-program-contains-definition
           compiled-program-definition-index
@@ -62,6 +63,11 @@
       (last-definition
        (compiled-program-module-definitions cp)
        type))
+
+    (define (compiled-program-lookup-definition cp predicate)
+      (lookup-definition
+       (compiled-program-module-definitions cp)
+       predicate))
 
     (define (compiled-program-get-definitions cp type)
       (get-definitions

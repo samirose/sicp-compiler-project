@@ -5,6 +5,7 @@
           add-definition
           last-definition
           contains-definition
+          lookup-definition
           lookup-definition-index
           definition-index
           get-definitions)
@@ -39,6 +40,12 @@
 
     (define (contains-definition defs def)
       (if (member def (definitions defs)) #t #f))
+
+    (define (lookup-definition defs predicate)
+      (let loop ((ds (definitions defs)))
+        (cond ((null? ds) #f)
+              ((predicate (car ds)) (car ds))
+              (else (loop (cdr ds))))))
 
     (define (lookup-definition-index defs type predicate)
       (let loop ((ds (definitions defs))

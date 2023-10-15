@@ -25,6 +25,11 @@
    (get-definitions ds 'func)
    "Empty definitions table does not contain func definitions")
 
+  (assert-equal
+   '()
+   (flatmap-definitions ds (lambda (d) (cons 'flatmapped (cdr d))))
+   "flatmap-definitions of empty table is empty list")
+
   (let ((ds (add-definition ds '(func $f (result i32)))))
     (assert-equal
      0
@@ -181,5 +186,15 @@
          '(global $glob (mut i32))
          (last-definition ds 'global)
          "Definitions table with two funcs and one global added has the global as last global definition")
+
+        (assert-equal
+         '((global (import "glob") (mut i32)) (global $glob (mut i32)))
+         (flatmap-definitions
+          ds
+          (lambda (d)
+            (if (eq? (car d) 'global)
+                `((global (import "glob") ,(caddr d)) ,d)
+                '())))
+         "flatmap-definitions can filter add, and modify definitions")
 
         ))))

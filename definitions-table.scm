@@ -6,6 +6,7 @@
           last-definition
           contains-definition
           lookup-definition
+          flatmap-definitions
           lookup-definition-index
           definition-index
           get-definitions)
@@ -46,6 +47,14 @@
         (cond ((null? ds) #f)
               ((predicate (car ds)) (car ds))
               (else (loop (cdr ds))))))
+
+    (define (flatmap-definitions defs proc)
+      (let loop ((ds (definitions defs))
+                 (rs '()))
+        (if (null? ds)
+            rs
+            (loop (cdr ds)
+                  (append (proc (car ds)) rs)))))
 
     (define (lookup-definition-index defs type predicate)
       (let loop ((ds (definitions defs))

@@ -6,6 +6,8 @@
   `(module
     $scheme-base
 
+    (memory $heap (export "$heap") 1)
+
     (global $error-code (mut i32) (i32.const ,error-no-error))
 
     (func (export "get-error-code") (result i32)
@@ -109,6 +111,23 @@
           i32.const ,procedure-tag
           i32.eq
           call $i32->boolean)
+
+    (func (export "symbol?") (param $obj i32) (result i32)
+          local.get $obj
+          i32.const ,immediate-value-mask
+          i32.and
+          i32.eqz
+          if (result i32)
+            local.get $obj
+            i32.load
+            i32.const ,heap-object-type-mask
+            i32.and
+            i32.const ,heap-object-type-symbol
+            i32.eq
+            call $i32->boolean
+          else
+            i32.const ,false-value
+          end)
 
     (func (export "eq?") (param $obj1 i32) (param $obj2 i32) (result i32)
           local.get $obj1

@@ -1,7 +1,11 @@
 (import (scheme base)
         (scheme read)
 	(scheme write)
-        (module-compiler))
+        (lists)
+        (module-compiler)
+        (wasm-syntax))
 
-(write (compile-r7rs-library-to-wasm-module (read)))
-(newline)
+(let ((output-port (current-output-port)))
+  (emit-wat
+   (compile-r7rs-library-to-wasm-module (read))
+   output-port))

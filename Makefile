@@ -64,7 +64,7 @@ $(call binaries,definitions-table : wasm-syntax counted-set)
 $(call binaries,scheme-libraries : compiled-program)
 $(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries values)
 $(call binaries,module-compiler : expression-compiler scheme-r7rs-syntax)
-$(call binaries,driver : module-compiler)
+$(call binaries,driver : lists module-compiler wasm-syntax)
 
 $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@

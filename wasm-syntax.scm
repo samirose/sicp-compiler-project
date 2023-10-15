@@ -5,10 +5,12 @@
           wasm-const-value?
           wasm-define-locals wasm-locals-definition? wasm-local-definitions-to-top
           wasm-import-definition?
-          wasm-data-offset wasm-data-length wasm-data-value wasm-data-definition)
+          i32-as-wasm-data string-as-wasm-data
+          emit-wat)
 
   (import (scheme base)
           (scheme cxr)
+          (scheme write)
           (srfi srfi-60)
           (lists)
           (pattern-match))
@@ -48,55 +50,83 @@
             ((pattern-match? `((import ,string? ,??*) ,??*) exp))
             (else (wasm-import-definition? (cdr exp)))))
 
-    (define (wasm-data-offset exp)
-      (cadr exp))
+    (define (i32-as-wasm-data n)
+      (do ((bytes (make-bytevector 4))
+           (i 0 (+ i 1)))
+          ((= i 4) (cons bytes 4))
+        (bytevector-u8-set!
+         bytes
+         i
+         (bitwise-and
+          (arithmetic-shift n (* -8 i))
+          #xff))))
 
-    (define (wasm-data-length exp)
-      (caddr exp))
+    (define (string-as-wasm-data s)
+      (cons s (bytevector-length (string->utf8 s))))
 
-    (define (wasm-data-value exp)
-      (cadddr exp))
+    (define (emit-wat-string-char c port)
+      (cond
+       ((char=? c #\x09) (write-string "\\t" port))
+       ((char=? c #\x0A) (write-string "\\n" port))
+       ((char=? c #\x0D) (write-string "\\r" port))
+       ((char=? c #\x22) (write-string "\\\"" port))
+       ((char=? c #\x27) (write-string "\\'" port))
+       ((char=? c #\x5C) (write-string "\\\\" port))
+       ((and (char>=? c #\x20) (not (char=? c #\x7F)))
+        (write-char c port))
+       (else (write-string "\\u{" port)
+             (write-string (number->string (char->integer c) 16) port)
+             (write-char #\} port))))
 
-    (define (byte-as-data-char byte)
-      (string-append
-       "\\"
-       (if (< byte #x10) "0" "")
-       (number->string byte 16)))
+    (define (emit-wat-string s port)
+      (write-char #\" port)
+      (string-for-each
+       (lambda (c) (emit-wat-string-char c port))
+       s)
+      (write-char #\" port))
 
-    (define (word-as-data-chars word)
-      (fold
-       (lambda (sr result)
-         (string-append
-          result
-          (byte-as-data-char (bitwise-and (arithmetic-shift word sr) #xff))))
-       ""
-       '(0 -8 -16 -24)))
+    (define (emit-wat-bytes bytes port)
+      (write-char #\" port)
+      (do ((hexchars "0123456789abcdef")
+           (i 0 (+ i 1))
+           (l (bytevector-length bytes)))
+          ((= i l))
+        (let* ((b (bytevector-u8-ref bytes i))
+               (hn (bitwise-and (arithmetic-shift b -4) #x0f))
+               (ln (bitwise-and b #x0f)))
+          (write-char #\\ port)
+          (write-char (string-ref hexchars hn) port)
+          (write-char (string-ref hexchars ln) port)))
+      (write-char #\" port))
 
-    (define (value-as-data-chars v)
-      (cond ((and (number? v) (<= #x00 v #xff)) ; byte
-             (cons (byte-as-data-char v) 1))
-             ((and (number? v) (<= 0 v #xffffffff)) ; 32bit word
-              (cons (word-as-data-chars v) 4))
-             ((number? v)
-              (error "Unsupported number" v))
-             ((string? v)
-              (cons v (bytevector-length (string->utf8 v))))
-             (else
-              (error "Unsupported data value" v))))
+    (define (emit-wat-cont ast port k)
+      (cond
+       ((null? ast)
+        (k))
+       ((number? ast)
+        (display ast port) (k))
+       ((symbol? ast)
+        (display ast port) (k))
+       ((string? ast)
+        (emit-wat-string ast port) (k))
+       ((bytevector? ast)
+        (emit-wat-bytes ast port) (k))
+       ((pair? ast)
+        (display #\( port)
+        (let loop ((lst ast))
+          (emit-wat-cont
+           (car lst)
+           port
+           (if (null? (cdr lst))
+               (lambda ()
+                 (display #\) port)
+                 (k))
+               (lambda ()
+                 (display #\ port)
+                 (loop (cdr lst)))))))
+       (else (error "Usupported WAT AST element" ast))))
 
-      (define (make-wasm-data-value vs)
-        (cond ((null? vs) (cons "" 0))
-              ((pair? vs)
-               (fold
-                (lambda (v r)
-                  (let ((r' (value-as-data-chars v)))
-                    (cons (string-append (car r) (car r')) (+ (cdr r) (cdr r')))))
-                (cons "" 0)
-                vs))
-              (else (value-as-data-chars vs))))
+    (define (emit-wat ast port)
+      (emit-wat-cont ast port (lambda () (newline port))))
 
-      (define (wasm-data-definition offset values)
-        (let ((dl (make-wasm-data-value values)))
-          `(data-with-length ,offset ,(cdr dl) ,(car dl))))
-
-      ))
+    ))

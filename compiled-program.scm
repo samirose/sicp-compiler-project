@@ -9,6 +9,7 @@
           compiled-program-add-definition
           compiled-program-last-definition
           compiled-program-lookup-definition
+          compiled-program-flatmap-definitions
           compiled-program-get-definitions
           compiled-program-contains-definition
           compiled-program-definition-index
@@ -68,6 +69,11 @@
       (lookup-definition
        (compiled-program-module-definitions cp)
        predicate))
+
+    (define (compiled-program-flatmap-definitions cp proc)
+      (flatmap-definitions
+       (compiled-program-module-definitions cp)
+       proc))
 
     (define (compiled-program-get-definitions cp type)
       (get-definitions

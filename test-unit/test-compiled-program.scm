@@ -15,6 +15,11 @@
    (compiled-program-value-code cp)
    "Empty compiled program does not have value code")
 
+  (assert-equal
+   '()
+   (compiled-program-flatmap-definitions cp (lambda (d) (cons 'flatmapped (cdr d))))
+   "flatmap-definitions of empty program is empty list")
+
   (let ((cp (compiled-program-add-definition
              cp
              '(global (mut i32) (i32.const 42)))))
@@ -112,7 +117,17 @@
       (assert-equal
        #f
        (compiled-program-lookup-definition cp (lambda (d) #f))
-       "compiled-program-lookup-definition returns false when predicate returns false for all definitions"))))
+       "compiled-program-lookup-definition returns false when predicate returns false for all definitions")
+
+      (assert-equal
+       '((global (mut i32) (i32.const 42)) (data (i32.const 42) "foo"))
+       (compiled-program-flatmap-definitions
+        cp
+        (lambda (d)
+          (if (eq? (car d) 'global)
+              `(,d (data ,(caddr d) "foo"))
+              '())))
+       "flatmap-definitions can filter, add and modify definitions"))))
 
   (let ((cp (compiled-program-with-definitions-and-value-code
              cp

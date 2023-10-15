@@ -153,6 +153,8 @@
               (compiled-program-get-definitions program type)))
            (not-import-definition?
             (lambda (def) (not (wasm-import-definition? def))))
+           (imported-memories
+            (filter wasm-import-definition? (get-module-definitions 'memory)))
            (imported-globals
             (filter wasm-import-definition? (get-module-definitions 'global)))
            (module-globals
@@ -161,9 +163,10 @@
             (filter wasm-import-definition? (get-module-definitions 'func)))
            (module-funcs
             (filter not-import-definition? (get-module-definitions 'func))))
-	`(module
+        `(module
           ,@(get-module-definitions 'type)
           ,@(get-module-definitions 'import)
+          ,@imported-memories
           ,@imported-globals
           ,@imported-funcs
           ,@module-globals

@@ -13,7 +13,8 @@
           (lexical-env)
           (compiled-program)
           (compilation-error)
-          (wasm-syntax))
+          (wasm-syntax)
+          (literals-compiler))
 
 ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R7RS-small
 ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
@@ -123,9 +124,12 @@
       (raise-compilation-error "Strings not supported yet" exp))
 
     (define (compile-quoted exp value program lexical-env compile)
-      (if (self-evaluating? value)
-          (compile value program lexical-env)
-          (raise-compilation-error "Quote not supported yet for" exp)))
+      (cond ((self-evaluating? value)
+             (compile value program lexical-env))
+            ((symbol? value)
+             (compile-literal-symbol value program))
+            (else
+             (raise-compilation-error "Quote not supported yet for" exp))))
 
     (define (compile-variable exp program lexical-env)
       (let* ((lexical-address

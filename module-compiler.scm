@@ -13,7 +13,8 @@
           (wasm-syntax)
           (pattern-match)
           (values)
-          (expression-compiler))
+          (expression-compiler)
+          (literals-compiler))
 
  ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R7RS-small
  ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
@@ -174,7 +175,8 @@
           ,@(get-module-definitions 'table)
           ,@(get-module-definitions 'export)
           ,@(get-module-definitions 'start)
-          ,@elems-def)))
+          ,@elems-def
+          ,@(literal-data-definitions program))))
 
     (define (make-global-lexical-env imported-identifiers defined-variables exports)
       (let ((duplicate-import (first-duplicate (filter symbol? imported-identifiers))))

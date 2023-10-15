@@ -159,4 +159,32 @@
  "true is not eq to procedure number?"
  #f (is-procedure-number?-eq-to #t))
 
+(compiler-test-eq
+ "symbol is symbol"
+ #t (symbol-is-symbol?))
+
+(compiler-test-eq
+ "0 is not a symbol"
+ #f (is-symbol? 0))
+
+(compiler-test-eq
+ "1 is not a symbol"
+ #f (is-symbol? 1))
+
+(compiler-test-eq
+ "-1 is not a symbol"
+ #f (is-symbol? -1))
+
+(compiler-test-eq
+ "false is not a symbol"
+ #f (is-symbol? #f))
+
+(compiler-test-eq
+ "true is not a symbol"
+ #f (is-symbol? #f))
+
+(compiler-test-eq
+ "procedure is not a symbol"
+ #f (procedure-is-symbol?))
+
 (compiler-test-end "types")

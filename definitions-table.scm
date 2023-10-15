@@ -3,7 +3,10 @@
   (export make-empty-definitions-table
           definitions-count
           add-definition
+          last-definition
           contains-definition
+          lookup-definition
+          flatmap-definitions
           lookup-definition-index
           definition-index
           get-definitions)
@@ -33,8 +36,25 @@
        (cons def (definitions defs))
        (counted-set-add (definition-counts defs) (car def) 1)))
 
+    (define (last-definition defs type)
+      (assq type (definitions defs)))
+
     (define (contains-definition defs def)
       (if (member def (definitions defs)) #t #f))
+
+    (define (lookup-definition defs predicate)
+      (let loop ((ds (definitions defs)))
+        (cond ((null? ds) #f)
+              ((predicate (car ds)) (car ds))
+              (else (loop (cdr ds))))))
+
+    (define (flatmap-definitions defs proc)
+      (let loop ((ds (definitions defs))
+                 (rs '()))
+        (if (null? ds)
+            rs
+            (loop (cdr ds)
+                  (append (proc (car ds)) rs)))))
 
     (define (lookup-definition-index defs type predicate)
       (let loop ((ds (definitions defs))

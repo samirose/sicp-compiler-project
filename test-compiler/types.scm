@@ -17,7 +17,10 @@
    procedure-from-procedure-is-procedure?
    is-procedure-eq-to-same-procedure?
    is-procedure-eq-to-different-procedure?
-   is-procedure-number?-eq-to)
+   is-procedure-number?-eq-to
+   symbol-is-symbol?
+   is-symbol?
+   procedure-is-symbol?)
 
   (import (scheme base))
 
@@ -83,4 +86,14 @@
 
     (define (is-procedure-number?-eq-to x)
       (eq? number? x))
+
+    (define (symbol-is-symbol?)
+      (symbol? 'sym))
+
+    (define (is-symbol? x)
+      (symbol? x))
+
+    (define (procedure-is-symbol?)
+      (symbol? doubler))
+
 ))

@@ -25,6 +25,11 @@
    (get-definitions ds 'func)
    "Empty definitions table does not contain func definitions")
 
+  (assert-equal
+   '()
+   (flatmap-definitions ds (lambda (d) (cons 'flatmapped (cdr d))))
+   "flatmap-definitions of empty table is empty list")
+
   (let ((ds (add-definition ds '(func $f (result i32)))))
     (assert-equal
      0
@@ -66,6 +71,16 @@
      (get-definitions ds 'func)
      "Definitions table with single func added contains the func definition")
 
+    (assert-equal
+     '(func $f (result i32))
+     (last-definition ds 'func)
+     "Defintions table with single func added has the definition as last func definition")
+
+    (assert-equal
+     #f
+     (last-definition ds 'global)
+     "Defintions table with single func added does not have a global last definition")
+
     (let ((ds (add-definition ds '(func $g (param i32) (result i32)))))
       (assert-equal
        0
@@ -87,6 +102,11 @@
        (get-definitions ds 'func)
        "Definitions table with two funcs added contains the func definitions in addition order")
 
+      (assert-equal
+       '(func $g (param i32) (result i32))
+       (last-definition ds 'func)
+       "Definitions table with two funcs added has the one added last as the last func definition")
+
       (let ((ds (add-definition ds '(global $glob (mut i32)))))
         (assert-equal
          1
@@ -97,6 +117,20 @@
          #t
          (contains-definition ds '(global $glob (mut i32)))
          "Definitions table with two funcs and one global added contains the global definition")
+
+        (assert-equal
+         '(func $g (param i32) (result i32))
+         (lookup-definition
+          ds
+          (lambda (d) (eq? (car d) 'func)))
+         "lookup-definition returns the last added matching definition")
+
+        (assert-equal
+         #f
+         (lookup-definition
+          ds
+          (lambda (d) #f))
+         "lookup-definition returns false when predicate returns false for all definitions")
 
         (assert-equal
          0
@@ -142,4 +176,25 @@
          '((func $f (result i32)) (func $g (param i32) (result i32)))
          (get-definitions ds 'func)
          "Definitions table with two funcs and one global added contains the func definitions in addition order")
+
+        (assert-equal
+         '(func $g (param i32) (result i32))
+         (last-definition ds 'func)
+         "Definitions table with two funcs and one global added has the func definition  added last as the last func definition")
+
+        (assert-equal
+         '(global $glob (mut i32))
+         (last-definition ds 'global)
+         "Definitions table with two funcs and one global added has the global as last global definition")
+
+        (assert-equal
+         '((global (import "glob") (mut i32)) (global $glob (mut i32)))
+         (flatmap-definitions
+          ds
+          (lambda (d)
+            (if (eq? (car d) 'global)
+                `((global (import "glob") ,(caddr d)) ,d)
+                '())))
+         "flatmap-definitions can filter add, and modify definitions")
+
         ))))

@@ -18,6 +18,7 @@
     (define library-import-table
       '(((scheme base)
 	 ("scheme base"
+          (#f         "$heap"               (memory 1))
 	  (#f         "get-error-code"      (func (result i32)))
 	  (#f         "i32->fixnum"         (func (param i32) (result i32)))
           (#f         "check-fixnum"        (func (param i32) (result i32)))
@@ -30,6 +31,7 @@
           (#f         "procedure->funcidx"  (func (param i32) (result i32)))
 	  (boolean?   "boolean?"            (func (param i32) (result i32)))
 	  (procedure? "procedure?"          (func (param i32) (result i32)))
+	  (symbol?    "symbol?"             (func (param i32) (result i32)))
 	  (eq?        "eq?"                 (func (param i32) (param i32) (result i32)))))))
 
     (define (library-definitions library)

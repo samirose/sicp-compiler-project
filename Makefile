@@ -56,15 +56,16 @@ compile-compiler : $(COMPILER_BINARIES) ## Compiles the compiler with host schem
 
 binaries = $(patsubst $(HOST_SCHEME_COMPILED_DIR):.go,:,$(patsubst %,$(HOST_SCHEME_COMPILED_DIR)%.go,$(1)))
 
-$(call binaries,compiled-program counted-set definitions-table expression-compiler lexical-env module-compiler scheme-r7rs-syntax scheme-libraries wasm-syntax : lists)
+$(call binaries,compiled-program counted-set expression-compiler lexical-env literals-compiler module-compiler scheme-r7rs-syntax scheme-libraries wasm-syntax : lists)
 $(call binaries,expression-compiler module-compiler scheme-syntax scheme-r7rs-syntax wasm-syntax : pattern-match)
 $(call binaries,assert scheme-libraries scheme-syntax scheme-r7rs-syntax : compilation-error)
 $(call binaries,compiled-program : counted-set definitions-table)
 $(call binaries,definitions-table : wasm-syntax counted-set)
 $(call binaries,scheme-libraries : compiled-program)
-$(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries values)
+$(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries values literals-compiler)
 $(call binaries,module-compiler : expression-compiler scheme-r7rs-syntax)
-$(call binaries,driver : module-compiler)
+$(call binaries,literals-compiler : values wasm-syntax compiled-program)
+$(call binaries,driver : lists module-compiler wasm-syntax)
 
 $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@

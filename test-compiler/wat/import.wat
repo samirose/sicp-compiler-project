@@ -1,5 +1,6 @@
 (module
   (type (;0;) (func (param i32) (result i32)))
+  (import "scheme base" "$heap" (memory (;0;) 1))
   (import "scheme base" "get-error-code" (func (;0;) (result i32)))
   (import "scheme base" "i32->fixnum" (func (;1;) (param i32) (result i32)))
   (import "scheme base" "check-fixnum" (func (;2;) (param i32) (result i32)))
@@ -12,27 +13,29 @@
   (import "scheme base" "procedure->funcidx" (func (;9;) (param i32) (result i32)))
   (import "scheme base" "boolean?" (func (;10;) (param i32) (result i32)))
   (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
-  (import "scheme base" "eq?" (func (;12;) (param i32 i32) (result i32)))
+  (import "scheme base" "symbol?" (func (;12;) (param i32) (result i32)))
+  (import "scheme base" "eq?" (func (;13;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
   (global (;3;) i32 (i32.const 50))
   (global (;4;) i32 (i32.const 66))
-  (global (;5;) (mut i32) (i32.const 46))
-  (func (;13;) (type 0) (param i32) (result i32)
+  (global (;5;) i32 (i32.const 82))
+  (global (;6;) (mut i32) (i32.const 46))
+  (func (;14;) (type 0) (param i32) (result i32)
     i32.const 42
     call 1)
-  (func (;14;)
-    i32.const 5
+  (func (;15;)
+    i32.const 6
     call 8
-    global.set 5
+    global.set 6
     i32.const 30
     drop)
-  (table (;0;) 6 funcref)
+  (table (;0;) 7 funcref)
   (export "zero?" (func 5))
-  (export "number?" (func 13))
-  (start 14)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13)
+  (export "number?" (func 14))
+  (start 15)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14)
   (type (;1;) (func (result i32)))
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

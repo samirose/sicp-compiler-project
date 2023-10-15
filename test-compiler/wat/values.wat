@@ -28,59 +28,57 @@
   (global (;9;) (mut i32) (i32.const 46))
   (global (;10;) (mut i32) (i32.const 46))
   (global (;11;) (mut i32) (i32.const 46))
+  (global (;12;) (mut i32) (i32.const 46))
+  (global (;13;) (mut i32) (i32.const 46))
   (func (;14;) (type 0) (result i32)
-    i32.const 6
-    i32.const 22
-    i32.const 22
-    call 7
-    select)
-  (func (;15;) (type 0) (result i32)
-    i32.const 6
-    i32.const 22
-    i32.const 6
-    call 7
-    select)
-  (func (;16;) (type 0) (result i32)
-    i32.const 6
-    i32.const 22
     i32.const 42
-    call 1
-    call 7
-    select)
-  (func (;17;) (type 0) (result i32)
-    i32.const 6
-    i32.const 22
-    i32.const 1
-    call 1
-    i32.const 0
-    call 1
-    i32.gt_s
-    select)
-  (func (;18;) (type 1) (param i32) (result i32)
-    local.get 0
-    call 3
-    i32.const 1
-    i32.add
     call 1)
-  (func (;19;) (type 0) (result i32)
-    i32.const 6
-    i32.const 22
-    i32.const 2
-    call 1
-    i32.const 10
-    call_indirect (type 1)
-    call 7
-    select)
-  (func (;20;) (type 0) (result i32)
-    i32.const 6
-    i32.const 22
-    i32.const 0
-    call 1
+  (func (;15;) (type 0) (result i32)
+    i32.const 53
+    call 1)
+  (func (;16;) (type 0) (result i32)
     i32.const 1
     call 1
-    i32.gt_s
-    select)
-  (func (;21;)
+    global.get 0
+    call 9
+    call_indirect (type 1))
+  (func (;17;) (type 0) (result i32)
+    i32.const 22)
+  (func (;18;) (type 0) (result i32)
+    i32.const 6)
+  (func (;19;) (type 0) (result i32)
+    i32.const 22)
+  (func (;20;) (type 0) (result i32)
+    i32.const 6)
+  (func (;21;) (type 0) (result i32)
+    (local i32)
+    block (result i32)  ;; label = @1
+      block  ;; label = @2
+        block  ;; label = @3
+          i32.const 6
+          global.get 2
+          call 9
+          call_indirect (type 1)
+          call 7
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        block  ;; label = @3
+          i32.const 22
+          global.get 2
+          call 9
+          call_indirect (type 1)
+          local.tee 0
+          call 7
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        local.get 0
+        br 1 (;@1;)
+      end
+      i32.const 6
+    end)
+  (func (;22;)
     i32.const 6
     call 8
     global.set 6
@@ -93,22 +91,30 @@
     i32.const 9
     call 8
     global.set 9
-    i32.const 11
+    i32.const 10
     call 8
     global.set 10
-    i32.const 12
+    i32.const 11
     call 8
     global.set 11
+    i32.const 12
+    call 8
+    global.set 12
+    i32.const 13
+    call 8
+    global.set 13
     i32.const 30
     drop)
-  (table (;0;) 13 funcref)
-  (export "not-true-is-false" (func 14))
-  (export "not-false-is-true" (func 15))
-  (export "not-non-false-value-is-false" (func 16))
-  (export "not-true-expression-is-false" (func 17))
-  (export "not-non-false-expression-is-false" (func 19))
-  (export "not-false-expression-is-true" (func 20))
-  (start 21)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20)
+  (table (;0;) 14 funcref)
+  (export "number" (func 14))
+  (export "quoted-number" (func 15))
+  (export "quoted-number-is-number?" (func 16))
+  (export "boolean-true" (func 17))
+  (export "boolean-false" (func 18))
+  (export "quoted-boolean-true" (func 19))
+  (export "quoted-boolean-false" (func 20))
+  (export "quoted-boolean-is-boolean?" (func 21))
+  (start 22)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21)
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

@@ -15,6 +15,11 @@
    (compiled-program-value-code cp)
    "Empty compiled program does not have value code")
 
+  (assert-equal
+   '()
+   (compiled-program-flatmap-definitions cp (lambda (d) (cons 'flatmapped (cdr d))))
+   "flatmap-definitions of empty program is empty list")
+
   (let ((cp (compiled-program-add-definition
              cp
              '(global (mut i32) (i32.const 42)))))
@@ -92,7 +97,37 @@
       (assert-equal
        '((global (mut i32) (i32.const 42)))
        (compiled-program-get-definitions cp 'global)
-       "compiled-program-with-definition-and-value-code retains the program's existing definitions"))))
+       "compiled-program-with-definition-and-value-code retains the program's existing definitions")
+
+      (assert-equal
+       '(func (result i32) (i32.const 53))
+       (compiled-program-last-definition cp 'func)
+       "compiled-program-last-definition returns the last defintion of specified type added to the program")
+
+      (assert-equal
+       '(global (mut i32) (i32.const 42))
+       (compiled-program-last-definition cp 'global)
+       "compiled-program-last-definition returns the last definition of specified type added to the program")
+
+      (assert-equal
+       '(func (result i32) (i32.const 53))
+       (compiled-program-lookup-definition cp (lambda (d) (eq? (car d) 'func)))
+       "compiled-program-lookup-definition returns the last defintion that matches the predicate")
+
+      (assert-equal
+       #f
+       (compiled-program-lookup-definition cp (lambda (d) #f))
+       "compiled-program-lookup-definition returns false when predicate returns false for all definitions")
+
+      (assert-equal
+       '((global (mut i32) (i32.const 42)) (data (i32.const 42) "foo"))
+       (compiled-program-flatmap-definitions
+        cp
+        (lambda (d)
+          (if (eq? (car d) 'global)
+              `(,d (data ,(caddr d) "foo"))
+              '())))
+       "flatmap-definitions can filter, add and modify definitions"))))
 
   (let ((cp (compiled-program-with-definitions-and-value-code
              cp
@@ -107,6 +142,7 @@
      '((func (result i32) global.get 1))
      (compiled-program-get-definitions cp 'func)
      "compiled-program-with-definitions-and-value-code adds the definitions to the program")
+
     (assert-equal
      '(call 0)
      (compiled-program-value-code cp)

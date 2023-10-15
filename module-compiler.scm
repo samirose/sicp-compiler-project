@@ -13,7 +13,8 @@
           (wasm-syntax)
           (pattern-match)
           (values)
-          (expression-compiler))
+          (expression-compiler)
+          (literals-compiler))
 
  ;;;; SCHEME to WAT (WebAssembly Text format) compiler written in R7RS-small
  ;;;; BASED ON COMPILER FROM SECTION 5.5 OF
@@ -153,6 +154,8 @@
               (compiled-program-get-definitions program type)))
            (not-import-definition?
             (lambda (def) (not (wasm-import-definition? def))))
+           (imported-memories
+            (filter wasm-import-definition? (get-module-definitions 'memory)))
            (imported-globals
             (filter wasm-import-definition? (get-module-definitions 'global)))
            (module-globals
@@ -161,9 +164,10 @@
             (filter wasm-import-definition? (get-module-definitions 'func)))
            (module-funcs
             (filter not-import-definition? (get-module-definitions 'func))))
-	`(module
+        `(module
           ,@(get-module-definitions 'type)
           ,@(get-module-definitions 'import)
+          ,@imported-memories
           ,@imported-globals
           ,@imported-funcs
           ,@module-globals
@@ -171,7 +175,8 @@
           ,@(get-module-definitions 'table)
           ,@(get-module-definitions 'export)
           ,@(get-module-definitions 'start)
-          ,@elems-def)))
+          ,@elems-def
+          ,@(literal-data-definitions program))))
 
     (define (make-global-lexical-env imported-identifiers defined-variables exports)
       (let ((duplicate-import (first-duplicate (filter symbol? imported-identifiers))))

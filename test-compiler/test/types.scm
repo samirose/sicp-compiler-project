@@ -181,7 +181,7 @@
 
 (compiler-test-eq
  "true is not a symbol"
- #f (is-symbol? #f))
+ #f (is-symbol? #t))
 
 (compiler-test-eq
  "procedure is not a symbol"

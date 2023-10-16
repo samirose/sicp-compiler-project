@@ -54,7 +54,7 @@
                     (symbol-header-length (cdr symbol-header-value))
                     (symbol-data-length (+ symbol-header-length symbol-length))
                     (symbol-data-values
-                     (map car (list symbol-header-value symbol-data-value)))
+                     (list (car symbol-header-value) (car symbol-data-value)))
                     (symbol-data-definition
                      (literal-data-definition
                       `((symbol . ,symbol)

@@ -81,6 +81,11 @@
 
     ,@(map
        (lambda (n)
+         `(assert_return (invoke "string?" (i32.const ,(number->fixnum-value n))) (i32.const ,false-value)))
+       fixnum-test-values)
+
+    ,@(map
+       (lambda (n)
          `(assert_return (invoke "check-initialized" (i32.const ,(number->fixnum-value n))) (i32.const ,(number->fixnum-value n))))
        fixnum-test-values)
 
@@ -120,6 +125,9 @@
     (assert_return (invoke "symbol?" (i32.const ,false-value)) (i32.const ,false-value))
     (assert_return (invoke "symbol?" (i32.const ,true-value)) (i32.const ,false-value))
 
+    (assert_return (invoke "string?" (i32.const ,false-value)) (i32.const ,false-value))
+    (assert_return (invoke "string?" (i32.const ,true-value)) (i32.const ,false-value))
+
     (assert_return (invoke "check-initialized" (i32.const ,false-value)) (i32.const ,false-value))
     (assert_return (invoke "check-initialized" (i32.const ,true-value)) (i32.const ,true-value))
 
@@ -156,6 +164,11 @@
 
     ,@(map
        (lambda (i)
+         `(assert_return (invoke "string?" (i32.const ,(funcidx->procedure-value i))) (i32.const ,false-value)))
+       funcidx-test-values)
+
+    ,@(map
+       (lambda (i)
          `(assert_return (invoke "check-initialized" (i32.const ,(funcidx->procedure-value i))) (i32.const ,(funcidx->procedure-value i))))
        funcidx-test-values)
 
@@ -164,6 +177,7 @@
     (assert_return (invoke "boolean?" (i32.const ,unspecified-value)) (i32.const ,false-value))
     (assert_return (invoke "procedure?" (i32.const ,unspecified-value)) (i32.const ,false-value))
     (assert_return (invoke "symbol?" (i32.const ,unspecified-value)) (i32.const ,false-value))
+    (assert_return (invoke "string?" (i32.const ,unspecified-value)) (i32.const ,false-value))
     (assert_return (invoke "check-initialized" (i32.const ,unspecified-value)) (i32.const ,unspecified-value))
 
     ;; uninitialized value tests

@@ -10,8 +10,8 @@
    boolean->boolean-value
    funcidx->procedure-value
    heap-object-type-mask
-   heap-object-type-symbol
-   symbol-literal-header
+   heap-object-type-symbol heap-object-type-string
+   symbol-literal-header string-literal-header
    error-no-error error-expected-number error-expected-procedure error-uninitialized)
 
   (import
@@ -67,6 +67,11 @@
       (if (<= length heap-object-max-size)
           (bitwise-ior heap-object-type-symbol length)
           (error "Too large symbol length" length)))
+
+    (define (string-literal-header length)
+      (if (<= length heap-object-max-size)
+          (bitwise-ior heap-object-type-string length)
+          (error "Too large string length" length)))
 
     (define error-no-error 0)
     (define error-expected-number 1)

@@ -2,6 +2,7 @@
 
   (export
    compile-literal-symbol
+   compile-literal-string
    literal-data-definitions)
 
   (import
@@ -65,6 +66,26 @@
                 program
                 symbol-data-definition
                 `(i32.const ,address))))))
+
+    (define (compile-literal-string string program)
+      (let* ((address (next-literal-address program 4))
+             (string-data-value (string-as-wasm-data string))
+             (string-length (cdr string-data-value))
+             (string-header-value
+              (i32-as-wasm-data (string-literal-header string-length)))
+             (string-header-length (cdr string-header-value))
+             (string-data-length (+ string-header-length string-length))
+             (string-data-values
+              (list (car string-header-value) (car string-data-value)))
+             (string-data-definition
+              (literal-data-definition
+               `((address . ,address)
+                 (length . ,string-data-length))
+               string-data-values)))
+        (compiled-program-with-definition-and-value-code
+         program
+         string-data-definition
+         `(i32.const ,address))))
 
     (define (literal-data-definition? exp)
       (eq? (car exp) 'literal-data-definition))

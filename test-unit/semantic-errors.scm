@@ -25,16 +25,6 @@
 
 ;; self-evaluating expressions
 (assert-expression-raises-compilation-error
- "a string"
- "Strings not supported yet" "a string"
- "String values are not yet supported")
-
-(assert-expression-raises-compilation-error
- (quote "a string")
- "Strings not supported yet" "a string"
- "Quoted string compiles to the string")
-
-(assert-expression-raises-compilation-error
  #\A
  "Unknown expression type" #\A
  "Character values are not yet supported")

@@ -129,6 +129,23 @@
             i32.const ,false-value
           end)
 
+    (func (export "string?") (param $obj i32) (result i32)
+          local.get $obj
+          i32.const ,immediate-value-mask
+          i32.and
+          i32.eqz
+          if (result i32)
+            local.get $obj
+            i32.load
+            i32.const ,heap-object-type-mask
+            i32.and
+            i32.const ,heap-object-type-string
+            i32.eq
+            call $i32->boolean
+          else
+            i32.const ,false-value
+          end)
+
     (func (export "eq?") (param $obj1 i32) (param $obj2 i32) (result i32)
           local.get $obj1
           local.get $obj2

@@ -29,7 +29,7 @@
          (string? str))))
 
     (define (string-may-contain-special-characters)
-      (let ((str "foo \t\n\r\\'bar'😀!@\x7f;\x07;"))
+      (let ((str "foo \t\n\r\\'bar' 😀 🤦🏼‍♂️ !@\x7f;\x07;"))
         (string? str)))
     )
   )

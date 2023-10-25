@@ -131,6 +131,6 @@
   (data (;2;) (i32.const 20) "\0a\00\00\02got string")
   (data (;3;) (i32.const 36) "\0c\00\00\02bound string")
   (data (;4;) (i32.const 52) "\06\00\00\02foobar")
-  (data (;5;) (i32.const 64) "\15\00\00\02foo \09\0a\0d\5c'bar'\f0\9f\98\80!@\7f\07")
+  (data (;5;) (i32.const 64) ")\00\00\02foo \09\0a\0d\5c'bar' \f0\9f\98\80 \f0\9f\a4\a6\f0\9f\8f\bc\e2\80\8d\e2\99\82\ef\b8\8f !@\7f\07")
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

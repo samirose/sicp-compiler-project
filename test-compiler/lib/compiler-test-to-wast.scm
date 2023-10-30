@@ -30,20 +30,14 @@
     `(,(string-append ";; " name)
       (assert_return ,test-exp (i32.const ,unspecified-value)))))
 
-(define error-to-error-code
-  '((no-error 0)
-    (expected-number 1)
-    (expected-procedure 2)
-    (uninitialized 3)))
-
 (define (compile-test-error exp)
   (let* ((name (cadr exp))
 	 (test-exp (compile-test-exp (caddr exp)))
          (expected-error (cadddr exp))
-         (expected-error-code-entry (assq expected-error error-to-error-code))
+         (expected-error-code-entry (assq expected-error symbol->error))
          (expected-error-code
           (if expected-error-code-entry
-              (cadr expected-error-code-entry)
+              (cdr expected-error-code-entry)
               (error "Unknown runtime error type" expected-error))))
     `(,(string-append ";; " name)
       (assert_trap ,test-exp "unreachable")

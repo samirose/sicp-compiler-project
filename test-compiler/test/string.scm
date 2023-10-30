@@ -15,4 +15,20 @@
  "literal string may contain special characters"
  #t (string-may-contain-special-characters))
 
+(compiler-test-eq
+ "string=? evaluates to true for two empty literal strings"
+ #t (string=?-empty-literal-strings))
+
+(compiler-test-eq
+ "string=? evaluates to true for two literal strings with equal content"
+ #t (string=?-literal-strings-with-equal-content))
+
+(compiler-test-eq
+ "string=? evaluates to false for two literal strings with same length but nonequal content"
+ #f (string=?-literal-strings-with-same-length-nonequal-content))
+
+(compiler-test-eq
+ "string=? evaluates to false for two literal strings with different length"
+ #f (string=?-literal-strings-with-different-length))
+
 (compiler-test-end "string")

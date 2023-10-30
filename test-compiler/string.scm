@@ -4,7 +4,11 @@
   (export
    literal-string-is-string
    literal-strings-as-values-are-strings
-   string-may-contain-special-characters)
+   string-may-contain-special-characters
+   string=?-empty-literal-strings
+   string=?-literal-strings-with-equal-content
+   string=?-literal-strings-with-same-length-nonequal-content
+   string=?-literal-strings-with-different-length)
 
   (import (scheme base))
 
@@ -31,5 +35,17 @@
     (define (string-may-contain-special-characters)
       (let ((str "foo \t\n\r\\'bar' 😀 🤦🏼‍♂️ !@\x7f;\x07;"))
         (string? str)))
+
+    (define (string=?-empty-literal-strings)
+      (string=? "" ""))
+
+    (define (string=?-literal-strings-with-equal-content)
+      (string=? ":foo#😀🤦🏼‍♂️bar!\r\n" ":foo#😀🤦🏼‍♂️bar!\r\n"))
+
+    (define (string=?-literal-strings-with-same-length-nonequal-content)
+      (string=? ":foobar#" ":foobaz#"))
+
+    (define (string=?-literal-strings-with-different-length)
+      (string=? ":foobar#" ":foobazz#"))
     )
   )

@@ -16,7 +16,8 @@
   (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
   (import "scheme base" "symbol?" (func (;12;) (param i32) (result i32)))
   (import "scheme base" "string?" (func (;13;) (param i32) (result i32)))
-  (import "scheme base" "eq?" (func (;14;) (param i32 i32) (result i32)))
+  (import "scheme base" "string=?" (func (;14;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;15;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
@@ -24,7 +25,7 @@
   (global (;4;) i32 (i32.const 66))
   (global (;5;) i32 (i32.const 82))
   (global (;6;) i32 (i32.const 98))
-  (global (;7;) (mut i32) (i32.const 46))
+  (global (;7;) i32 (i32.const 114))
   (global (;8;) (mut i32) (i32.const 46))
   (global (;9;) (mut i32) (i32.const 46))
   (global (;10;) (mut i32) (i32.const 46))
@@ -32,7 +33,8 @@
   (global (;12;) (mut i32) (i32.const 46))
   (global (;13;) (mut i32) (i32.const 46))
   (global (;14;) (mut i32) (i32.const 46))
-  (func (;15;) (type 0) (result i32)
+  (global (;15;) (mut i32) (i32.const 46))
+  (func (;16;) (type 0) (result i32)
     (local i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
@@ -72,42 +74,42 @@
       end
       i32.const 6
     end)
-  (func (;16;) (type 1) (param i32 i32) (result i32)
+  (func (;17;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
     i32.eq
     call 6)
-  (func (;17;) (type 1) (param i32 i32) (result i32)
+  (func (;18;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
     i32.gt_s
     call 6)
-  (func (;18;) (type 1) (param i32 i32) (result i32)
+  (func (;19;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
     i32.lt_s
     call 6)
-  (func (;19;) (type 1) (param i32 i32) (result i32)
+  (func (;20;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
     i32.ge_s
     call 6)
-  (func (;20;) (type 1) (param i32 i32) (result i32)
+  (func (;21;) (type 1) (param i32 i32) (result i32)
     local.get 0
     call 2
     local.get 1
     call 2
     i32.le_s
     call 6)
-  (func (;21;) (type 0) (result i32)
+  (func (;22;) (type 0) (result i32)
     (local i32 i32 i32 i32 i32 i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
@@ -327,7 +329,7 @@
       end
       i32.const 6
     end)
-  (func (;22;) (type 0) (result i32)
+  (func (;23;) (type 0) (result i32)
     (local i32 i32 i32 i32 i32 i32)
     block  ;; label = @1
       block  ;; label = @2
@@ -538,10 +540,7 @@
       local.set 0
     end
     local.get 0)
-  (func (;23;)
-    i32.const 7
-    call 8
-    global.set 7
+  (func (;24;)
     i32.const 8
     call 8
     global.set 8
@@ -563,18 +562,21 @@
     i32.const 14
     call 8
     global.set 14
+    i32.const 15
+    call 8
+    global.set 15
     i32.const 30
     drop)
-  (table (;0;) 15 funcref)
-  (export "all-with-single-argument-are-true" (func 15))
-  (export "binary-equal" (func 16))
-  (export "binary-greater-than" (func 17))
-  (export "binary-less-than" (func 18))
-  (export "binary-greater-or-equal-than" (func 19))
-  (export "binary-less-or-equal-than" (func 20))
-  (export "more-than-two-params-true" (func 21))
-  (export "more-than-two-params-false" (func 22))
-  (start 23)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22)
+  (table (;0;) 16 funcref)
+  (export "all-with-single-argument-are-true" (func 16))
+  (export "binary-equal" (func 17))
+  (export "binary-greater-than" (func 18))
+  (export "binary-less-than" (func 19))
+  (export "binary-greater-or-equal-than" (func 20))
+  (export "binary-less-or-equal-than" (func 21))
+  (export "more-than-two-params-true" (func 22))
+  (export "more-than-two-params-false" (func 23))
+  (start 24)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23)
   (type (;2;) (func (param i32) (result i32)))
   (type (;3;) (func)))

@@ -9,7 +9,7 @@
    number->fixnum-value
    boolean->boolean-value
    funcidx->procedure-value
-   heap-object-type-mask
+   heap-object-type-mask heap-object-size-mask
    heap-object-type-symbol heap-object-type-string
    symbol-literal-header string-literal-header
    error-no-error

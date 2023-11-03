@@ -187,83 +187,46 @@
             i32.const 4
             i32.add
             local.get $len
-            call $memequal
+            i32.const 2
+            i32.shr_u
+            call $equal-words
             call $i32->boolean
           else
             i32.const ,false-value
           end)
 
-  (func $memequal (param $addr1 i32) (param $addr2 i32) (param $len i32) (result i32)
-        block $same_contents
-          block $process_words
-            loop $compare_words
-              ;; exit loop if length less than word size
-              local.get $len
-              i32.const 4
-              i32.lt_u
-              br_if $process_words
-              ;; load word from addr1 and increment it by word
-              local.get $addr1
-              i32.load
-              local.get $addr1
-              i32.const 4
-              i32.add
-              local.set $addr1
-              ;; load word from addr2 and increment it by word
-              local.get $addr2
-              i32.load
-              local.get $addr2
-              i32.const 4
-              i32.add
-              local.set $addr2
-              ;; subtract word from len
-              local.get $len
-              i32.const 4
-              i32.sub
-              local.set $len
-              ;; compare words
-              i32.eq
-              br_if $compare_words
-              br $same_contents
+    (func $equal-words (param $addr1 i32) (param $addr2 i32) (param $n i32) (result i32)
+          block $equal_contents
+            block $compare_words
+              loop $loop
+                local.get $n
+                i32.eqz
+                br_if $compare_words
+                local.get $addr1
+                i32.load
+                local.get $addr1
+                i32.const 4
+                i32.add
+                local.set $addr1
+                local.get $addr2
+                i32.load
+                local.get $addr2
+                i32.const 4
+                i32.add
+                local.set $addr2
+                local.get $n
+                i32.const 1
+                i32.sub
+                local.set $n
+                i32.eq
+                br_if $loop
+                br $equal_contents
+              end
             end
+            i32.const 1
+            return
           end
-          block $process_bytes
-            loop $compare_bytes
-              ;; exit when length reaches zero
-              local.get $len
-              i32.eqz
-              br_if $process_bytes
-              ;; load byte from addr1 and increment it by one
-              local.get $addr1
-              i32.load8_u
-              local.get $addr1
-              i32.const 1
-              i32.add
-              local.set $addr1
-              ;; load byte from addr2 and increment it by one
-              local.get $addr2
-              i32.load8_u
-              local.get $addr2
-              i32.const 1
-              i32.add
-              local.set $addr2
-              ;; subtract one from len
-              local.get $len
-              i32.const 1
-              i32.sub
-              local.set $len
-              ;; compare bytes
-              i32.eq
-              br_if $compare_bytes
-              br $same_contents
-            end
-          end
-          ;; all elements were equal
-          i32.const 1
-          return
-        end
-        ;; an element was not equal
-        i32.const 0)
+          i32.const 0)
 
     (func $check-string (param $obj i32) (result i32)
           (local $str i32)

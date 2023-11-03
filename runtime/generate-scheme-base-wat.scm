@@ -187,6 +187,8 @@
             i32.const 4
             i32.add
             local.get $len
+            i32.const 3
+            i32.add
             i32.const 2
             i32.shr_u
             call $equal-words

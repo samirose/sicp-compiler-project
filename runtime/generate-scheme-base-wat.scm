@@ -97,7 +97,7 @@
           local.get $obj
           call $check-procedure
           i32.const ,immediate-shift
-          i32.shr_s)
+          i32.shr_u)
 
     (func (export "boolean?") (param $obj i32) (result i32)
           local.get $obj

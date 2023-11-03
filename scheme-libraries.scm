@@ -32,6 +32,8 @@
 	  (boolean?   "boolean?"            (func (param i32) (result i32)))
 	  (procedure? "procedure?"          (func (param i32) (result i32)))
 	  (symbol?    "symbol?"             (func (param i32) (result i32)))
+	  (string?    "string?"             (func (param i32) (result i32)))
+	  (string=?   "string=?"            (func (param i32) (param i32) (result i32)))
 	  (eq?        "eq?"                 (func (param i32) (param i32) (result i32)))))))
 
     (define (library-definitions library)

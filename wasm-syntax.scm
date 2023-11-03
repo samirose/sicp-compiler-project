@@ -65,6 +65,7 @@
       (cons s (bytevector-length (string->utf8 s))))
 
     (define (emit-wat-string-char c port)
+      ;; W3C / WebAssembly Core Specification / 6.3.3. Strings
       (cond
        ((char=? c #\x09) (write-string "\\t" port))
        ((char=? c #\x0A) (write-string "\\n" port))
@@ -74,9 +75,11 @@
        ((char=? c #\x5C) (write-string "\\\\" port))
        ((and (char>=? c #\x20) (not (char=? c #\x7F)))
         (write-char c port))
-       (else (write-string "\\u{" port)
-             (write-string (number->string (char->integer c) 16) port)
-             (write-char #\} port))))
+       ((or (char<=? c #\xD7FF) (char<=? #\xE000 c #\x10FFFF))
+        (write-string "\\u{" port)
+        (write-string (number->string (char->integer c) 16) port)
+        (write-char #\} port))
+       (else (error "Invalid UNICODE character" c))))
 
     (define (emit-wat-string s port)
       (write-char #\" port)
@@ -104,25 +107,25 @@
        ((null? ast)
         (k))
        ((number? ast)
-        (display ast port) (k))
+        (write-string (number->string ast) port) (k))
        ((symbol? ast)
-        (display ast port) (k))
+        (write-string (symbol->string ast) port) (k))
        ((string? ast)
         (emit-wat-string ast port) (k))
        ((bytevector? ast)
         (emit-wat-bytes ast port) (k))
        ((pair? ast)
-        (display #\( port)
+        (write-char #\( port)
         (let loop ((lst ast))
           (emit-wat-cont
            (car lst)
            port
            (if (null? (cdr lst))
                (lambda ()
-                 (display #\) port)
+                 (write-char #\) port)
                  (k))
                (lambda ()
-                 (display #\ port)
+                 (write-char #\ port)
                  (loop (cdr lst)))))))
        (else (error "Usupported WAT AST element" ast))))
 

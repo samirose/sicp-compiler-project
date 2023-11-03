@@ -121,7 +121,7 @@
        `(i32.const ,(boolean->boolean-value exp))))
 
     (define (compile-string exp program)
-      (raise-compilation-error "Strings not supported yet" exp))
+      (compile-literal-string exp program))
 
     (define (compile-quoted exp value program lexical-env compile)
       (cond ((self-evaluating? value)

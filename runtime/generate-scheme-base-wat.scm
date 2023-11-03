@@ -2,6 +2,21 @@
 (import (scheme write))
 (import (values))
 
+(define macro-is-heap-obj
+  `(i32.const ,immediate-value-mask
+    i32.and
+    i32.eqz))
+
+(define (macro-is-heap-obj-type heap-obj-type)
+  `(i32.const ,heap-object-type-mask
+    i32.and
+    i32.const ,heap-obj-type
+    i32.eq))
+
+(define (macro-raise-error error)
+  `(i32.const ,error
+    call $raise-error))
+
 (define scheme-base-wat
   `(module
     $scheme-base
@@ -82,7 +97,7 @@
           local.get $obj
           call $check-procedure
           i32.const ,immediate-shift
-          i32.shr_s)
+          i32.shr_u)
 
     (func (export "boolean?") (param $obj i32) (result i32)
           local.get $obj
@@ -114,16 +129,23 @@
 
     (func (export "symbol?") (param $obj i32) (result i32)
           local.get $obj
-          i32.const ,immediate-value-mask
-          i32.and
-          i32.eqz
+          ,@macro-is-heap-obj
           if (result i32)
             local.get $obj
             i32.load
-            i32.const ,heap-object-type-mask
-            i32.and
-            i32.const ,heap-object-type-symbol
-            i32.eq
+            ,@(macro-is-heap-obj-type heap-object-type-symbol)
+            call $i32->boolean
+          else
+            i32.const ,false-value
+          end)
+
+    (func (export "string?") (param $obj i32) (result i32)
+          local.get $obj
+          ,@macro-is-heap-obj
+          if (result i32)
+            local.get $obj
+            i32.load
+            ,@(macro-is-heap-obj-type heap-object-type-string)
             call $i32->boolean
           else
             i32.const ,false-value
@@ -144,6 +166,85 @@
           i32.const ,error-uninitialized
           call $raise-error
           end)
+
+    (func (export "string=?") (param $s1 i32) (param $s2 i32) (result i32)
+          (local $len i32)
+          local.get $s1
+          call $check-string
+          i32.const ,heap-object-size-mask
+          i32.and
+          local.tee $len
+          local.get $s2
+          call $check-string
+          i32.const ,heap-object-size-mask
+          i32.and
+          i32.eq
+          if (result i32)
+            local.get $s1
+            i32.const 4
+            i32.add
+            local.get $s2
+            i32.const 4
+            i32.add
+            local.get $len
+            i32.const 2
+            i32.shr_u
+            call $equal-words
+            call $i32->boolean
+          else
+            i32.const ,false-value
+          end)
+
+    (func $equal-words (param $addr1 i32) (param $addr2 i32) (param $n i32) (result i32)
+          block $equal_contents
+            block $compare_words
+              loop $loop
+                local.get $n
+                i32.eqz
+                br_if $compare_words
+                local.get $addr1
+                i32.load
+                local.get $addr1
+                i32.const 4
+                i32.add
+                local.set $addr1
+                local.get $addr2
+                i32.load
+                local.get $addr2
+                i32.const 4
+                i32.add
+                local.set $addr2
+                local.get $n
+                i32.const 1
+                i32.sub
+                local.set $n
+                i32.eq
+                br_if $loop
+                br $equal_contents
+              end
+            end
+            i32.const 1
+            return
+          end
+          i32.const 0)
+
+    (func $check-string (param $obj i32) (result i32)
+          (local $str i32)
+          block $is_string
+            block $is_heap_obj
+              local.get $obj
+              ,@macro-is-heap-obj
+              br_if $is_heap_obj
+              ,@(macro-raise-error error-expected-string)
+            end
+            local.get $obj
+            i32.load
+            local.tee $str
+            ,@(macro-is-heap-obj-type heap-object-type-string)
+            br_if $is_string
+            ,@(macro-raise-error error-expected-string)
+          end
+          local.get $str)
     ))
 
 (write scheme-base-wat)

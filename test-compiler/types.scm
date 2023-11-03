@@ -20,7 +20,12 @@
    is-procedure-number?-eq-to
    symbol-is-symbol?
    is-symbol?
-   procedure-is-symbol?)
+   procedure-is-symbol?
+   string-is-symbol?
+   string-is-string?
+   is-string?
+   procedure-is-string?
+   symbol-is-string?)
 
   (import (scheme base))
 
@@ -95,5 +100,20 @@
 
     (define (procedure-is-symbol?)
       (symbol? doubler))
+
+    (define (string-is-symbol?)
+      (symbol? "bar"))
+
+    (define (string-is-string?)
+      (string? "foo"))
+
+    (define (is-string? x)
+      (string? x))
+
+    (define (procedure-is-string?)
+      (string? doubler))
+
+    (define (symbol-is-string?)
+      (string? 'test))
 
 ))

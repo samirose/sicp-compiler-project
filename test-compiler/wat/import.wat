@@ -14,28 +14,32 @@
   (import "scheme base" "boolean?" (func (;10;) (param i32) (result i32)))
   (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
   (import "scheme base" "symbol?" (func (;12;) (param i32) (result i32)))
-  (import "scheme base" "eq?" (func (;13;) (param i32 i32) (result i32)))
+  (import "scheme base" "string?" (func (;13;) (param i32) (result i32)))
+  (import "scheme base" "string=?" (func (;14;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;15;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
   (global (;3;) i32 (i32.const 50))
   (global (;4;) i32 (i32.const 66))
   (global (;5;) i32 (i32.const 82))
-  (global (;6;) (mut i32) (i32.const 46))
-  (func (;14;) (type 0) (param i32) (result i32)
+  (global (;6;) i32 (i32.const 98))
+  (global (;7;) i32 (i32.const 114))
+  (global (;8;) (mut i32) (i32.const 46))
+  (func (;16;) (type 0) (param i32) (result i32)
     i32.const 42
     call 1)
-  (func (;15;)
-    i32.const 6
+  (func (;17;)
+    i32.const 8
     call 8
-    global.set 6
+    global.set 8
     i32.const 30
     drop)
-  (table (;0;) 7 funcref)
+  (table (;0;) 9 funcref)
   (export "zero?" (func 5))
-  (export "number?" (func 14))
-  (start 15)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14)
+  (export "number?" (func 16))
+  (start 17)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16)
   (type (;1;) (func (result i32)))
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

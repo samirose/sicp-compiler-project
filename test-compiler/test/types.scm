@@ -181,10 +181,46 @@
 
 (compiler-test-eq
  "true is not a symbol"
- #f (is-symbol? #f))
+ #f (is-symbol? #t))
 
 (compiler-test-eq
  "procedure is not a symbol"
  #f (procedure-is-symbol?))
+
+(compiler-test-eq
+ "string is not a symbol"
+ #f (string-is-symbol?))
+
+(compiler-test-eq
+ "string is string"
+ #t (string-is-string?))
+
+(compiler-test-eq
+ "0 is not a string"
+ #f (is-string? 0))
+
+(compiler-test-eq
+ "1 is not a string"
+ #f (is-string? 1))
+
+(compiler-test-eq
+ "-1 is not a string"
+ #f (is-string? -1))
+
+(compiler-test-eq
+ "false is not a string"
+ #f (is-string? #f))
+
+(compiler-test-eq
+ "true is not a string"
+ #f (is-string? #t))
+
+(compiler-test-eq
+ "procedure is not a string"
+ #f (procedure-is-string?))
+
+(compiler-test-eq
+ "symbol is not a string"
+ #f (symbol-is-string?))
 
 (compiler-test-end "types")

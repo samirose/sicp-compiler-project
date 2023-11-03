@@ -9,10 +9,15 @@
    number->fixnum-value
    boolean->boolean-value
    funcidx->procedure-value
-   heap-object-type-mask
-   heap-object-type-symbol
-   symbol-literal-header
-   error-no-error error-expected-number error-expected-procedure error-uninitialized)
+   heap-object-type-mask heap-object-size-mask
+   heap-object-type-symbol heap-object-type-string
+   symbol-literal-header string-literal-header
+   error-no-error
+   error-uninitialized
+   error-expected-number
+   error-expected-procedure
+   error-expected-string
+   symbol->error)
 
   (import
    (scheme base)
@@ -68,9 +73,24 @@
           (bitwise-ior heap-object-type-symbol length)
           (error "Too large symbol length" length)))
 
+    (define (string-literal-header length)
+      (if (<= length heap-object-max-size)
+          (bitwise-ior heap-object-type-string length)
+          (error "Too large string length" length)))
+
     (define error-no-error 0)
-    (define error-expected-number 1)
-    (define error-expected-procedure 2)
-    (define error-uninitialized 3)
+    (define error-uninitialized 1)
+    (define error-expected-number 2)
+    (define error-expected-procedure 3)
+    (define error-expected-symbol 4)
+    (define error-expected-string 5)
+
+    (define symbol->error
+      `((no-error . ,error-no-error)
+        (uninitialized . ,error-uninitialized)
+        (expected-number . ,error-expected-number)
+        (expected-procedure . ,error-expected-procedure)
+        (expected-symbol . ,error-expected-symbol)
+        (expected-string . ,error-expected-string)))
     )
   )

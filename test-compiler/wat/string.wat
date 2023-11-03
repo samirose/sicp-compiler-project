@@ -37,6 +37,8 @@
   (global (;15;) (mut i32) (i32.const 46))
   (global (;16;) (mut i32) (i32.const 46))
   (global (;17;) (mut i32) (i32.const 46))
+  (global (;18;) (mut i32) (i32.const 46))
+  (global (;19;) (mut i32) (i32.const 46))
   (func (;16;) (type 1) (result i32)
     i32.const 0
     global.get 5
@@ -115,23 +117,35 @@
     call_indirect (type 2))
   (func (;22;) (type 1) (result i32)
     i32.const 120
-    i32.const 156
+    i32.const 128
     global.get 6
     call 9
     call_indirect (type 2))
   (func (;23;) (type 1) (result i32)
-    i32.const 192
-    i32.const 204
+    i32.const 136
+    i32.const 144
     global.get 6
     call 9
     call_indirect (type 2))
   (func (;24;) (type 1) (result i32)
-    i32.const 216
-    i32.const 228
+    i32.const 152
+    i32.const 188
     global.get 6
     call 9
     call_indirect (type 2))
-  (func (;25;)
+  (func (;25;) (type 1) (result i32)
+    i32.const 224
+    i32.const 236
+    global.get 6
+    call 9
+    call_indirect (type 2))
+  (func (;26;) (type 1) (result i32)
+    i32.const 248
+    i32.const 260
+    global.get 6
+    call 9
+    call_indirect (type 2))
+  (func (;27;)
     i32.const 8
     call 8
     global.set 8
@@ -161,18 +175,26 @@
     i32.const 16
     call 8
     global.set 17
+    i32.const 17
+    call 8
+    global.set 18
+    i32.const 18
+    call 8
+    global.set 19
     i32.const 30
     drop)
-  (table (;0;) 17 funcref)
+  (table (;0;) 19 funcref)
   (export "literal-string-is-string" (func 16))
   (export "literal-strings-as-values-are-strings" (func 19))
   (export "string-may-contain-special-characters" (func 20))
   (export "string=?-empty-literal-strings" (func 21))
-  (export "string=?-literal-strings-with-equal-content" (func 22))
-  (export "string=?-literal-strings-with-same-length-nonequal-content" (func 23))
-  (export "string=?-literal-strings-with-different-length" (func 24))
-  (start 25)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24)
+  (export "string=?-one-char-equal-strings" (func 22))
+  (export "string=?-one-char-nonequal-strings" (func 23))
+  (export "string=?-literal-strings-with-equal-content" (func 24))
+  (export "string=?-literal-strings-with-same-length-nonequal-content" (func 25))
+  (export "string=?-literal-strings-with-different-length" (func 26))
+  (start 27)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26)
   (data (;0;) (i32.const 0) "\03\00\00\02foo")
   (data (;1;) (i32.const 8) "\06\00\00\02foobar")
   (data (;2;) (i32.const 20) "\0a\00\00\02got string")
@@ -181,10 +203,14 @@
   (data (;5;) (i32.const 64) ")\00\00\02foo \09\0a\0d\5c'bar' \f0\9f\98\80 \f0\9f\a4\a6\f0\9f\8f\bc\e2\80\8d\e2\99\82\ef\b8\8f !@\7f\07")
   (data (;6;) (i32.const 112) "\00\00\00\02")
   (data (;7;) (i32.const 116) "\00\00\00\02")
-  (data (;8;) (i32.const 120) " \00\00\02:foo#\f0\9f\98\80\f0\9f\a4\a6\f0\9f\8f\bc\e2\80\8d\e2\99\82\ef\b8\8fbar!\0d\0a")
-  (data (;9;) (i32.const 156) " \00\00\02:foo#\f0\9f\98\80\f0\9f\a4\a6\f0\9f\8f\bc\e2\80\8d\e2\99\82\ef\b8\8fbar!\0d\0a")
-  (data (;10;) (i32.const 192) "\08\00\00\02:foobar#")
-  (data (;11;) (i32.const 204) "\08\00\00\02:foobaz#")
-  (data (;12;) (i32.const 216) "\08\00\00\02:foobar#")
-  (data (;13;) (i32.const 228) "\09\00\00\02:foobazz#")
+  (data (;8;) (i32.const 120) "\01\00\00\02a")
+  (data (;9;) (i32.const 128) "\01\00\00\02a")
+  (data (;10;) (i32.const 136) "\01\00\00\02a")
+  (data (;11;) (i32.const 144) "\01\00\00\02b")
+  (data (;12;) (i32.const 152) " \00\00\02:foo#\f0\9f\98\80\f0\9f\a4\a6\f0\9f\8f\bc\e2\80\8d\e2\99\82\ef\b8\8fbar!\0d\0a")
+  (data (;13;) (i32.const 188) " \00\00\02:foo#\f0\9f\98\80\f0\9f\a4\a6\f0\9f\8f\bc\e2\80\8d\e2\99\82\ef\b8\8fbar!\0d\0a")
+  (data (;14;) (i32.const 224) "\08\00\00\02:foobar#")
+  (data (;15;) (i32.const 236) "\08\00\00\02:foobaz#")
+  (data (;16;) (i32.const 248) "\08\00\00\02:foobar#")
+  (data (;17;) (i32.const 260) "\09\00\00\02:foobazz#")
   (type (;3;) (func)))

@@ -20,6 +20,14 @@
  #t (string=?-empty-literal-strings))
 
 (compiler-test-eq
+ "string=? evaluates to true for two equal one-character literal strings"
+ #t (string=?-one-char-equal-strings))
+
+(compiler-test-eq
+ "string=? evaluates to false for two nonequal one-character literal strings"
+ #f (string=?-one-char-nonequal-strings))
+
+(compiler-test-eq
  "string=? evaluates to true for two literal strings with equal content"
  #t (string=?-literal-strings-with-equal-content))
 

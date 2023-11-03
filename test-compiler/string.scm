@@ -8,7 +8,9 @@
    string=?-empty-literal-strings
    string=?-literal-strings-with-equal-content
    string=?-literal-strings-with-same-length-nonequal-content
-   string=?-literal-strings-with-different-length)
+   string=?-literal-strings-with-different-length
+   string=?-one-char-equal-strings
+   string=?-one-char-nonequal-strings)
 
   (import (scheme base))
 
@@ -38,6 +40,12 @@
 
     (define (string=?-empty-literal-strings)
       (string=? "" ""))
+
+    (define (string=?-one-char-equal-strings)
+      (string=? "a" "a"))
+
+    (define (string=?-one-char-nonequal-strings)
+      (string=? "a" "b"))
 
     (define (string=?-literal-strings-with-equal-content)
       (string=? ":foo#😀🤦🏼‍♂️bar!\r\n" ":foo#😀🤦🏼‍♂️bar!\r\n"))

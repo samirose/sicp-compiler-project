@@ -72,6 +72,8 @@ forms a good development platform for working with the code.
 project because of its SICP origins, but it does not support the M1 Apple Silicon Mac I am using
 as my main machine.)
 * Add bit tagged typing to values and type predicates: `number?`, `boolean?`, `procedure?` and uninitialized and unspecified values and add type checking to generated code.
+* Literal symbols
+* Literal strings
 
 ## Features currently under work
 
@@ -80,7 +82,6 @@ as my main machine.)
 of over- or underflow
 
 ## Backlog
-* Add support for read-only symbols and strings
 * Add run-time support for rudimentary heap-based values: vectors, pairs
 * Implement simple garbage collection using [SICP section 5.3](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-33.html#%_sec_5.3) as a guideline in WAT
 * Implement lexical [closures](https://en.wikipedia.org/wiki/Closure_(computer_programming)) with function activation records as vector lists on the heap

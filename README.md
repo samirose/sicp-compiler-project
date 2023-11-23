@@ -82,6 +82,10 @@ as my main machine.)
 of over- or underflow
 
 ## Backlog
+* Implement symbol=? (6.5 [[R7RS]](#r7rs))
+* Implement eqv? for currently implemented types (6.1 [[R7RS]](#r7rs))
+* Implement support for programs (5.1 [[R7RS]](#r7rs))
+* Implement basic output facility with WASI (6.13.3 [[R7RS]](#r7rs))
 * Add run-time support for rudimentary heap-based values: vectors, pairs
 * Implement simple garbage collection using [SICP section 5.3](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-33.html#%_sec_5.3) as a guideline in WAT
 * Implement lexical [closures](https://en.wikipedia.org/wiki/Closure_(computer_programming)) with function activation records as vector lists on the heap

@@ -94,6 +94,7 @@ of over- or underflow
 ## References
 
 ### Essential
+* <a id="r7rs"></a>[[R7RS]](https://standards.scheme.org/unofficial/errata-corrected-r7rs.pdf) Revised<sup>7</sup> Report on the Algorithmic Language Scheme
 * [Structure and Interpretation of Computer Programs (SICP) Web Site](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html)
 * [WebAssembly home page](https://webassembly.org)
 * [WebAssembly specification](https://webassembly.github.io/spec/core/)

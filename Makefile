@@ -52,7 +52,7 @@ runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme
 	cat $^ > $@
 
 .PHONY : compile-compiler
-compile-compiler : $(COMPILER_BINARIES) $(COMPILER_DEPENDENCIES) ## Compiles the compiler with host scheme
+compile-compiler : $(COMPILER_BINARIES) ## Compiles the compiler with host scheme
 
 $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@

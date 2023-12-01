@@ -52,23 +52,18 @@ runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme
 	cat $^ > $@
 
 .PHONY : compile-compiler
-compile-compiler : $(COMPILER_BINARIES) ## Compiles the compiler with host scheme
-
-binaries = $(patsubst $(HOST_SCHEME_COMPILED_DIR):.go,:,$(patsubst %,$(HOST_SCHEME_COMPILED_DIR)%.go,$(1)))
-
-$(call binaries,compiled-program counted-set expression-compiler lexical-env literals-compiler module-compiler scheme-r7rs-syntax scheme-libraries wasm-syntax : lists)
-$(call binaries,expression-compiler module-compiler scheme-syntax scheme-r7rs-syntax wasm-syntax : pattern-match)
-$(call binaries,assert scheme-libraries scheme-syntax scheme-r7rs-syntax : compilation-error)
-$(call binaries,compiled-program : counted-set definitions-table)
-$(call binaries,definitions-table : wasm-syntax counted-set)
-$(call binaries,scheme-libraries : compiled-program)
-$(call binaries,expression-compiler module-compiler : lexical-env scheme-syntax scheme-libraries values literals-compiler)
-$(call binaries,module-compiler : expression-compiler scheme-r7rs-syntax)
-$(call binaries,literals-compiler : values wasm-syntax compiled-program)
-$(call binaries,driver : lists module-compiler wasm-syntax)
+compile-compiler : $(COMPILER_BINARIES) $(COMPILER_DEPENDENCIES) ## Compiles the compiler with host scheme
 
 $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@
+
+COMPILER_DEPENDENCIES = $(HOST_SCHEME_COMPILED_DIR)module-dependencies.mk
+$(COMPILER_DEPENDENCIES) : $(COMPILER_SOURCES) tools/scheme-dependencies.scm | $(HOST_SCHEME_COMPILED_DIR)
+	$(HOST_SCHEME_RUN_PROGRAM) tools/scheme-dependencies.scm $(COMPILER_SOURCES) \
+	  | sed -e 's|\([^[:space:]]*\)\.scm|$(HOST_SCHEME_COMPILED_DIR)\1\.go|g' \
+	  | tee $@.tmp && mv -f $@.tmp $@
+
+include $(COMPILER_DEPENDENCIES)
 
 $(COMPILER_BINARIES) : $(HOST_SCHEME_COMPILED_DIR)%.go : %.scm | $(HOST_SCHEME_COMPILED_DIR)
 	GUILE_LOAD_COMPILED_PATH=$(HOST_SCHEME_COMPILED_DIR) $(HOST_SCHEME_COMPILE_MODULE) -o $@ $<

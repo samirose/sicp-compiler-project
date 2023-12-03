@@ -48,7 +48,10 @@ runtime/test/test-runtime.log : runtime/test/test-runtime.json | runtime/test/
 runtime/test/test-runtime.json : runtime/test/test-runtime.wast | runtime/test/
 	wast2json $< -o $@
 
-runtime/test/test-runtime.wast : runtime/scheme-base.wat runtime/register-scheme-base.wast runtime/test/scheme-base.wast | runtime/test/
+runtime/test/test-runtime.wast : runtime/scheme-base.wat \
+                                 runtime/register-scheme-base.wast \
+                                 runtime/test/scheme-base.wast \
+                                 | runtime/test/
 	cat $^ > $@
 
 .PHONY : compile-compiler
@@ -86,7 +89,10 @@ test-compiler-host : $(COMPILER_TEST_HOST_LOGS) ## Executes the compiler integra
 
 $(COMPILER_TEST_HOST_TARGETS) : $(TEST_COMPILER_DIR)%-host : $(TEST_COMPILER_DIR)host-log/%.log
 
-$(COMPILER_TEST_HOST_LOGS) : $(TEST_COMPILER_DIR)host-log/%.log : $(TEST_COMPILER_DIR)%.scm $(TEST_COMPILER_DIR)test/%.scm $(TEST_COMPILER_DIR)/lib/compiler-test.scm | $(TEST_COMPILER_DIR)host-log/
+$(COMPILER_TEST_HOST_LOGS) : $(TEST_COMPILER_DIR)host-log/%.log : $(TEST_COMPILER_DIR)%.scm \
+                                                                  $(TEST_COMPILER_DIR)test/%.scm \
+                                                                  $(TEST_COMPILER_DIR)/lib/compiler-test.scm \
+                                                                  | $(TEST_COMPILER_DIR)host-log/
 	cd $(TEST_COMPILER_DIR)host-log ; \
 	rm -f $(notdir $(@:%.log=%.fail.log)) ; \
 	$(RUN_COMPILER_TEST_HOST) ../test/$(notdir $<) || \
@@ -105,7 +111,8 @@ test-compiler-wast : $(COMPILER_TEST_WAST_LOGS) $(COMPILER_TEST_WAT_MODULES) ## 
 
 $(COMPILER_TEST_WAST_TARGETS) : $(TEST_COMPILER_DIR)%-wast : $(TEST_COMPILER_DIR)wast-log/%.log
 
-$(COMPILER_TEST_WAST_LOGS) : $(TEST_COMPILER_DIR)wast-log/%.log : $(TEST_COMPILER_DIR)build/%-test.json | $(TEST_COMPILER_DIR)wast-log/
+$(COMPILER_TEST_WAST_LOGS) : $(TEST_COMPILER_DIR)wast-log/%.log : $(TEST_COMPILER_DIR)build/%-test.json \
+                                                                  | $(TEST_COMPILER_DIR)wast-log/
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
@@ -117,11 +124,13 @@ $(TEST_COMPILER_DIR)build/%-test.json : $(TEST_COMPILER_DIR)build/test-prelude.w
 	  && mv -f $@.tmp $@
 
 $(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)lib/compiler-test-to-wast.scm
-$(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)build/%-test.wast : $(TEST_COMPILER_DIR)test/%.scm | $(TEST_COMPILER_DIR)build/
+$(COMPILER_TEST_WAST_TESTS) : $(TEST_COMPILER_DIR)build/%-test.wast : $(TEST_COMPILER_DIR)test/%.scm \
+                                                                      | $(TEST_COMPILER_DIR)build/
 	$(COMPILER_TEST_TO_WAST) < $< > $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(COMPILER_TEST_WAT_MODULES) : $(TEST_COMPILER_DIR)wat/%.wat : $(TEST_COMPILER_DIR)build/%.wat | $(TEST_COMPILER_DIR)wat
+$(COMPILER_TEST_WAT_MODULES) : $(TEST_COMPILER_DIR)wat/%.wat : $(TEST_COMPILER_DIR)build/%.wat \
+                                                               | $(TEST_COMPILER_DIR)wat
 	wat-desugar $< -o $@
 
 COMPILER_TEST_DIRECT_TESTS := $(wildcard $(TEST_COMPILER_DIR)wast/*.wast)

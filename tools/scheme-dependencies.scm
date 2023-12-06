@@ -22,113 +22,122 @@
  (scheme cxr)
  (only (srfi srfi-1) fold))
 
-(define (scheme-library? sexp)
-  (and (pair? sexp)
-       (eq? (car sexp) 'define-library)
-       (not (null? (cdr sexp)))))
-
-(define (library-name def)
-  (cadr def))
-
-(define (import-definition? sexp)
-  (and (pair? sexp) (eq? (car sexp) 'import)))
-
-(define (import-sets sets)
-  (let collect-sets ((sets sets)
-                     (imports '()))
-    (cond
-     ((null? sets) imports)
-     (else
-      (let ((import-decl (car sets)))
-        (case (and (pair? import-decl) (car import-decl))
-          ((only except prefix rename)
-           (collect-sets
-            (cdr sets)
-            (append imports (collect-sets (list (cadar sets)) imports))))
-          (else
-           (collect-sets
-            (cdr sets)
-            (cons import-decl imports)))))))))
-
-(define (scheme-library-imports library)
-  (fold
-   (lambda (definition imports)
-     (if (import-definition? definition)
-         (append (import-sets (cdr definition)) imports)
-         imports))
-   '()
-   (cdr library)))
-
-(define (scheme-program-imports first-definition)
-  (do ((definition first-definition (read))
-       (imports '() (if (import-definition? definition)
-                        (append (import-sets (cdr definition)) imports)
-                        imports)))
-      ((eof-object? definition) imports)))
-
-(define (scheme-module-imports filename sexp)
-  ((cond ((scheme-library? sexp) scheme-library-imports)
-         (else scheme-program-imports))
-   sexp))
-
-(define (scheme-library-name filename)
-  (with-input-from-file
-      filename
+(define (fold-scheme-objects-in-file kons init filename)
+  (with-input-from-file filename
     (lambda ()
-      (let ((sexp (read)))
-        (and (scheme-library? sexp)
-             (library-name sexp))))))
+      (do ((definition (read) (read))
+           (result init (kons definition result)))
+          ((eof-object? definition) result)))))
 
-(define (process-scheme-files filenames)
-  (let*
-      ((library-file-alist
+(define (library-definition? object)
+  (and (pair? object)
+       (eq? (car object) 'define-library)
+       (or (not (null? (cdr object)))
+           (error "Expected ⟨library name⟩" object))))
+
+(define (library-name library-definition)
+  (cadr library-definition))
+
+(define (library-declarations library-definition)
+  (cddr library-definition))
+
+(define (import-definition? object)
+  (and (pair? object)
+       (eq? (car object) 'import)
+       (or (not (null? (cdr object)))
+           (error "Expected ⟨import set⟩" object))))
+
+(define (import-sets import-definition)
+  (let collect-sets ((sets (cdr import-definition))
+                     (imports '()))
+    (if (null? sets)
+        imports
+        (let ((import-decl (car sets)))
+          (case (and (pair? import-decl) (car import-decl))
+            ((only except prefix rename)
+             (collect-sets
+              (cdr sets)
+              (fold cons
+                    imports
+                    (collect-sets (list (cadar sets)) '()))))
+            (else
+             (collect-sets
+              (cdr sets)
+              (cons import-decl imports))))))))
+
+(define (scheme-definition-imports definition)
+  (cond ((import-definition? definition)
+         (import-sets definition))
+        ((library-definition? definition)
+         (fold
+          (lambda (declaration imports)
+            (if (import-definition? declaration)
+                (fold cons
+                      imports
+                      (import-sets declaration))
+                imports))
+          '()
+          (library-declarations definition)))
+        (else '())))
+
+(define (scheme-module-imports filename)
+  (fold-scheme-objects-in-file
+   (lambda (object imports)
+     (fold cons
+           imports
+           (scheme-definition-imports object)))
+   '()
+   filename))
+
+(let*
+    ((filenames (cdr (command-line)))
+
+     (library-module-alist
+      (fold
+       (lambda (filename alist)
+         (fold-scheme-objects-in-file
+          (lambda (object alist)
+            (if (library-definition? object)
+                (let ((library-name (library-name object)))
+                  (if (assoc library-name alist)
+                      (error "Duplicate library definition" library-name)
+                      (cons (cons library-name filename)
+                            alist)))
+                alist))
+          alist
+          filename))
+       '()
+       filenames))
+
+     (imports-to-defining-modules
+      (lambda (filename)
         (fold
-         (lambda (filename alist)
-           (cond ((scheme-library-name filename) =>
-                  (lambda (library-name)
-                    (if (assoc library-name alist)
-                        (error "Duplicate library definition" library-name))
-                    (cons (cons library-name filename) alist)))
-                 (else alist)))
+         (lambda (import defining-modules)
+           (let ((defining-module
+                   (cond ((assoc import library-module-alist) => cdr)
+                         (else #f))))
+             (cond
+              ;; library is not defined by modules in filenames
+              ((not defining-module) defining-modules)
+              ;; import is in the same file as definition
+              ((string=? defining-module filename) defining-modules)
+              (else (cons defining-module defining-modules)))))
          '()
-         filenames))
+         (scheme-module-imports filename)))))
 
-       (module-imports-to-files
-        (lambda (filename)
-          (with-input-from-file filename
-            (lambda ()
-              (let ((sexp (read)))
-                (fold
-                 (lambda (import module-files)
-                   (cond ((assoc import library-file-alist) =>
-                          (lambda (library.file)
-                            (cons (cdr library.file) module-files)))
-                         (else module-files)))
-                 '()
-                 (scheme-module-imports filename sexp)))))))
-
-       (module-imports-alist
-        (fold
-         (lambda (filename alist)
-           (cons (cons filename (module-imports-to-files filename))
-                 alist))
-         '()
-         filenames)))
-
-    (for-each
-     (lambda (module.imports)
-       (unless (null? (cdr module.imports))
+  (for-each
+   (lambda (filename)
+     (let ((prequisites (imports-to-defining-modules filename)))
+       (unless (null? prequisites)
          (begin
-           (write-string (car module.imports))
+           (write-string filename)
            (write-char #\:)
            (for-each
-            (lambda (import)
+            (lambda (prequisite)
               (write-char #\ )
-              (write-string import))
-            (cdr module.imports)))
-         (newline)))
-     module-imports-alist)))
+              (write-string prequisite))
+            prequisites)
+           (newline)))))
+   filenames)
 
-(let ((filenames (cdr (command-line))))
-  (process-scheme-files filenames)
   (newline))

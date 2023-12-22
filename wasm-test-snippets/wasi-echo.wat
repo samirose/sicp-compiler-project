@@ -69,16 +69,16 @@
 
           ;; check if the buffer was full and prompt for next input if not
           local.get $bytes_read
-          (i32.load i32.const 0x10) ;; input buffer length in in its iovec
+          (i32.load (i32.const 0x10)) ;; input buffer length in in its iovec
           i32.lt_s
           br_if $prompt_next
 
-          ;; check if the read input ended in a newline (assume line-oriented stdin)
+          ;; check if the read input ended in a line feed (assume line-oriented stdin)
           local.get $bytes_read
           i32.load offset=0x1f
-          (i32.const 0x0a) ;; newline ASCII code
+          (i32.const 0x0a) ;; ASCII LF (line feed)
           i32.eq
-          br_if $prompt_next ;; input ended in newline, prompt for next input
+          br_if $prompt_next ;; input ended in line feed, prompt for next input
 
           ;; read more input to buffer
           br $readloop

@@ -82,10 +82,10 @@ as my main machine.)
 of over- or underflow
 
 ## Backlog
-* Implement symbol=? (6.5 [[R7RS]](#r7rs))
-* Implement eqv? for currently implemented types (6.1 [[R7RS]](#r7rs))
-* Implement support for programs (5.1 [[R7RS]](#r7rs))
-* Implement basic output facility with WASI (6.13.3 [[R7RS]](#r7rs))
+* Implement symbol=? (6.5 [[R7RS][r7rs]])
+* Implement eqv? for currently implemented types (6.1 [[R7RS][r7rs]])
+* Implement support for programs (5.1 [[R7RS][r7rs]])
+* Implement basic output facility with WASI (6.13.3 [[R7RS][r7rs]])
 * Add run-time support for rudimentary heap-based values: vectors, pairs
 * Implement simple garbage collection using [SICP section 5.3](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-33.html#%_sec_5.3) as a guideline in WAT
 * Implement lexical [closures](https://en.wikipedia.org/wiki/Closure_(computer_programming)) with function activation records as vector lists on the heap
@@ -98,7 +98,7 @@ of over- or underflow
 ## References
 
 ### Essential
-* <a id="r7rs"></a>[[R7RS]](https://standards.scheme.org/unofficial/errata-corrected-r7rs.pdf) Revised<sup>7</sup> Report on the Algorithmic Language Scheme
+* [[R7RS][r7rs]] Revised<sup>7</sup> Report on the Algorithmic Language Scheme
 * [Structure and Interpretation of Computer Programs (SICP) Web Site](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html)
 * [WebAssembly home page](https://webassembly.org)
 * [WebAssembly specification](https://webassembly.github.io/spec/core/)
@@ -117,3 +117,5 @@ of over- or underflow
 ### Similar projects
 * [Schism – an experimental compiler from Scheme to WebAssembly](https://github.com/google/schism)
 * [WAForth: Forth Interpreter+Compiler for WebAssembly](https://el-tramo.be/blog/waforth/)
+
+[r7rs]: https://standards.scheme.org/unofficial/errata-corrected-r7rs.pdf

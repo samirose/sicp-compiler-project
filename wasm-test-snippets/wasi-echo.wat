@@ -17,24 +17,24 @@
   ;; WASI iovec for writing out input buffer
   (data (i32.const 0x14) "\20\00\00\00") ;; pointer to buffer
   (data (i32.const 0x18) "\64\00\00\00") ;; buffer length, initially 100 characters
+  ;; bytes written to output
+  (data (i32.const 0x1c) "\00\00\00\00")
   ;; input buffer
-  (data (i32.const 0x20) "\00") ;; buffer (of 100 characters) to hold read in string
-
-  ;; reserved for bytes written to output
-  (data (i32.const 0x100) "\00\00\00\00")
+  (data (i32.const 0x20) "\00") ;; buffer to hold characters read
 
   ;; WASI main entry point
   (func $main (export "_start")
     (local $bytes_read i32)
+    (local $bytes_written i32)
     (block $done
       (loop $prompt_next
 
         ;; write prompt
         (call $fd_write
-          (i32.const 1)     ;; stdout
-          (i32.const 0x00)  ;; prompt string iovec address
-          (i32.const 1)     ;; one iovec
-          (i32.const 0x100) ;; location to write number of bytes written
+          (i32.const 1)    ;; stdout
+          (i32.const 0x00) ;; prompt string iovec address
+          (i32.const 1)    ;; one iovec
+          (i32.const 0x1c) ;; location to write number of bytes written
         )
         drop ;; discard result
 
@@ -58,18 +58,46 @@
           i32.eqz
           br_if $done
 
-          ;; write out bytes read into the buffer
-          (call $fd_write
-            (i32.const 1)     ;; stdout
-            (i32.const 0x14)  ;; input buffer write iovec address
-            (i32.const 1)     ;; one iovec
-            (i32.const 0x100) ;; location to write number of bytes written
+          ;; restore write iovec buffer pointer
+          (i32.store (i32.const 0x14) (i32.const 0x20))
+
+          (loop $writeall
+            ;; write out bytes read into the buffer
+            (call $fd_write
+              (i32.const 1)    ;; stdout
+              (i32.const 0x14) ;; input buffer write iovec address
+              (i32.const 1)    ;; one iovec
+              (i32.const 0x1c) ;; location to write number of bytes written
+            )
+
+            ;; if result != success branch out
+            i32.const 0
+            i32.ne
+            br_if $done
+
+            ;; check if all read bytes were written and stay in writeloop if not
+            (block $writecomplete
+              (i32.load (i32.const 0x1c))
+              local.tee $bytes_written
+              local.get $bytes_read
+              i32.eq
+              br_if $writecomplete
+              ;; not all was written, update write iovec and write again
+              (i32.load (i32.const 0x14))
+              local.get $bytes_written
+              i32.add
+              (i32.store (i32.const 0x14))
+              (i32.load (i32.const 0x18))
+              local.get $bytes_written
+              i32.sub
+              (i32.store (i32.const 0x18))
+              br $writeall
+            )
           )
-          drop ;; discard result
 
           ;; check if the buffer was full and prompt for next input if not
           local.get $bytes_read
-          (i32.load (i32.const 0x10)) ;; input buffer length in in its iovec
+          (i32.load (i32.const 0x10)) ;; input buffer length in read iovec
           i32.lt_s
           br_if $prompt_next
 

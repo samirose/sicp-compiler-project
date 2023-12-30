@@ -230,23 +230,38 @@
           end
           i32.const 0)
 
-    (func $check-string (param $obj i32) (result i32)
-          (local $str i32)
-          block $is_string
+    (func $check-heap-obj
+          (param $obj i32)
+          (param $type i32)
+          (param $error i32)
+          (result i32)
+          (local $heap-obj i32)
+          block $is_type
             block $is_heap_obj
               local.get $obj
               ,@macro-is-heap-obj
               br_if $is_heap_obj
-              ,@(macro-raise-error error-expected-string)
+              local.get $error
+              call $raise-error
             end
             local.get $obj
             i32.load
-            local.tee $str
-            ,@(macro-is-heap-obj-type heap-object-type-string)
-            br_if $is_string
-            ,@(macro-raise-error error-expected-string)
+            local.tee $heap-obj
+            (i32.const ,heap-object-type-mask)
+            i32.and
+            local.get $type
+            i32.eq
+            br_if $is_type
+            local.get $error
+            call $raise-error
           end
-          local.get $str)
+          local.get $heap-obj)
+
+    (func $check-string (param $obj i32) (result i32)
+          local.get $obj
+          (i32.const ,heap-object-type-string)
+          (i32.const ,error-expected-string)
+          call $check-heap-obj)
     ))
 
 (write scheme-base-wat)

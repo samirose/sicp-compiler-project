@@ -15,7 +15,8 @@
 
 (define (macro-raise-error error)
   `(i32.const ,error
-    call $raise-error))
+    global.set $error-code
+    unreachable))
 
 (define scheme-base-wat
   `(module
@@ -29,11 +30,6 @@
           global.get $error-code
           i32.const ,error-no-error
           global.set $error-code)
-
-    (func $raise-error (export "raise-error") (param $error-code i32)
-          local.get $error-code
-          global.set $error-code
-          unreachable)
 
     (func (export "i32->fixnum") (param $value i32) (result i32)
           local.get $value
@@ -50,8 +46,7 @@
           i32.const ,fixnum-mask
           i32.ne
           if
-          i32.const ,error-expected-number
-          call $raise-error
+          ,@(macro-raise-error error-expected-number)
           end)
 
     (func $fixnum->i32 (export "fixnum->i32") (param $obj i32) (result i32)
@@ -89,8 +84,7 @@
           i32.const ,procedure-tag
           i32.ne
           if
-          i32.const ,error-expected-procedure
-          call $raise-error
+          ,@(macro-raise-error error-expected-procedure)
           end)
 
     (func (export "procedure->funcidx") (param $obj i32) (result i32)
@@ -163,8 +157,7 @@
           i32.const ,uninitialized-value
           i32.eq
           if
-          i32.const ,error-uninitialized
-          call $raise-error
+          ,@(macro-raise-error error-uninitialized)
           end)
 
     (func (export "string=?") (param $s1 i32) (param $s2 i32) (result i32)
@@ -236,31 +229,30 @@
           (param $error i32)
           (result i32)
           (local $heap-obj i32)
-          block $is_type
-            block $is_heap_obj
-              local.get $obj
-              ,@macro-is-heap-obj
-              br_if $is_heap_obj
-              local.get $error
-              call $raise-error
-            end
+          block $error
+            local.get $obj
+            ,@macro-is-heap-obj
+            i32.eqz
+            br_if $error
             local.get $obj
             i32.load
             local.tee $heap-obj
-            (i32.const ,heap-object-type-mask)
+            i32.const ,heap-object-type-mask
             i32.and
             local.get $type
-            i32.eq
-            br_if $is_type
-            local.get $error
-            call $raise-error
+            i32.ne
+            br_if $error
+            local.get $heap-obj
+            return
           end
-          local.get $heap-obj)
+          local.get $error
+          global.set $error-code
+          unreachable)
 
     (func $check-string (param $obj i32) (result i32)
           local.get $obj
-          (i32.const ,heap-object-type-string)
-          (i32.const ,error-expected-string)
+          i32.const ,heap-object-type-string
+          i32.const ,error-expected-string
           call $check-heap-obj)
     ))
 

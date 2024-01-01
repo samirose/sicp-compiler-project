@@ -2,9 +2,12 @@
 (import (scheme write))
 (import (values))
 
-(define macro-is-heap-obj
+(define macro-is-not-heap-obj
   `(i32.const ,immediate-value-mask
-    i32.and
+    i32.and))
+
+(define macro-is-heap-obj
+  `(,@macro-is-not-heap-obj
     i32.eqz))
 
 (define (macro-is-heap-obj-type heap-obj-type)
@@ -240,8 +243,7 @@
           (result i32)
           block $error
             local.get $obj
-            ,@macro-is-heap-obj
-            i32.eqz
+            ,@macro-is-not-heap-obj
             br_if $error
             local.get $obj
             i32.load
@@ -267,8 +269,7 @@
           (local $heap-obj i32)
           block $error
             local.get $obj
-            ,@macro-is-heap-obj
-            i32.eqz
+            ,@macro-is-not-heap-obj
             br_if $error
             local.get $obj
             i32.load

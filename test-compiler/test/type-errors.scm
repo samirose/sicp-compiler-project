@@ -35,4 +35,20 @@
  "unspecified value as operator is a type error"
  (unspecified-as-operator 1) expected-procedure)
 
+(compiler-test-error
+ "arithmetic with symbol value is a type error"
+ (symbol-plus-two) expected-number)
+
+(compiler-test-error
+ "symbol as operator is a type error"
+ (symbol-as-operator 1) expected-procedure)
+
+(compiler-test-error
+ "arithmetic with string value is a type error"
+ (string-plus-two) expected-number)
+
+(compiler-test-error
+ "string as operator is a type error"
+ (string-as-operator 1) expected-procedure)
+
 (compiler-test-end "type-errors")

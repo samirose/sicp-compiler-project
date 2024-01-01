@@ -73,34 +73,25 @@
     end)
   (func (;18;) (type 1) (result i32)
     (local i32)
-    block (result i32)  ;; label = @1
+    block  ;; label = @1
       block  ;; label = @2
-        block  ;; label = @3
-          i32.const 20
-          global.get 9
-          global.get 7
-          call 9
-          call_indirect (type 2)
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        block  ;; label = @3
-          global.get 9
-          global.get 10
-          global.get 7
-          call 9
-          call_indirect (type 2)
-          local.tee 0
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        local.get 0
-        br 1 (;@1;)
+        i32.const 20
+        global.get 9
+        global.get 7
+        call 9
+        call_indirect (type 2)
+        local.tee 0
+        call 7
+        br_if 1 (;@1;)
       end
-      i32.const 6
-    end)
+      global.get 9
+      global.get 10
+      global.get 7
+      call 9
+      call_indirect (type 2)
+      local.set 0
+    end
+    local.get 0)
   (func (;19;) (type 0) (param i32) (result i32)
     local.get 0
     global.get 4

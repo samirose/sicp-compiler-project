@@ -34,6 +34,10 @@
   (global (;12;) (mut i32) (i32.const 46))
   (global (;13;) (mut i32) (i32.const 46))
   (global (;14;) (mut i32) (i32.const 46))
+  (global (;15;) (mut i32) (i32.const 46))
+  (global (;16;) (mut i32) (i32.const 46))
+  (global (;17;) (mut i32) (i32.const 46))
+  (global (;18;) (mut i32) (i32.const 46))
   (func (;16;) (type 0) (param i32) (result i32)
     local.get 0
     call 3
@@ -115,7 +119,27 @@
     end
     call 9
     call_indirect (type 0))
-  (func (;25;)
+  (func (;25;) (type 1) (result i32)
+    i32.const 0
+    global.get 8
+    call 9
+    call_indirect (type 0))
+  (func (;26;) (type 0) (param i32) (result i32)
+    local.get 0
+    i32.const 8
+    call 9
+    call_indirect (type 0))
+  (func (;27;) (type 1) (result i32)
+    i32.const 16
+    global.get 8
+    call 9
+    call_indirect (type 0))
+  (func (;28;) (type 0) (param i32) (result i32)
+    local.get 0
+    i32.const 24
+    call 9
+    call_indirect (type 0))
+  (func (;29;)
     i32.const 8
     call 8
     global.set 8
@@ -137,9 +161,21 @@
     i32.const 16
     call 8
     global.set 14
+    i32.const 17
+    call 8
+    global.set 15
+    i32.const 18
+    call 8
+    global.set 16
+    i32.const 19
+    call 8
+    global.set 17
+    i32.const 20
+    call 8
+    global.set 18
     i32.const 30
     drop)
-  (table (;0;) 17 funcref)
+  (table (;0;) 21 funcref)
   (export "plus-two" (func 16))
   (export "two-times" (func 17))
   (export "lambda-two-times" (func 19))
@@ -147,6 +183,14 @@
   (export "apply-to" (func 21))
   (export "unspecified-plus-two" (func 22))
   (export "unspecified-as-operator" (func 24))
-  (start 25)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24)
+  (export "symbol-plus-two" (func 25))
+  (export "symbol-as-operator" (func 26))
+  (export "string-plus-two" (func 27))
+  (export "string-as-operator" (func 28))
+  (start 29)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28)
+  (data (;0;) (i32.const 0) "\03\00\00\01foo")
+  (data (;1;) (i32.const 8) "\03\00\00\01bar")
+  (data (;2;) (i32.const 16) "\03\00\00\02foo")
+  (data (;3;) (i32.const 24) "\03\00\00\02bar")
   (type (;3;) (func)))

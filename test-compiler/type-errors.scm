@@ -8,7 +8,11 @@
    procedure-plus-two
    apply-to
    unspecified-plus-two
-   unspecified-as-operator)
+   unspecified-as-operator
+   symbol-plus-two
+   symbol-as-operator
+   string-plus-two
+   string-as-operator)
 
   (import (scheme base))
 
@@ -33,6 +37,18 @@
 
     (define (unspecified-as-operator x)
       ((cond (#f (lambda (x) (+ x 1)))) x))
+
+    (define (symbol-plus-two)
+      (plus-two 'foo))
+
+    (define (symbol-as-operator x)
+      ('bar x))
+
+    (define (string-plus-two)
+      (plus-two "foo"))
+
+    (define (string-as-operator x)
+      ("bar" x))
 
     )
   )

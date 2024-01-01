@@ -12,8 +12,16 @@
  #t (literal-symbols-with-same-name-are-eq))
 
 (compiler-test-eq
+ "symbol=? is true for literal symbols with same name"
+ #t (literal-symbols-with-same-name-are-symbol=?))
+
+(compiler-test-eq
  "eq? is false for literal symbols with different name"
  #f (literal-symbols-with-different-name-are-not-eq))
+
+(compiler-test-eq
+ "symbol=? is false for literal symbols with different name"
+ #f (literal-symbols-with-different-name-are-not-symbol=?))
 
 (compiler-test-eq
  "literal symbols as values are symbols"

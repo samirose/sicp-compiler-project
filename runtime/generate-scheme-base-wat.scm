@@ -160,6 +160,14 @@
           ,@(macro-raise-error error-uninitialized)
           end)
 
+    (func (export "symbol=?") (param $s1 i32) (param $s2 i32) (result i32)
+          local.get $s1
+          call $check-symbol-type
+          local.get $s2
+          call $check-symbol-type
+          i32.eq
+          call $i32->boolean)
+
     (func (export "string=?") (param $s1 i32) (param $s2 i32) (result i32)
           (local $len i32)
           local.get $s1
@@ -223,6 +231,34 @@
           end
           i32.const 0)
 
+    ;; Checks that $obj is a heap object of $type.
+    ;; Returns $obj on success or raises $error.
+    (func $check-heap-obj-type
+          (param $obj i32)
+          (param $type i32)
+          (param $error i32)
+          (result i32)
+          block $error
+            local.get $obj
+            ,@macro-is-heap-obj
+            i32.eqz
+            br_if $error
+            local.get $obj
+            i32.load
+            i32.const ,heap-object-type-mask
+            i32.and
+            local.get $type
+            i32.ne
+            br_if $error
+            local.get $obj
+            return
+          end
+          local.get $error
+          global.set $error-code
+          unreachable)
+
+    ;; Checks that $obj is a heap object of $type.
+    ;; Returns the header of the heap object on success or raises $error.
     (func $check-heap-obj
           (param $obj i32)
           (param $type i32)
@@ -249,11 +285,21 @@
           global.set $error-code
           unreachable)
 
+    ;; Returns heap object header pointed by $obj if it is a heap object of type string.
+    ;; Raises error-expected-string otherwise.
     (func $check-string (param $obj i32) (result i32)
           local.get $obj
           i32.const ,heap-object-type-string
           i32.const ,error-expected-string
           call $check-heap-obj)
+
+    ;; Returns $obj if it is of symbol type.
+    ;; Raises error-expected-symbol otherwise.
+    (func $check-symbol-type (param $obj i32) (result i32)
+          local.get $obj
+          i32.const ,heap-object-type-symbol
+          i32.const ,error-expected-symbol
+          call $check-heap-obj-type)
     ))
 
 (write scheme-base-wat)

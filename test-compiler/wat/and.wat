@@ -16,8 +16,9 @@
   (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
   (import "scheme base" "symbol?" (func (;12;) (param i32) (result i32)))
   (import "scheme base" "string?" (func (;13;) (param i32) (result i32)))
-  (import "scheme base" "string=?" (func (;14;) (param i32 i32) (result i32)))
-  (import "scheme base" "eq?" (func (;15;) (param i32 i32) (result i32)))
+  (import "scheme base" "symbol=?" (func (;14;) (param i32 i32) (result i32)))
+  (import "scheme base" "string=?" (func (;15;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;16;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
@@ -26,7 +27,7 @@
   (global (;5;) i32 (i32.const 82))
   (global (;6;) i32 (i32.const 98))
   (global (;7;) i32 (i32.const 114))
-  (global (;8;) (mut i32) (i32.const 46))
+  (global (;8;) i32 (i32.const 130))
   (global (;9;) (mut i32) (i32.const 46))
   (global (;10;) (mut i32) (i32.const 46))
   (global (;11;) (mut i32) (i32.const 46))
@@ -34,14 +35,15 @@
   (global (;13;) (mut i32) (i32.const 46))
   (global (;14;) (mut i32) (i32.const 46))
   (global (;15;) (mut i32) (i32.const 46))
-  (func (;16;) (type 0) (result i32)
-    i32.const 22)
+  (global (;16;) (mut i32) (i32.const 46))
   (func (;17;) (type 0) (result i32)
-    i32.const 6)
+    i32.const 22)
   (func (;18;) (type 0) (result i32)
+    i32.const 6)
+  (func (;19;) (type 0) (result i32)
     i32.const 42
     call 1)
-  (func (;19;) (type 0) (result i32)
+  (func (;20;) (type 0) (result i32)
     (local i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
@@ -65,7 +67,7 @@
       end
       i32.const 6
     end)
-  (func (;20;) (type 0) (result i32)
+  (func (;21;) (type 0) (result i32)
     (local i32 i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
@@ -120,7 +122,7 @@
         i32.const 6
       end
     end)
-  (func (;21;) (type 1) (param i32) (result i32)
+  (func (;22;) (type 1) (param i32) (result i32)
     local.get 0
     call 7
     if (result i32)  ;; label = @1
@@ -128,7 +130,7 @@
     else
       i32.const 22
     end)
-  (func (;22;) (type 0) (result i32)
+  (func (;23;) (type 0) (result i32)
     (local i32 i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
@@ -143,7 +145,7 @@
         end
         block  ;; label = @3
           i32.const 6
-          i32.const 13
+          i32.const 14
           call_indirect (type 1)
           call 7
           br_if 0 (;@3;)
@@ -168,7 +170,7 @@
       end
       i32.const 6
     end)
-  (func (;23;) (type 0) (result i32)
+  (func (;24;) (type 0) (result i32)
     (local i32 i32)
     i32.const 0
     call 1
@@ -213,7 +215,7 @@
     end
     drop
     local.get 0)
-  (func (;24;) (type 0) (result i32)
+  (func (;25;) (type 0) (result i32)
     (local i32 i32)
     i32.const 0
     call 1
@@ -257,10 +259,7 @@
     end
     drop
     local.get 0)
-  (func (;25;)
-    i32.const 8
-    call 8
-    global.set 8
+  (func (;26;)
     i32.const 9
     call 8
     global.set 9
@@ -273,7 +272,7 @@
     i32.const 12
     call 8
     global.set 12
-    i32.const 14
+    i32.const 13
     call 8
     global.set 13
     i32.const 15
@@ -282,18 +281,21 @@
     i32.const 16
     call 8
     global.set 15
+    i32.const 17
+    call 8
+    global.set 16
     i32.const 30
     drop)
-  (table (;0;) 17 funcref)
-  (export "empty-and-is-true" (func 16))
-  (export "and-one-false-is-false" (func 17))
-  (export "and-one-non-false-value-is-value" (func 18))
-  (export "and-two-non-false-values-is-last-value" (func 19))
-  (export "and-any-false-is-false" (func 20))
-  (export "and-with-complex-expressions" (func 22))
-  (export "and-evaluates-expressions-from-left-to-right" (func 23))
-  (export "and-false-short-circuits-to-false" (func 24))
-  (start 25)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24)
+  (table (;0;) 18 funcref)
+  (export "empty-and-is-true" (func 17))
+  (export "and-one-false-is-false" (func 18))
+  (export "and-one-non-false-value-is-value" (func 19))
+  (export "and-two-non-false-values-is-last-value" (func 20))
+  (export "and-any-false-is-false" (func 21))
+  (export "and-with-complex-expressions" (func 23))
+  (export "and-evaluates-expressions-from-left-to-right" (func 24))
+  (export "and-false-short-circuits-to-false" (func 25))
+  (start 26)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25)
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

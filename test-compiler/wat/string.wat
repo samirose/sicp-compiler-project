@@ -41,6 +41,8 @@
   (global (;18;) (mut i32) (i32.const 46))
   (global (;19;) (mut i32) (i32.const 46))
   (global (;20;) (mut i32) (i32.const 46))
+  (global (;21;) (mut i32) (i32.const 46))
+  (global (;22;) (mut i32) (i32.const 46))
   (func (;17;) (type 1) (result i32)
     i32.const 0
     global.get 5
@@ -147,7 +149,20 @@
     global.get 7
     call 9
     call_indirect (type 2))
-  (func (;28;)
+  (func (;28;) (type 1) (result i32)
+    i32.const 42
+    call 1
+    global.get 10
+    global.get 7
+    call 9
+    call_indirect (type 2))
+  (func (;29;) (type 1) (result i32)
+    i32.const 276
+    i32.const 284
+    global.get 7
+    call 9
+    call_indirect (type 2))
+  (func (;30;)
     i32.const 9
     call 8
     global.set 9
@@ -183,9 +198,15 @@
     i32.const 19
     call 8
     global.set 20
+    i32.const 20
+    call 8
+    global.set 21
+    i32.const 21
+    call 8
+    global.set 22
     i32.const 30
     drop)
-  (table (;0;) 20 funcref)
+  (table (;0;) 22 funcref)
   (export "literal-string-is-string" (func 17))
   (export "literal-strings-as-values-are-strings" (func 20))
   (export "string-may-contain-special-characters" (func 21))
@@ -195,8 +216,10 @@
   (export "string=?-literal-strings-with-equal-content" (func 25))
   (export "string=?-literal-strings-with-same-length-nonequal-content" (func 26))
   (export "string=?-literal-strings-with-different-length" (func 27))
-  (start 28)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27)
+  (export "string=?-expects-string-first-argument" (func 28))
+  (export "string=?-expects-string-second-argument" (func 29))
+  (start 30)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29)
   (data (;0;) (i32.const 0) "\03\00\00\02foo")
   (data (;1;) (i32.const 8) "\06\00\00\02foobar")
   (data (;2;) (i32.const 20) "\0a\00\00\02got string")
@@ -215,4 +238,6 @@
   (data (;15;) (i32.const 236) "\08\00\00\02:foobaz#")
   (data (;16;) (i32.const 248) "\08\00\00\02:foobar#")
   (data (;17;) (i32.const 260) "\09\00\00\02:foobazz#")
+  (data (;18;) (i32.const 276) "\04\00\00\02symb")
+  (data (;19;) (i32.const 284) "\04\00\00\01symb")
   (type (;3;) (func)))

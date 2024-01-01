@@ -21,7 +21,7 @@
       (and (eq? 'foo 'foo) (eq? s1 'foo)))
 
     (define (literal-symbols-with-different-name-are-not-eq)
-      (and (eq? 'baz s1) (eq? s1 s2)))
+      (or (eq? 'baz s1) (eq? s1 s2)))
 
     (define (is-symbol? x)
       (symbol? x))

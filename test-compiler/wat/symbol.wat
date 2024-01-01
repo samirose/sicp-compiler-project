@@ -40,6 +40,8 @@
   (global (;17;) (mut i32) (i32.const 46))
   (global (;18;) (mut i32) (i32.const 46))
   (global (;19;) (mut i32) (i32.const 46))
+  (global (;20;) (mut i32) (i32.const 46))
+  (global (;21;) (mut i32) (i32.const 46))
   (func (;17;) (type 1) (result i32)
     i32.const 0
     global.get 4
@@ -212,7 +214,20 @@
     global.get 4
     call 9
     call_indirect (type 0))
-  (func (;26;)
+  (func (;26;) (type 1) (result i32)
+    i32.const 42
+    call 1
+    global.get 10
+    global.get 6
+    call 9
+    call_indirect (type 2))
+  (func (;27;) (type 1) (result i32)
+    i32.const 88
+    i32.const 96
+    global.get 6
+    call 9
+    call_indirect (type 2))
+  (func (;28;)
     i32.const 9
     call 8
     global.set 9
@@ -244,9 +259,15 @@
     i32.const 17
     call 8
     global.set 19
+    i32.const 18
+    call 8
+    global.set 20
+    i32.const 19
+    call 8
+    global.set 21
     i32.const 30
     drop)
-  (table (;0;) 18 funcref)
+  (table (;0;) 20 funcref)
   (export "literal-symbol-is-symbol" (func 17))
   (export "literal-symbols-with-same-name-are-eq" (func 18))
   (export "literal-symbols-with-same-name-are-symbol=?" (func 19))
@@ -254,12 +275,16 @@
   (export "literal-symbols-with-different-name-are-not-symbol=?" (func 21))
   (export "literal-symbols-as-values-are-symbols" (func 24))
   (export "symbol-may-contain-special-characters" (func 25))
-  (start 26)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25)
+  (export "symbol=?-expects-symbol-first-argument" (func 26))
+  (export "symbol=?-expects-symbol-second-argument" (func 27))
+  (start 28)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27)
   (data (;0;) (i32.const 0) "\03\00\00\01foo")
   (data (;1;) (i32.const 8) "\06\00\00\01foobar")
   (data (;2;) (i32.const 20) "\03\00\00\01baz")
   (data (;3;) (i32.const 28) "\0a\00\00\01got-symbol")
   (data (;4;) (i32.const 44) "\0c\00\00\01bound-symbol")
   (data (;5;) (i32.const 60) "\17\00\00\01\22foo\22 \09\0a\0d\5c'bar'\f0\9f\98\80!@\7f\07")
+  (data (;6;) (i32.const 88) "\04\00\00\01symb")
+  (data (;7;) (i32.const 96) "\04\00\00\02symb")
   (type (;3;) (func)))

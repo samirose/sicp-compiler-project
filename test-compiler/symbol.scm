@@ -8,7 +8,9 @@
    literal-symbols-with-different-name-are-not-eq
    literal-symbols-with-different-name-are-not-symbol=?
    literal-symbols-as-values-are-symbols
-   symbol-may-contain-special-characters)
+   symbol-may-contain-special-characters
+   symbol=?-expects-symbol-first-argument
+   symbol=?-expects-symbol-second-argument)
 
   (import (scheme base))
 
@@ -48,5 +50,11 @@
     (define (symbol-may-contain-special-characters)
       (let ((symb '|"foo" \t\n\r\\'bar'😀!@\x7f;\x07;|))
         (symbol? symb)))
+
+    (define (symbol=?-expects-symbol-first-argument)
+      (symbol=? 42 s1))
+
+    (define (symbol=?-expects-symbol-second-argument)
+      (symbol=? 'symb "symb"))
     )
   )

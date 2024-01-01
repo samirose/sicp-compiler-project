@@ -31,4 +31,12 @@
  "literal symbol names may contain special characters"
  #t (symbol-may-contain-special-characters))
 
+(compiler-test-error
+ "symbol=? expectes a symbol as its first argument"
+ (symbol=?-expects-symbol-first-argument) expected-symbol)
+
+(compiler-test-error
+ "symbol=? expectes a symbol as its second argument"
+ (symbol=?-expects-symbol-second-argument) expected-symbol)
+
 (compiler-test-end "symbol")

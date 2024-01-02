@@ -10,7 +10,9 @@
    string=?-literal-strings-with-same-length-nonequal-content
    string=?-literal-strings-with-different-length
    string=?-one-char-equal-strings
-   string=?-one-char-nonequal-strings)
+   string=?-one-char-nonequal-strings
+   string=?-expects-string-first-argument
+   string=?-expects-string-second-argument)
 
   (import (scheme base))
 
@@ -55,5 +57,11 @@
 
     (define (string=?-literal-strings-with-different-length)
       (string=? ":foobar#" ":foobazz#"))
+
+    (define (string=?-expects-string-first-argument)
+      (string=? 42 s1))
+
+    (define (string=?-expects-string-second-argument)
+      (string=? "symb" 'symb))
     )
   )

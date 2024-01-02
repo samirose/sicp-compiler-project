@@ -4,9 +4,13 @@
   (export
    literal-symbol-is-symbol
    literal-symbols-with-same-name-are-eq
+   literal-symbols-with-same-name-are-symbol=?
    literal-symbols-with-different-name-are-not-eq
+   literal-symbols-with-different-name-are-not-symbol=?
    literal-symbols-as-values-are-symbols
-   symbol-may-contain-special-characters)
+   symbol-may-contain-special-characters
+   symbol=?-expects-symbol-first-argument
+   symbol=?-expects-symbol-second-argument)
 
   (import (scheme base))
 
@@ -20,8 +24,14 @@
     (define (literal-symbols-with-same-name-are-eq)
       (and (eq? 'foo 'foo) (eq? s1 'foo)))
 
+    (define (literal-symbols-with-same-name-are-symbol=?)
+      (and (symbol=? 'foo 'foo) (symbol=? s1 'foo)))
+
     (define (literal-symbols-with-different-name-are-not-eq)
-      (and (eq? 'baz s1) (eq? s1 s2)))
+      (or (eq? 'baz s1) (eq? s1 s2)))
+
+    (define (literal-symbols-with-different-name-are-not-symbol=?)
+      (or (symbol=? 'baz s1) (symbol=? s1 s2)))
 
     (define (is-symbol? x)
       (symbol? x))
@@ -40,5 +50,11 @@
     (define (symbol-may-contain-special-characters)
       (let ((symb '|"foo" \t\n\r\\'bar'😀!@\x7f;\x07;|))
         (symbol? symb)))
+
+    (define (symbol=?-expects-symbol-first-argument)
+      (symbol=? 42 s1))
+
+    (define (symbol=?-expects-symbol-second-argument)
+      (symbol=? 'symb "symb"))
     )
   )

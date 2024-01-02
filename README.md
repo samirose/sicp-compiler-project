@@ -82,7 +82,6 @@ as my main machine.)
 of over- or underflow
 
 ## Backlog
-* Implement symbol=? (6.5 [[R7RS][r7rs]])
 * Implement eqv? for currently implemented types (6.1 [[R7RS][r7rs]])
 * Implement support for programs (5.1 [[R7RS][r7rs]])
 * Implement basic output facility with WASI (6.13.3 [[R7RS][r7rs]])

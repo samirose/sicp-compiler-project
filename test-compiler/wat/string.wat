@@ -17,8 +17,9 @@
   (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
   (import "scheme base" "symbol?" (func (;12;) (param i32) (result i32)))
   (import "scheme base" "string?" (func (;13;) (param i32) (result i32)))
-  (import "scheme base" "string=?" (func (;14;) (param i32 i32) (result i32)))
-  (import "scheme base" "eq?" (func (;15;) (param i32 i32) (result i32)))
+  (import "scheme base" "symbol=?" (func (;14;) (param i32 i32) (result i32)))
+  (import "scheme base" "string=?" (func (;15;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;16;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
@@ -27,7 +28,7 @@
   (global (;5;) i32 (i32.const 82))
   (global (;6;) i32 (i32.const 98))
   (global (;7;) i32 (i32.const 114))
-  (global (;8;) (mut i32) (i32.const 46))
+  (global (;8;) i32 (i32.const 130))
   (global (;9;) (mut i32) (i32.const 46))
   (global (;10;) (mut i32) (i32.const 46))
   (global (;11;) (mut i32) (i32.const 46))
@@ -39,19 +40,22 @@
   (global (;17;) (mut i32) (i32.const 46))
   (global (;18;) (mut i32) (i32.const 46))
   (global (;19;) (mut i32) (i32.const 46))
-  (func (;16;) (type 1) (result i32)
+  (global (;20;) (mut i32) (i32.const 46))
+  (global (;21;) (mut i32) (i32.const 46))
+  (global (;22;) (mut i32) (i32.const 46))
+  (func (;17;) (type 1) (result i32)
     i32.const 0
     global.get 5
     call 9
     call_indirect (type 0))
-  (func (;17;) (type 0) (param i32) (result i32)
+  (func (;18;) (type 0) (param i32) (result i32)
     local.get 0
     global.get 5
     call 9
     call_indirect (type 0))
-  (func (;18;) (type 1) (result i32)
-    i32.const 20)
   (func (;19;) (type 1) (result i32)
+    i32.const 20)
+  (func (;20;) (type 1) (result i32)
     (local i32 i32)
     i32.const 36
     local.set 0
@@ -59,24 +63,24 @@
       block  ;; label = @2
         block  ;; label = @3
           i32.const 52
-          global.get 10
-          call 9
-          call_indirect (type 0)
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        block  ;; label = @3
-          global.get 9
-          global.get 10
-          call 9
-          call_indirect (type 0)
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        block  ;; label = @3
           global.get 11
+          call 9
+          call_indirect (type 0)
+          call 7
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        block  ;; label = @3
+          global.get 10
+          global.get 11
+          call 9
+          call_indirect (type 0)
+          call 7
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        block  ;; label = @3
+          global.get 12
           call 9
           call_indirect (type 1)
           global.get 5
@@ -101,7 +105,7 @@
       end
       i32.const 6
     end)
-  (func (;20;) (type 1) (result i32)
+  (func (;21;) (type 1) (result i32)
     (local i32)
     i32.const 64
     local.set 0
@@ -109,50 +113,60 @@
     global.get 5
     call 9
     call_indirect (type 0))
-  (func (;21;) (type 1) (result i32)
+  (func (;22;) (type 1) (result i32)
     i32.const 112
     i32.const 116
-    global.get 6
-    call 9
-    call_indirect (type 2))
-  (func (;22;) (type 1) (result i32)
-    i32.const 120
-    i32.const 128
-    global.get 6
+    global.get 7
     call 9
     call_indirect (type 2))
   (func (;23;) (type 1) (result i32)
-    i32.const 136
-    i32.const 144
-    global.get 6
+    i32.const 120
+    i32.const 128
+    global.get 7
     call 9
     call_indirect (type 2))
   (func (;24;) (type 1) (result i32)
-    i32.const 152
-    i32.const 188
-    global.get 6
+    i32.const 136
+    i32.const 144
+    global.get 7
     call 9
     call_indirect (type 2))
   (func (;25;) (type 1) (result i32)
-    i32.const 224
-    i32.const 236
-    global.get 6
+    i32.const 152
+    i32.const 188
+    global.get 7
     call 9
     call_indirect (type 2))
   (func (;26;) (type 1) (result i32)
-    i32.const 248
-    i32.const 260
-    global.get 6
+    i32.const 224
+    i32.const 236
+    global.get 7
     call 9
     call_indirect (type 2))
-  (func (;27;)
-    i32.const 8
-    call 8
-    global.set 8
-    i32.const 8
-    global.set 9
+  (func (;27;) (type 1) (result i32)
+    i32.const 248
+    i32.const 260
+    global.get 7
+    call 9
+    call_indirect (type 2))
+  (func (;28;) (type 1) (result i32)
+    i32.const 42
+    call 1
+    global.get 10
+    global.get 7
+    call 9
+    call_indirect (type 2))
+  (func (;29;) (type 1) (result i32)
+    i32.const 276
+    i32.const 284
+    global.get 7
+    call 9
+    call_indirect (type 2))
+  (func (;30;)
     i32.const 9
     call 8
+    global.set 9
+    i32.const 8
     global.set 10
     i32.const 10
     call 8
@@ -181,20 +195,31 @@
     i32.const 18
     call 8
     global.set 19
+    i32.const 19
+    call 8
+    global.set 20
+    i32.const 20
+    call 8
+    global.set 21
+    i32.const 21
+    call 8
+    global.set 22
     i32.const 30
     drop)
-  (table (;0;) 19 funcref)
-  (export "literal-string-is-string" (func 16))
-  (export "literal-strings-as-values-are-strings" (func 19))
-  (export "string-may-contain-special-characters" (func 20))
-  (export "string=?-empty-literal-strings" (func 21))
-  (export "string=?-one-char-equal-strings" (func 22))
-  (export "string=?-one-char-nonequal-strings" (func 23))
-  (export "string=?-literal-strings-with-equal-content" (func 24))
-  (export "string=?-literal-strings-with-same-length-nonequal-content" (func 25))
-  (export "string=?-literal-strings-with-different-length" (func 26))
-  (start 27)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26)
+  (table (;0;) 22 funcref)
+  (export "literal-string-is-string" (func 17))
+  (export "literal-strings-as-values-are-strings" (func 20))
+  (export "string-may-contain-special-characters" (func 21))
+  (export "string=?-empty-literal-strings" (func 22))
+  (export "string=?-one-char-equal-strings" (func 23))
+  (export "string=?-one-char-nonequal-strings" (func 24))
+  (export "string=?-literal-strings-with-equal-content" (func 25))
+  (export "string=?-literal-strings-with-same-length-nonequal-content" (func 26))
+  (export "string=?-literal-strings-with-different-length" (func 27))
+  (export "string=?-expects-string-first-argument" (func 28))
+  (export "string=?-expects-string-second-argument" (func 29))
+  (start 30)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29)
   (data (;0;) (i32.const 0) "\03\00\00\02foo")
   (data (;1;) (i32.const 8) "\06\00\00\02foobar")
   (data (;2;) (i32.const 20) "\0a\00\00\02got string")
@@ -213,4 +238,6 @@
   (data (;15;) (i32.const 236) "\08\00\00\02:foobaz#")
   (data (;16;) (i32.const 248) "\08\00\00\02:foobar#")
   (data (;17;) (i32.const 260) "\09\00\00\02:foobazz#")
+  (data (;18;) (i32.const 276) "\04\00\00\02symb")
+  (data (;19;) (i32.const 284) "\04\00\00\01symb")
   (type (;3;) (func)))

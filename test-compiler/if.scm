@@ -2,6 +2,10 @@
   (if)
 
   (export if-true
+          if-number
+          if-procedure
+          if-symbol
+          if-string
           if-true-expression
           if-true-does-not-evaluate-alternative
           if-true-consequent-only
@@ -20,6 +24,18 @@
 
     (define (if-true)
       (if #t 1 2))
+
+    (define (if-number)
+      (if 0 1 2))
+
+    (define (if-procedure)
+      (if if-true 1 2))
+
+    (define (if-symbol)
+      (if 'symb 1 2))
+
+    (define (if-string)
+      (if "str" 1 2))
 
     (define (if-true-expression)
       (set! x 1)

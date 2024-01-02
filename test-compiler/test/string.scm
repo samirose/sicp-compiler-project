@@ -39,4 +39,12 @@
  "string=? evaluates to false for two literal strings with different length"
  #f (string=?-literal-strings-with-different-length))
 
+(compiler-test-error
+ "string=? expectes a string as its first argument"
+ (string=?-expects-string-first-argument) expected-string)
+
+(compiler-test-error
+ "string=? expectes a string as its second argument"
+ (string=?-expects-string-second-argument) expected-string)
+
 (compiler-test-end "string")

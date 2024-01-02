@@ -8,6 +8,22 @@
  1 (if-true))
 
 (compiler-test-eq
+ "if with literal number test evaluates to the consequent"
+ 1 (if-number))
+
+(compiler-test-eq
+ "if with procedure test evaluates to the consequent"
+ 1 (if-procedure))
+
+(compiler-test-eq
+ "if with literal symbol test evaluates to the consequent"
+ 1 (if-symbol))
+
+(compiler-test-eq
+ "if with literal string test evaluates to the consequent"
+ 1 (if-string))
+
+(compiler-test-eq
  "if with test evaluating to true evaluates to the consequent"
  1 (if-true-expression))
 

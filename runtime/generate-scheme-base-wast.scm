@@ -188,10 +188,6 @@
     ;; error-code is initially no error
     (assert_return (invoke "get-error-code") (i32.const ,error-no-error))
 
-    ;; raise-error sets error code and traps
-    (assert_trap (invoke "raise-error" (i32.const 99)) "unreachable")
-    (assert_return (invoke "get-error-code") (i32.const 99))
-
     ;; Converting a non-fixnum with fixnum->i32 causes a trap and error-code being set
     (assert_trap (invoke "fixnum->i32" (i32.const 0)) "unreachable")
     (assert_return (invoke "get-error-code") (i32.const ,error-expected-number))

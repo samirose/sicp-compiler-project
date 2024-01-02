@@ -17,6 +17,7 @@
    error-expected-number
    error-expected-procedure
    error-expected-string
+   error-expected-symbol
    symbol->error)
 
   (import

@@ -19,6 +19,7 @@
   (import "scheme base" "symbol=?" (func (;14;) (param i32 i32) (result i32)))
   (import "scheme base" "string=?" (func (;15;) (param i32 i32) (result i32)))
   (import "scheme base" "eq?" (func (;16;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;17;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
@@ -28,7 +29,7 @@
   (global (;6;) i32 (i32.const 98))
   (global (;7;) i32 (i32.const 114))
   (global (;8;) i32 (i32.const 130))
-  (global (;9;) (mut i32) (i32.const 46))
+  (global (;9;) i32 (i32.const 146))
   (global (;10;) (mut i32) (i32.const 46))
   (global (;11;) (mut i32) (i32.const 46))
   (global (;12;) (mut i32) (i32.const 46))
@@ -36,14 +37,15 @@
   (global (;14;) (mut i32) (i32.const 46))
   (global (;15;) (mut i32) (i32.const 46))
   (global (;16;) (mut i32) (i32.const 46))
-  (func (;17;) (type 0) (result i32)
-    i32.const 6)
+  (global (;17;) (mut i32) (i32.const 46))
   (func (;18;) (type 0) (result i32)
     i32.const 6)
   (func (;19;) (type 0) (result i32)
+    i32.const 6)
+  (func (;20;) (type 0) (result i32)
     i32.const 42
     call 1)
-  (func (;20;) (type 0) (result i32)
+  (func (;21;) (type 0) (result i32)
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
@@ -58,7 +60,7 @@
       local.set 0
     end
     local.get 0)
-  (func (;21;) (type 0) (result i32)
+  (func (;22;) (type 0) (result i32)
     (local i32 i32)
     block  ;; label = @1
       block  ;; label = @2
@@ -95,7 +97,7 @@
     else
       i32.const 6
     end)
-  (func (;22;) (type 1) (param i32) (result i32)
+  (func (;23;) (type 1) (param i32) (result i32)
     local.get 0
     call 7
     if (result i32)  ;; label = @1
@@ -103,12 +105,12 @@
     else
       i32.const 6
     end)
-  (func (;23;) (type 0) (result i32)
+  (func (;24;) (type 0) (result i32)
     (local i32 i32)
     block  ;; label = @1
       block  ;; label = @2
         i32.const 6
-        i32.const 14
+        i32.const 15
         call_indirect (type 1)
         local.tee 0
         call 7
@@ -138,7 +140,7 @@
       local.set 0
     end
     local.get 0)
-  (func (;24;) (type 0) (result i32)
+  (func (;25;) (type 0) (result i32)
     (local i32 i32)
     i32.const 0
     call 1
@@ -186,7 +188,7 @@
     else
       i32.const 6
     end)
-  (func (;25;) (type 0) (result i32)
+  (func (;26;) (type 0) (result i32)
     (local i32 i32)
     i32.const 0
     call 1
@@ -221,10 +223,7 @@
     local.get 1
     drop
     local.get 0)
-  (func (;26;)
-    i32.const 9
-    call 8
-    global.set 9
+  (func (;27;)
     i32.const 10
     call 8
     global.set 10
@@ -237,7 +236,7 @@
     i32.const 13
     call 8
     global.set 13
-    i32.const 15
+    i32.const 14
     call 8
     global.set 14
     i32.const 16
@@ -246,18 +245,21 @@
     i32.const 17
     call 8
     global.set 16
+    i32.const 18
+    call 8
+    global.set 17
     i32.const 30
     drop)
-  (table (;0;) 18 funcref)
-  (export "empty-or-is-false" (func 17))
-  (export "or-one-false-is-false" (func 18))
-  (export "or-one-non-false-value-is-value" (func 19))
-  (export "or-two-non-falses-is-first-value" (func 20))
-  (export "or-any-non-false-is-non-false" (func 21))
-  (export "or-with-complex-expressions" (func 23))
-  (export "or-evaluates-expressions-from-left-to-right" (func 24))
-  (export "or-true-short-circuits-to-true" (func 25))
-  (start 26)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25)
+  (table (;0;) 19 funcref)
+  (export "empty-or-is-false" (func 18))
+  (export "or-one-false-is-false" (func 19))
+  (export "or-one-non-false-value-is-value" (func 20))
+  (export "or-two-non-falses-is-first-value" (func 21))
+  (export "or-any-non-false-is-non-false" (func 22))
+  (export "or-with-complex-expressions" (func 24))
+  (export "or-evaluates-expressions-from-left-to-right" (func 25))
+  (export "or-true-short-circuits-to-true" (func 26))
+  (start 27)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26)
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

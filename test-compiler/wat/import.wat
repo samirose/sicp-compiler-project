@@ -18,6 +18,7 @@
   (import "scheme base" "symbol=?" (func (;14;) (param i32 i32) (result i32)))
   (import "scheme base" "string=?" (func (;15;) (param i32 i32) (result i32)))
   (import "scheme base" "eq?" (func (;16;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;17;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
@@ -27,21 +28,22 @@
   (global (;6;) i32 (i32.const 98))
   (global (;7;) i32 (i32.const 114))
   (global (;8;) i32 (i32.const 130))
-  (global (;9;) (mut i32) (i32.const 46))
-  (func (;17;) (type 0) (param i32) (result i32)
+  (global (;9;) i32 (i32.const 146))
+  (global (;10;) (mut i32) (i32.const 46))
+  (func (;18;) (type 0) (param i32) (result i32)
     i32.const 42
     call 1)
-  (func (;18;)
-    i32.const 9
+  (func (;19;)
+    i32.const 10
     call 8
-    global.set 9
+    global.set 10
     i32.const 30
     drop)
-  (table (;0;) 10 funcref)
+  (table (;0;) 11 funcref)
   (export "zero?" (func 5))
-  (export "number?" (func 17))
-  (start 18)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17)
+  (export "number?" (func 18))
+  (start 19)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18)
   (type (;1;) (func (result i32)))
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

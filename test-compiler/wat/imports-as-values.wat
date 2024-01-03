@@ -20,6 +20,7 @@
   (import "scheme base" "symbol=?" (func (;14;) (param i32 i32) (result i32)))
   (import "scheme base" "string=?" (func (;15;) (param i32 i32) (result i32)))
   (import "scheme base" "eq?" (func (;16;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;17;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
@@ -29,35 +30,33 @@
   (global (;6;) i32 (i32.const 98))
   (global (;7;) i32 (i32.const 114))
   (global (;8;) i32 (i32.const 130))
-  (global (;9;) (mut i32) (i32.const 46))
+  (global (;9;) i32 (i32.const 146))
   (global (;10;) (mut i32) (i32.const 46))
   (global (;11;) (mut i32) (i32.const 46))
   (global (;12;) (mut i32) (i32.const 46))
-  (func (;17;) (type 0) (result i32)
+  (global (;13;) (mut i32) (i32.const 46))
+  (func (;18;) (type 0) (result i32)
     global.get 0)
-  (func (;18;) (type 2) (param i32 i32) (result i32)
+  (func (;19;) (type 2) (param i32 i32) (result i32)
     local.get 1
     local.get 0
     call 9
     call_indirect (type 1))
-  (func (;19;) (type 0) (result i32)
-    global.get 9
+  (func (;20;) (type 0) (result i32)
+    global.get 10
     call 9
     call_indirect (type 0)
     global.get 3
     call 9
     call_indirect (type 1))
-  (func (;20;) (type 1) (param i32) (result i32)
+  (func (;21;) (type 1) (param i32) (result i32)
     local.get 0
-    global.get 9
+    global.get 10
     call 9
     call_indirect (type 0)
     call 9
     call_indirect (type 1))
-  (func (;21;)
-    i32.const 9
-    call 8
-    global.set 9
+  (func (;22;)
     i32.const 10
     call 8
     global.set 10
@@ -67,11 +66,14 @@
     i32.const 12
     call 8
     global.set 12
+    i32.const 13
+    call 8
+    global.set 13
     i32.const 30
     drop)
-  (table (;0;) 13 funcref)
-  (export "imported-procedure-value-is-procedure" (func 19))
-  (export "apply-number?-as-value" (func 20))
-  (start 21)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20)
+  (table (;0;) 14 funcref)
+  (export "imported-procedure-value-is-procedure" (func 20))
+  (export "apply-number?-as-value" (func 21))
+  (start 22)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21)
   (type (;3;) (func)))

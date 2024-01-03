@@ -19,6 +19,7 @@
   (import "scheme base" "symbol=?" (func (;14;) (param i32 i32) (result i32)))
   (import "scheme base" "string=?" (func (;15;) (param i32 i32) (result i32)))
   (import "scheme base" "eq?" (func (;16;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;17;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
@@ -28,14 +29,15 @@
   (global (;6;) i32 (i32.const 98))
   (global (;7;) i32 (i32.const 114))
   (global (;8;) i32 (i32.const 130))
-  (global (;9;) (mut i32) (i32.const 46))
+  (global (;9;) i32 (i32.const 146))
   (global (;10;) (mut i32) (i32.const 46))
   (global (;11;) (mut i32) (i32.const 46))
   (global (;12;) (mut i32) (i32.const 46))
   (global (;13;) (mut i32) (i32.const 46))
   (global (;14;) (mut i32) (i32.const 46))
   (global (;15;) (mut i32) (i32.const 46))
-  (func (;17;) (type 0) (result i32)
+  (global (;16;) (mut i32) (i32.const 46))
+  (func (;18;) (type 0) (result i32)
     (local i32)
     i32.const 40
     i32.const 2
@@ -43,25 +45,25 @@
     call 1
     local.set 0
     local.get 0)
-  (func (;18;) (type 1) (param i32) (result i32)
+  (func (;19;) (type 1) (param i32) (result i32)
     local.get 0
     call 3
     i32.const 1
     i32.add
     call 1)
-  (func (;19;) (type 0) (result i32)
+  (func (;20;) (type 0) (result i32)
     (local i32)
     i32.const 42
     call 1
     local.set 0
     local.get 0)
-  (func (;20;) (type 1) (param i32) (result i32)
+  (func (;21;) (type 1) (param i32) (result i32)
     local.get 0
     call 3
     i32.const 1
     i32.add
     call 1)
-  (func (;21;) (type 0) (result i32)
+  (func (;22;) (type 0) (result i32)
     (local i32)
     i32.const 40
     i32.const 2
@@ -69,13 +71,13 @@
     call 1
     local.set 0
     local.get 0)
-  (func (;22;) (type 1) (param i32) (result i32)
+  (func (;23;) (type 1) (param i32) (result i32)
     local.get 0
     call 3
     i32.const 1
     i32.add
     call 1)
-  (func (;23;) (type 0) (result i32)
+  (func (;24;) (type 0) (result i32)
     (local i32 i32)
     i32.const 40
     call 1
@@ -89,10 +91,7 @@
     call 3
     i32.add
     call 1)
-  (func (;24;)
-    i32.const 9
-    call 8
-    global.set 9
+  (func (;25;)
     i32.const 10
     call 8
     global.set 10
@@ -111,17 +110,20 @@
     i32.const 15
     call 8
     global.set 15
+    i32.const 16
+    call 8
+    global.set 16
     i32.const 30
     drop)
-  (table (;0;) 16 funcref)
-  (export "override-quote-let" (func 17))
-  (export "override-quote-arg" (func 18))
-  (export "override-define-let" (func 19))
-  (export "override-define-arg" (func 20))
-  (export "override-lambda-let" (func 21))
-  (export "override-lambda-arg" (func 22))
-  (export "override-special-symbols-let*" (func 23))
-  (start 24)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23)
+  (table (;0;) 17 funcref)
+  (export "override-quote-let" (func 18))
+  (export "override-quote-arg" (func 19))
+  (export "override-define-let" (func 20))
+  (export "override-define-arg" (func 21))
+  (export "override-lambda-let" (func 22))
+  (export "override-lambda-arg" (func 23))
+  (export "override-special-symbols-let*" (func 24))
+  (start 25)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24)
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func)))

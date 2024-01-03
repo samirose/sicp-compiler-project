@@ -19,6 +19,7 @@
   (import "scheme base" "symbol=?" (func (;14;) (param i32 i32) (result i32)))
   (import "scheme base" "string=?" (func (;15;) (param i32 i32) (result i32)))
   (import "scheme base" "eq?" (func (;16;) (param i32 i32) (result i32)))
+  (import "scheme base" "eq?" (func (;17;) (param i32 i32) (result i32)))
   (global (;0;) i32 (i32.const 2))
   (global (;1;) i32 (i32.const 18))
   (global (;2;) i32 (i32.const 34))
@@ -28,11 +29,12 @@
   (global (;6;) i32 (i32.const 98))
   (global (;7;) i32 (i32.const 114))
   (global (;8;) i32 (i32.const 130))
-  (global (;9;) (mut i32) (i32.const 46))
+  (global (;9;) i32 (i32.const 146))
   (global (;10;) (mut i32) (i32.const 46))
   (global (;11;) (mut i32) (i32.const 46))
   (global (;12;) (mut i32) (i32.const 46))
-  (func (;17;) (type 0) (param i32 i32 i32) (result i32)
+  (global (;13;) (mut i32) (i32.const 46))
+  (func (;18;) (type 0) (param i32 i32 i32) (result i32)
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
@@ -71,7 +73,7 @@
           call 3
           i32.mul
           call 1
-          global.get 9
+          global.get 10
           call 9
           call_indirect (type 0)
           br 2 (;@1;)
@@ -85,18 +87,18 @@
       call 3
       i32.div_s
       call 1
-      global.get 9
+      global.get 10
       call 9
       call_indirect (type 0)
     end)
-  (func (;18;) (type 1) (param i32 i32) (result i32)
+  (func (;19;) (type 1) (param i32 i32) (result i32)
     local.get 0
     local.get 1
     local.get 1
-    global.get 9
+    global.get 10
     call 9
     call_indirect (type 0))
-  (func (;19;) (type 1) (param i32 i32) (result i32)
+  (func (;20;) (type 1) (param i32 i32) (result i32)
     local.get 1
     call 2
     i32.const 0
@@ -108,14 +110,14 @@
       local.get 1
       local.get 0
       local.get 1
-      global.get 10
-      call 9
-      call_indirect (type 1)
       global.get 11
       call 9
       call_indirect (type 1)
+      global.get 12
+      call 9
+      call_indirect (type 1)
     end)
-  (func (;20;) (type 1) (param i32 i32) (result i32)
+  (func (;21;) (type 1) (param i32 i32) (result i32)
     (local i32 i32)
     local.get 0
     call 2
@@ -149,13 +151,10 @@
     local.set 3
     local.get 2
     local.get 3
-    global.get 11
+    global.get 12
     call 9
     call_indirect (type 1))
-  (func (;21;)
-    i32.const 9
-    call 8
-    global.set 9
+  (func (;22;)
     i32.const 10
     call 8
     global.set 10
@@ -165,12 +164,15 @@
     i32.const 12
     call 8
     global.set 12
+    i32.const 13
+    call 8
+    global.set 13
     i32.const 30
     drop)
-  (table (;0;) 13 funcref)
-  (export "gcd-test" (func 20))
-  (start 21)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20)
+  (table (;0;) 14 funcref)
+  (export "gcd-test" (func 21))
+  (start 22)
+  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21)
   (type (;2;) (func (result i32)))
   (type (;3;) (func (param i32) (result i32)))
   (type (;4;) (func)))

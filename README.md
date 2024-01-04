@@ -74,6 +74,7 @@ as my main machine.)
 * Add bit tagged typing to values and type predicates: `number?`, `boolean?`, `procedure?` and uninitialized and unspecified values and add type checking to generated code.
 * Literal symbols
 * Literal strings
+* eqv? implementation for supported types (6.1 [[R7RS][r7rs]]). Equivalent to eq? with the currently supported types.
 
 ## Features currently under work
 
@@ -82,9 +83,8 @@ as my main machine.)
 of over- or underflow
 
 ## Backlog
-* Implement eqv? for currently implemented types (6.1 [[R7RS][r7rs]])
-* Implement support for programs (5.1 [[R7RS][r7rs]])
 * Implement basic output facility with WASI (6.13.3 [[R7RS][r7rs]])
+* Implement support for programs (5.1 [[R7RS][r7rs]])
 * Add run-time support for rudimentary heap-based values: vectors, pairs
 * Implement simple garbage collection using [SICP section 5.3](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-33.html#%_sec_5.3) as a guideline in WAT
 * Implement lexical [closures](https://en.wikipedia.org/wiki/Closure_(computer_programming)) with function activation records as vector lists on the heap

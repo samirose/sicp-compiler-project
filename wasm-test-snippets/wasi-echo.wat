@@ -79,7 +79,7 @@
             (block $writecomplete
               (i32.load (i32.const 0x1c))
               local.tee $bytes_written
-              local.get $bytes_read
+              (i32.load (i32.const 0x18))
               i32.eq
               br_if $writecomplete
               ;; not all was written, update write iovec and write again

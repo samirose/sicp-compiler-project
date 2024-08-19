@@ -146,32 +146,27 @@
            (list 'runtime-index library name definition-index)))))
 
   (define (compile-runtime-call program library name)
-    (let ((index (lookup-runtime-index program library name)))
-      (if index
-          (compiled-program-append-value-code
-           program
-           `(call ,index))
-          (let* ((code-table (or (runtime-library-table library)
-                                 (raise-compilation-error "Unknown library" library)))
-                 (entry (or (runtime-library-table-entry code-table name)
-                            (raise-compilation-error "Unknown procedure" (list library name))))
-                 (dependencies (definition-dependencies code-table entry))
-                 (program
-                  (fold (lambda (e p)
-                          (add-runtime-definition
-                           p
-                           library
-                           (runtime-entry-name e)
-                           ((runtime-entry-definition-generator e)
-                            (lambda (n) (lookup-runtime-index p library n)))))
-                        program
-                        dependencies)))
-            (add-runtime-definition
+    (let emit ((program program))
+      (let ((index (lookup-runtime-index program library name)))
+        (if index
+            (compiled-program-append-value-code
              program
-             library
-             name
-             ((runtime-entry-definition-generator entry)
-              (lambda (n) (lookup-runtime-index program library n))))))))
+             `(call ,index))
+            (emit
+             (let* ((code-table (or (runtime-library-table library)
+                                    (raise-compilation-error "Unknown library" library)))
+                    (entry (or (runtime-library-table-entry code-table name)
+                               (raise-compilation-error "Unknown procedure" (list library name))))
+                    (dependencies (definition-dependencies code-table entry)))
+               (fold (lambda (e p)
+                       (add-runtime-definition
+                        p
+                        library
+                        (runtime-entry-name e)
+                        ((runtime-entry-definition-generator e)
+                         (lambda (n) (lookup-runtime-index p library n)))))
+                     program
+                     (append dependencies (list entry)))))))))
 
   )
 ;;)

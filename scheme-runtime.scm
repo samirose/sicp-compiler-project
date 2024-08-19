@@ -53,7 +53,6 @@
                  i32.const ,error-expected-number
                  call ,(runtime-index '$raise-error)
                  end)))
-
       ($fixnum->i32
        #f
        ,(lambda (runtime-index)
@@ -80,6 +79,37 @@
                  i32.const ,false-value
                  i32.eq
                  select)))
+      ($funcidx->procedure
+       #f
+       ,(lambda (runtime-index)
+          `(func (param $funcidx i32) (result i32)
+                 local.get $funcidx
+                 i32.const ,immediate-shift
+                 i32.shl
+                 i32.const ,procedure-tag
+                 i32.or)))
+      ($check-procedure
+       #f
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 local.get $obj
+                 i32.const ,immediate-mask
+                 i32.and
+                 i32.const ,procedure-tag
+                 i32.ne
+                 if
+                 i32.const ,error-expected-procedure
+                 call ,(runtime-index '$raise-error)
+                 end)))
+      ($procedure->funcidx
+       #f
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 call ,(runtime-index '$check-procedure)
+                 i32.const ,immediate-shift
+                 i32.shr_u)))
       ))
 
   (define runtime-libraries-table

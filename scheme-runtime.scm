@@ -10,6 +10,20 @@
         (compilation-error))
 
 (begin
+  (define macro-is-not-heap-obj
+    `(i32.const ,immediate-value-mask
+      i32.and))
+
+  (define macro-is-heap-obj
+    `(,@macro-is-not-heap-obj
+      i32.eqz))
+
+  (define (macro-is-heap-obj-type heap-obj-type)
+    `(i32.const ,heap-object-type-mask
+      i32.and
+      i32.const ,heap-obj-type
+      i32.eq))
+
   (define scheme-base-code-table
     `(($error-code
        #f
@@ -110,6 +124,78 @@
                  call ,(runtime-index '$check-procedure)
                  i32.const ,immediate-shift
                  i32.shr_u)))
+      ($boolean?
+       boolean?
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 i32.const ,immediate-mask
+                 i32.and
+                 i32.const ,boolean-tag
+                 i32.eq
+                 call ,(runtime-index '$i32->boolean))))
+      ($number?
+       number?
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 i32.const ,fixnum-mask
+                 i32.and
+                 call ,(runtime-index '$i32->boolean))))
+      ($zero?
+       zero?
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 call ,(runtime-index '$fixnum->i32)
+                 i32.eqz
+                 call ,(runtime-index '$i32->boolean))))
+      ($procedure?
+       procedure?
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 i32.const ,immediate-mask
+                 i32.and
+                 i32.const ,procedure-tag
+                 i32.eq
+                 call ,(runtime-index '$i32->boolean))))
+      ($symbol?
+       symbol?
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 ,@macro-is-heap-obj
+                 if (result i32)
+                   local.get $obj
+                   i32.load
+                   ,@(macro-is-heap-obj-type heap-object-type-symbol)
+                   call ,(runtime-index '$i32->boolean)
+                 else
+                   i32.const ,false-value
+                 end)))
+      ($string?
+       string?
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 ,@macro-is-heap-obj
+                 if (result i32)
+                   local.get $obj
+                   i32.load
+                   ,@(macro-is-heap-obj-type heap-object-type-string)
+                   call ,(runtime-index '$i32->boolean)
+                 else
+                   i32.const ,false-value
+                 end)))
+      ($eq?
+       eq?
+       (lambda (runtime-index)
+         `(func (export "eq?") (param $obj1 i32) (param $obj2 i32) (result i32)
+                local.get $obj1
+                local.get $obj2
+                i32.eq
+                call ,(runtime-index '$i32->boolean))))
       ))
 
   (define runtime-libraries-table

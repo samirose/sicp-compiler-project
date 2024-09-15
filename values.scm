@@ -1,6 +1,7 @@
 (define-library (values)
 
   (export
+   i32-size
    fixnum-mask fixnum-shift fixnum-max fixnum-min
    immediate-value-mask immediate-mask immediate-shift
    procedure-tag
@@ -9,8 +10,9 @@
    number->fixnum-value
    boolean->boolean-value
    funcidx->procedure-value
-   heap-object-type-mask heap-object-size-mask
+   heap-object-type-mask heap-object-size-mask heap-object-header-size
    heap-object-type-symbol heap-object-type-string
+   macro-align-heap-address
    symbol-literal-header string-literal-header
    error-no-error
    error-uninitialized
@@ -25,6 +27,8 @@
    (srfi srfi-60))
 
   (begin
+    (define i32-size 4) ; bytes
+
     ;; fixnums are encoded with least signigicant bit set
     (define fixnum-mask #x00000001)     ; ..00000001
     (define fixnum-shift 1)
@@ -32,7 +36,7 @@
     (define fixnum-min (- (+ fixnum-max 1)))
 
     ;; Other immediate value types are encoded in the least significant 4 bits
-    ;; Note that the least significant two bits need to non-zero for all immediate type tags to
+    ;; Note that the least significant two bits need to be non-zero for all immediate type tags to
     ;; enable detecting 32-bit aligned pointers from immediates.
     (define immediate-value-mask #x00000003) ; ...00000011
     (define immediate-mask       #x0000000f) ; ...00001111
@@ -68,6 +72,7 @@
     (define heap-object-type-string #x02000000) ; 000100100...
     (define heap-object-size-mask   #x00ffffff) ; 001...
     (define heap-object-max-size heap-object-size-mask)
+    (define heap-object-header-size i32-size)
 
     (define (symbol-literal-header length)
       (if (<= length heap-object-max-size)
@@ -78,6 +83,12 @@
       (if (<= length heap-object-max-size)
           (bitwise-ior heap-object-type-string length)
           (error "Too large string length" length)))
+
+    (define (macro-align-heap-address)
+      '(i32.const 3
+        i32.add
+        i32.const 2
+        i32.shr_u))
 
     (define error-no-error 0)
     (define error-uninitialized 1)

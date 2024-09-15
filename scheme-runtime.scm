@@ -190,12 +190,158 @@
                  end)))
       ($eq?
        eq?
-       (lambda (runtime-index)
-         `(func (export "eq?") (param $obj1 i32) (param $obj2 i32) (result i32)
-                local.get $obj1
-                local.get $obj2
-                i32.eq
-                call ,(runtime-index '$i32->boolean))))
+       ,(lambda (runtime-index)
+          `(func (param $obj1 i32) (param $obj2 i32) (result i32)
+                 local.get $obj1
+                 local.get $obj2
+                 i32.eq
+                 call ,(runtime-index '$i32->boolean))))
+      ($symbol=?
+       symbol=?
+       ,(lambda (runtime-index)
+          `(func (param $s1 i32) (param $s2 i32) (result i32)
+                 local.get $s1
+                 call ,(runtime-index '$check-symbol-type)
+                 local.get $s2
+                 call ,(runtime-index '$check-symbol-type)
+                 i32.eq
+                 call ,(runtime-index '$i32->boolean))))
+      ($string=?
+       string=?
+       ,(lambda (runtime-index)
+          `(func (param $s1 i32) (param $s2 i32) (result i32)
+                 (local $len i32)
+                 local.get $s1
+                 call ,(runtime-index '$check-string)
+                 i32.const ,heap-object-size-mask
+                 i32.and
+                 local.tee $len
+                 local.get $s2
+                 call ,(runtime-index '$check-string)
+                 i32.const ,heap-object-size-mask
+                 i32.and
+                 i32.eq
+                 if (result i32)
+                   local.get $s1
+                   i32.const ,heap-object-header-size
+                   i32.add
+                   local.get $s2
+                   i32.const ,heap-object-header-size
+                   i32.add
+                   local.get $len
+                   ,@(macro-align-heap-address)
+                   call ,(runtime-index '$equal-words)
+                   call ,(runtime-index '$i32->boolean)
+                 else
+                   i32.const ,false-value
+                 end)))
+      ($check-symbol-type
+       #f
+       ,(lambda (runtime-index)
+          ;; Returns $obj if it is of symbol type.
+          ;; Raises error-expected-symbol otherwise.
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 i32.const ,heap-object-type-symbol
+                 i32.const ,error-expected-symbol
+                 call ,(runtime-index '$check-heap-obj-type))))
+      ($check-string
+       #f
+       ,(lambda (runtime-index)
+          ;; Returns heap object header pointed by $obj if it is a heap object of type string.
+          ;; Raises error-expected-string otherwise.
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 i32.const ,heap-object-type-string
+                 i32.const ,error-expected-string
+                 call ,(runtime-index '$check-heap-obj))))
+      ($check-heap-obj-type
+       #f
+       ,(lambda (runtime-index)
+          ;; Checks that $obj is a heap object of type $type.
+          ;; Returns $obj on success or raises error $error.
+          `(func (param $obj i32)
+                 (param $type i32)
+                 (param $error i32)
+                 (result i32)
+                 block $error
+                   local.get $obj
+                   ,@macro-is-not-heap-obj
+                   br_if $error
+                   local.get $obj
+                   i32.load
+                   i32.const ,heap-object-type-mask
+                   i32.and
+                   local.get $type
+                   i32.ne
+                   br_if $error
+                   local.get $obj
+                   return
+                 end
+                 local.get $error
+                 call ,(runtime-index '$raise-error))))
+      ($check-heap-obj
+       #f
+       ,(lambda (runtime-index)
+          ;; Checks that $obj is a heap object of type $type.
+          ;; Returns the header of the heap object on success or raises $error.
+          `(func (param $obj i32)
+                 (param $type i32)
+                 (param $error i32)
+                 (result i32)
+                 (local $heap-obj i32)
+                 block $error
+                   local.get $obj
+                   ,@macro-is-not-heap-obj
+                   br_if $error
+                   local.get $obj
+                   i32.load
+                   local.tee $heap-obj
+                   i32.const ,heap-object-type-mask
+                   i32.and
+                   local.get $type
+                   i32.ne
+                   br_if $error
+                   local.get $heap-obj
+                   return
+                 end
+                 local.get $error
+                 call ,(runtime-index '$raise-error))))
+      ($equal-words
+       #f
+       ,(lambda (runtime-index)
+          `(func (param $addr1 i32) (param $addr2 i32) (param $n i32) (result i32)
+                 block $equal_contents
+                   block $compare_words
+                     loop $loop
+                       local.get $n
+                       i32.eqz
+                       br_if $compare_words
+                       local.get $addr1
+                       i32.load
+                       local.get $addr1
+                       i32.const ,i32-size
+                       i32.add
+                       local.set $addr1
+                       local.get $addr2
+                       i32.load
+                       local.get $addr2
+                       i32.const ,i32-size
+                       i32.add
+                       local.set $addr2
+                       local.get $n
+                       i32.const 1
+                       i32.sub
+                       local.set $n
+                       i32.eq
+                       br_if $loop
+                       br $equal_contents
+                     end
+                   end
+                   i32.const 1
+                   return
+                 end
+                 i32.const 0)))
       ))
 
   (define runtime-libraries-table

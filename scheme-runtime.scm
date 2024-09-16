@@ -24,6 +24,9 @@
       i32.const ,heap-obj-type
       i32.eq))
 
+  (define scheme-base-definitions
+    '(memory (export "$heap") 1))
+
   (define scheme-base-code-table
     `(($error-code
        #f
@@ -345,10 +348,15 @@
       ))
 
   (define runtime-libraries-table
-    (list (cons '(scheme base) scheme-base-code-table)))
+    (list (list '(scheme base) scheme-base-definitions scheme-base-code-table)))
+
+  (define (runtime-library-definitions library)
+    (cond ((assoc library runtime-libraries-table) => cadr)
+          (else #f)))
 
   (define (runtime-library-table library)
-    (assoc library runtime-libraries-table))
+    (cond ((assoc library runtime-libraries-table) => caddr)
+          (else #f)))
 
   (define (runtime-library-table-entry code-table name)
     (assq name code-table))

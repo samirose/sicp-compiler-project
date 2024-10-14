@@ -7,3 +7,4 @@ build/
 log/
 test-compiler/host-log/
 test-compiler/wast-log/
+.direnv/

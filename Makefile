@@ -1,4 +1,4 @@
-SHELL = /bin/bash
+SHELL = bash
 .SHELLFLAGS = -o pipefail -c
 
 .PHONY : help

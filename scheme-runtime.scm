@@ -127,16 +127,6 @@
                  call ,(runtime-index '$check-procedure)
                  i32.const ,immediate-shift
                  i32.shr_u)))
-      ($boolean?
-       boolean?
-       ,(lambda (runtime-index)
-          `(func (param $obj i32) (result i32)
-                 local.get $obj
-                 i32.const ,immediate-mask
-                 i32.and
-                 i32.const ,boolean-tag
-                 i32.eq
-                 call ,(runtime-index '$i32->boolean))))
       ($number?
        number?
        ,(lambda (runtime-index)
@@ -152,6 +142,16 @@
                  local.get $obj
                  call ,(runtime-index '$fixnum->i32)
                  i32.eqz
+                 call ,(runtime-index '$i32->boolean))))
+      ($boolean?
+       boolean?
+       ,(lambda (runtime-index)
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 i32.const ,immediate-mask
+                 i32.and
+                 i32.const ,boolean-tag
+                 i32.eq
                  call ,(runtime-index '$i32->boolean))))
       ($procedure?
        procedure?
@@ -199,65 +199,6 @@
                  local.get $obj2
                  i32.eq
                  call ,(runtime-index '$i32->boolean))))
-      ($symbol=?
-       symbol=?
-       ,(lambda (runtime-index)
-          `(func (param $s1 i32) (param $s2 i32) (result i32)
-                 local.get $s1
-                 call ,(runtime-index '$check-symbol-type)
-                 local.get $s2
-                 call ,(runtime-index '$check-symbol-type)
-                 i32.eq
-                 call ,(runtime-index '$i32->boolean))))
-      ($string=?
-       string=?
-       ,(lambda (runtime-index)
-          `(func (param $s1 i32) (param $s2 i32) (result i32)
-                 (local $len i32)
-                 local.get $s1
-                 call ,(runtime-index '$check-string)
-                 i32.const ,heap-object-size-mask
-                 i32.and
-                 local.tee $len
-                 local.get $s2
-                 call ,(runtime-index '$check-string)
-                 i32.const ,heap-object-size-mask
-                 i32.and
-                 i32.eq
-                 if (result i32)
-                   local.get $s1
-                   i32.const ,heap-object-header-size
-                   i32.add
-                   local.get $s2
-                   i32.const ,heap-object-header-size
-                   i32.add
-                   local.get $len
-                   ,@(macro-align-heap-address)
-                   call ,(runtime-index '$equal-words)
-                   call ,(runtime-index '$i32->boolean)
-                 else
-                   i32.const ,false-value
-                 end)))
-      ($check-symbol-type
-       #f
-       ,(lambda (runtime-index)
-          ;; Returns $obj if it is of symbol type.
-          ;; Raises error-expected-symbol otherwise.
-          `(func (param $obj i32) (result i32)
-                 local.get $obj
-                 i32.const ,heap-object-type-symbol
-                 i32.const ,error-expected-symbol
-                 call ,(runtime-index '$check-heap-obj-type))))
-      ($check-string
-       #f
-       ,(lambda (runtime-index)
-          ;; Returns heap object header pointed by $obj if it is a heap object of type string.
-          ;; Raises error-expected-string otherwise.
-          `(func (param $obj i32) (result i32)
-                 local.get $obj
-                 i32.const ,heap-object-type-string
-                 i32.const ,error-expected-string
-                 call ,(runtime-index '$check-heap-obj))))
       ($check-heap-obj-type
        #f
        ,(lambda (runtime-index)
@@ -283,6 +224,26 @@
                  end
                  local.get $error
                  call ,(runtime-index '$raise-error))))
+      ($check-symbol-type
+       #f
+       ,(lambda (runtime-index)
+          ;; Returns $obj if it is of symbol type.
+          ;; Raises error-expected-symbol otherwise.
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 i32.const ,heap-object-type-symbol
+                 i32.const ,error-expected-symbol
+                 call ,(runtime-index '$check-heap-obj-type))))
+      ($symbol=?
+       symbol=?
+       ,(lambda (runtime-index)
+          `(func (param $s1 i32) (param $s2 i32) (result i32)
+                 local.get $s1
+                 call ,(runtime-index '$check-symbol-type)
+                 local.get $s2
+                 call ,(runtime-index '$check-symbol-type)
+                 i32.eq
+                 call ,(runtime-index '$i32->boolean))))
       ($check-heap-obj
        #f
        ,(lambda (runtime-index)
@@ -310,6 +271,16 @@
                  end
                  local.get $error
                  call ,(runtime-index '$raise-error))))
+      ($check-string
+       #f
+       ,(lambda (runtime-index)
+          ;; Returns heap object header pointed by $obj if it is a heap object of type string.
+          ;; Raises error-expected-string otherwise.
+          `(func (param $obj i32) (result i32)
+                 local.get $obj
+                 i32.const ,heap-object-type-string
+                 i32.const ,error-expected-string
+                 call ,(runtime-index '$check-heap-obj))))
       ($equal-words
        #f
        ,(lambda (runtime-index)
@@ -345,6 +316,35 @@
                    return
                  end
                  i32.const 0)))
+      ($string=?
+       string=?
+       ,(lambda (runtime-index)
+          `(func (param $s1 i32) (param $s2 i32) (result i32)
+                 (local $len i32)
+                 local.get $s1
+                 call ,(runtime-index '$check-string)
+                 i32.const ,heap-object-size-mask
+                 i32.and
+                 local.tee $len
+                 local.get $s2
+                 call ,(runtime-index '$check-string)
+                 i32.const ,heap-object-size-mask
+                 i32.and
+                 i32.eq
+                 if (result i32)
+                   local.get $s1
+                   i32.const ,heap-object-header-size
+                   i32.add
+                   local.get $s2
+                   i32.const ,heap-object-header-size
+                   i32.add
+                   local.get $len
+                   ,@(macro-align-heap-address)
+                   call ,(runtime-index '$equal-words)
+                   call ,(runtime-index '$i32->boolean)
+                 else
+                   i32.const ,false-value
+                 end)))
       ))
 
   (define runtime-libraries-table

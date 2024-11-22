@@ -25,7 +25,7 @@
       i32.eq))
 
   (define scheme-base-definitions
-    '(memory (export "$heap") 1))
+    '((memory (export "$heap") 1)))
 
   (define scheme-base-code-table
     `(($error-code
@@ -350,16 +350,17 @@
   (define runtime-libraries-table
     (list (list '(scheme base) scheme-base-definitions scheme-base-code-table)))
 
-  (define (runtime-library-definitions library)
-    (cond ((assoc library runtime-libraries-table) => cadr)
-          (else #f)))
+  (define (runtime-library-entry library)
+    (assoc library runtime-libraries-table))
 
-  (define (runtime-library-table library)
-    (cond ((assoc library runtime-libraries-table) => caddr)
-          (else #f)))
+  (define (runtime-library-definitions library-entry)
+    (cadr library-entry))
 
-  (define (runtime-library-table-entry code-table name)
-    (assq name code-table))
+  (define (runtime-library-table library-entry)
+    (caddr library-entry))
+
+  (define (runtime-library-table-entry library-table name)
+    (assq name library-table))
 
   (define (runtime-entry-name entry)
     (car entry))
@@ -370,24 +371,50 @@
   (define (runtime-entry-definition-generator entry)
     (caddr entry))
 
-  (define (definition-dependencies code-table entry)
-    (let immediate-dependencies ((current-entry entry))
-      (let ((entry-dependencies '()))
-        ((runtime-entry-definition-generator current-entry)
-         (lambda (dependency-name)
-           (cond
-            ((assq dependency-name code-table) =>
-             (lambda (dependency-entry)
-               (unless (memq dependency-entry entry-dependencies)
-                 (set! entry-dependencies (cons dependency-entry entry-dependencies)))))
-            (else (error "Unknown runtime dependency" dependency-name)))))
-        (fold
-         (lambda (dependency-entry dependencies)
-           (if (eq? dependency-entry entry)
-               (error "Dependency cycle detected" entry))
-           (append (immediate-dependencies dependency-entry) dependencies))
-         entry-dependencies
-         entry-dependencies))))
+  (define (compile-runtime-library program library)
+    (let* ((library-entry
+            (cond ((runtime-library-entry library))
+                  (else (error "Unknown runtime library" library))))
+           (program
+            (fold
+             (lambda (definition program)
+               (compiled-program-add-definition
+                program
+                definition))
+             program
+             (runtime-library-definitions library-entry))))
+      (fold
+       (lambda (entry program)
+         (add-runtime-definition
+          program
+          library
+          (runtime-entry-name entry)
+          (runtime-entry-exported-name entry)
+          ((runtime-entry-definition-generator entry)
+           (lambda (name)
+             (lookup-runtime-index program library name)))))
+       program
+       (runtime-library-table library-entry))))
+
+  (define (runtime-exported-names program library)
+    (reverse
+     (fold
+      (lambda (definition names)
+        (let ((properties (cadr definition)))
+          (cond ((not (equal? library (properties-library properties))) false)
+                ((properties-exported-name properties) => (lambda (exported-name)
+                                                            (cons exported-name names)))
+                (else names))))
+      '()
+      (compiled-program-get-definitions program 'runtime-index))))
+
+  (define-record-type runtime-index-properties
+    (make-runtime-index-properties library name exported-name definition-index)
+    runtime-index-properties?
+    (library properties-library)
+    (name properties-name)
+    (exported-name properties-exported-name)
+    (definition-index properties-definition-index))
 
   (define (lookup-runtime-index program library name)
     (cond
@@ -395,11 +422,12 @@
        (compiled-program-module-definitions program)
        (lambda (def)
          (and (eq? (car def) 'runtime-index)
-              (equal? (cadr def) library)
-              (eq? (caddr def) name)))) => cadddr)
+              (equal? library (properties-library (cadr def)))
+              (eq? name (properties-name (cadr def)))))) => (lambda (def)
+                                                              (properties-definition-index (cadr def))))
      (else #f)))
 
-  (define (add-runtime-definition program library name definition)
+  (define (add-runtime-definition program library name exported-name definition)
     (if (lookup-runtime-index program library name)
         program
         (let* ((program
@@ -413,30 +441,9 @@
                     1)))
           (compiled-program-add-definition
            program
-           (list 'runtime-index library name definition-index)))))
-
-  (define (compile-runtime-call program library name)
-    (let emit ((program program))
-      (let ((index (lookup-runtime-index program library name)))
-        (if index
-            (compiled-program-append-value-code
-             program
-             `(call ,index))
-            (emit
-             (let* ((code-table (or (runtime-library-table library)
-                                    (raise-compilation-error "Unknown library" library)))
-                    (entry (or (runtime-library-table-entry code-table name)
-                               (raise-compilation-error "Unknown procedure" (list library name))))
-                    (dependencies (definition-dependencies code-table entry)))
-               (fold (lambda (e p)
-                       (add-runtime-definition
-                        p
-                        library
-                        (runtime-entry-name e)
-                        ((runtime-entry-definition-generator e)
-                         (lambda (n) (lookup-runtime-index p library n)))))
-                     program
-                     (append dependencies (list entry)))))))))
+           (list 'runtime-index
+                 (make-runtime-index-properties
+                  library name exported-name definition-index))))))
 
   )
 ;;)

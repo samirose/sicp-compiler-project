@@ -176,16 +176,16 @@
 
     (define (make-global-lexical-env imported-identifiers defined-variables exports)
       (let ((duplicate-import (first-duplicate (filter symbol? imported-identifiers))))
-	(if (not (null? duplicate-import))
-            (raise-compilation-error "Duplicate imported identifier" (car duplicate-import))))
+	(unless (null? duplicate-import)
+          (raise-compilation-error "Duplicate imported identifier" (car duplicate-import))))
       (let ((duplicate-var (first-duplicate (filter symbol? defined-variables))))
-	(if (not (null? duplicate-var))
-            (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
+	(unless (null? duplicate-var)
+          (raise-compilation-error "Top-level identifier already defined" (car duplicate-var))))
       (let ((variables (append imported-identifiers defined-variables)))
 	(for-each
 	 (lambda (export)
-           (if (not (memq export variables))
-               (raise-compilation-error "No top-level definition for export" export)))
+           (unless (memq export variables)
+             (raise-compilation-error "No top-level definition for export" export)))
 	 exports)
 	(let*
             ((import-variables

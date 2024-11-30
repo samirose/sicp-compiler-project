@@ -115,7 +115,7 @@
 		(let* ((program
 			(compile-sequence non-definitions program lexical-env compile))
                        (global-init-code
-			 (compiled-program-value-code program))
+			(compiled-program-value-code program))
                        (global-init-func-index
 			(compiled-program-definitions-count program 'func)))
 		  (compiled-program-with-definitions-and-value-code

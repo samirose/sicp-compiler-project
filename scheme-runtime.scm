@@ -2,7 +2,8 @@
 
   (export is-runtime-library
           compile-runtime-library
-          runtime-exports)
+          runtime-exports
+          lookup-runtime-index)
 
   (import (scheme base)
           (scheme cxr)
@@ -14,9 +15,13 @@
           (compilation-error))
 
   (begin
+    (define (macro-raise-error runtime-index)
+      `(global.set ,(runtime-index '$error-code)
+        unreachable))
+
     (define macro-is-not-heap-obj
       `(i32.const ,immediate-value-mask
-                  i32.and))
+        i32.and))
 
     (define macro-is-heap-obj
       `(,@macro-is-not-heap-obj
@@ -24,9 +29,9 @@
 
     (define (macro-is-heap-obj-type heap-obj-type)
       `(i32.const ,heap-object-type-mask
-                  i32.and
-                  i32.const ,heap-obj-type
-                  i32.eq))
+        i32.and
+        i32.const ,heap-obj-type
+        i32.eq))
 
     (define scheme-base-definitions
       '((memory (export "$heap") 1)))
@@ -44,13 +49,6 @@
                      global.get ,error-code-index
                      i32.const ,error-no-error
                      global.set ,error-code-index))))
-        ($raise-error
-         #f
-         ,(lambda (runtime-index)
-            `(func (param $error i32)
-                   local.get $error
-                   global.set ,(runtime-index '$error-code)
-                   unreachable)))
         ($i32->fixnum
          #f
          ,(lambda (runtime-index)
@@ -72,7 +70,7 @@
                    i32.ne
                    if
                    i32.const ,error-expected-number
-                   call ,(runtime-index '$raise-error)
+                   ,@(macro-raise-error runtime-index)
                    end)))
         ($fixnum->i32
          #f
@@ -121,7 +119,7 @@
                    i32.ne
                    if
                    i32.const ,error-expected-procedure
-                   call ,(runtime-index '$raise-error)
+                   ,@(macro-raise-error runtime-index)
                    end)))
         ($procedure->funcidx
          #f
@@ -227,7 +225,7 @@
                    return
                    end
                    local.get $error
-                   call ,(runtime-index '$raise-error))))
+                   ,@(macro-raise-error runtime-index))))
         ($check-symbol-type
          #f
          ,(lambda (runtime-index)
@@ -274,7 +272,7 @@
                    return
                    end
                    local.get $error
-                   call ,(runtime-index '$raise-error))))
+                   ,@(macro-raise-error runtime-index))))
         ($check-string
          #f
          ,(lambda (runtime-index)
@@ -379,7 +377,7 @@
     (define (runtime-entry-definition-generator entry)
       (caddr entry))
 
-    (define (compile-runtime-library program library)
+    (define (compile-runtime-library library program)
       (let* ((library-entry
               (cond ((runtime-library-entry library))
                     (else (error "Unknown runtime library" library))))

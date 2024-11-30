@@ -2,26 +2,23 @@
 
 ;; Helper module for testing re-exported import
 (module
-  (import "scheme base" "i32->fixnum"  (func $i32->fixnum  (param i32) (result i32)))
-  (import "scheme base" "fixnum->i32"  (func $fixnum->i32  (param i32) (result i32)))
-  (import "scheme base" "boolean->i32"  (func $boolean->i32 (param i32) (result i32)))
-
   (import "import_scm" "number?" (func $re-exported-number? (param i32) (result i32)))
   (import "import_scm" "zero?" (func $re-exported-zero? (param i32) (result i32)))
 
   (func (export "test-number?") (param $x i32) (result i32)
     local.get $x
-    call $re-exported-number?
-    call $fixnum->i32)
+    call $re-exported-number?)
 
   (func (export "test-zero?") (param $x i32) (result i32)
     local.get $x
-    call $i32->fixnum
-    call $re-exported-zero?
-    call $boolean->i32)
+    call $re-exported-zero?)
 )
 
-(assert_return (invoke "test-number?" (i32.const 0)) (i32.const 42))
+;; i32(1) = fixnum(0), i32(85) = fixnum(42)
+(assert_return (invoke "test-number?" (i32.const 1)) (i32.const 85))
 
-(assert_return (invoke "test-zero?" (i32.const 0)) (i32.const 1))
-(assert_return (invoke "test-zero?" (i32.const 1)) (i32.const 0))
+;; i32(1) = fixnum(0), i32(22) = boolean(#t)
+(assert_return (invoke "test-zero?" (i32.const 1)) (i32.const 22))
+
+;; i32(3) = fixnum(1), i32(6) = boolean(#f)
+(assert_return (invoke "test-zero?" (i32.const 3)) (i32.const 6))

@@ -17,43 +17,6 @@ RUN_COMPILER = $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) dr
 compile : $(COMPILER_BINARIES) ## Compiles a scheme file from standard input and outputs WAT to standard output
 	$(RUN_COMPILER) $<
 
-.PHONY : generate-runtime
-generate-runtime : runtime/scheme-base.wat ## Generates the runtime library WAT
-
-runtime/generate-scheme-base-wat.scm : values.scm
-
-runtime/scheme-base.wat : runtime/generate-scheme-base-wat.scm
-	$(HOST_SCHEME_RUN_PROGRAM) -L . $< | wat-desugar - > $@.tmp \
-	  && mv -f $@.tmp $@
-
-.PHONY : generate-runtime-test
-generate-runtime-test : runtime/test/scheme-base.wast ## Generates the runtime library test script
-
-runtime/test/ :
-	mkdir -p runtime/test
-
-runtime/generate-scheme-base-wast.scm : values.scm
-
-runtime/test/scheme-base.wast : runtime/generate-scheme-base-wast.scm | runtime/test/
-	$(HOST_SCHEME_RUN_PROGRAM) -L . $< > $@.tmp \
-	  && mv -f $@.tmp $@
-
-.PHONY : test-runtime
-test-runtime : runtime/test/test-runtime.log ## Executes tests for the runtime library
-
-runtime/test/test-runtime.log : runtime/test/test-runtime.json | runtime/test/
-	spectest-interp $< | tee $@.tmp \
-	  && mv -f $@.tmp $@
-
-runtime/test/test-runtime.json : runtime/test/test-runtime.wast | runtime/test/
-	wast2json $< -o $@
-
-runtime/test/test-runtime.wast : runtime/scheme-base.wat \
-                                 runtime/register-scheme-base.wast \
-                                 runtime/test/scheme-base.wast \
-                                 | runtime/test/
-	cat $^ > $@
-
 .PHONY : compile-compiler
 compile-compiler : $(COMPILER_BINARIES) ## Compiles the compiler with host scheme
 
@@ -116,8 +79,7 @@ $(COMPILER_TEST_WAST_LOGS) : $(TEST_COMPILER_DIR)wast-log/%.log : $(TEST_COMPILE
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(TEST_COMPILER_DIR)build/%-test.json : $(TEST_COMPILER_DIR)build/test-prelude.wast \
-                                        $(TEST_COMPILER_DIR)build/%.wat \
+$(TEST_COMPILER_DIR)build/%-test.json : $(TEST_COMPILER_DIR)build/%.wat \
                                         $(TEST_COMPILER_DIR)build/%-test.wast \
                                         | $(TEST_COMPILER_DIR)build/
 	cat $^ | wast2json - -o $@.tmp \
@@ -146,17 +108,11 @@ $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPIL
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
 
-$(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/test-prelude.wast \
-                                   $(TEST_COMPILER_DIR)build/%.wat \
+$(TEST_COMPILER_DIR)build/%.json : $(TEST_COMPILER_DIR)build/%.wat \
                                    $(TEST_COMPILER_DIR)wast/%.wast \
                                    | $(TEST_COMPILER_DIR)build/
 	cat $^ | wast2json - -o $@.tmp \
 	  && mv -f $@.tmp $@
-
-$(TEST_COMPILER_DIR)build/test-prelude.wast : runtime/scheme-base.wat \
-                                              runtime/register-scheme-base.wast \
-                                              | $(TEST_COMPILER_DIR)build/
-	cat $^ > $@
 
 $(TEST_COMPILER_DIR)build/%.wat : $(TEST_COMPILER_DIR)%.scm $(COMPILER_BINARIES) | $(TEST_COMPILER_DIR)build/
 	$(RUN_COMPILER) < $< > $@.tmp \
@@ -190,7 +146,7 @@ $(UNIT_TEST_LOGS) : $(UNIT_TEST_BINARIES)
 $(UNIT_TEST_BINARIES) : $(COMPILER_BINARIES)
 
 .PHONY : test
-test : test-runtime test-unit test-compiler-host test-compiler-wast test-compiler-direct ## Executes all tests
+test : test-unit test-compiler-host test-compiler-wast test-compiler-direct ## Executes all tests
 
 .PHONY : clean
 clean : clean-test clean-compiler ## Removes test outputs and forces compiler re-compilation
@@ -202,8 +158,6 @@ clean-compiler : ## Forces compiler re-compilation
 .PHONY : clean-test
 clean-test : ## Removes test build artefacts and results
 	-rm -rf \
-	  runtime/test \
-	  runtime/scheme-base.wat \
 	  $(TEST_UNIT_DIR)log \
 	  $(TEST_UNIT_DIR)compiled \
 	  $(TEST_COMPILER_DIR)build \

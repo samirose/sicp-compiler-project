@@ -45,7 +45,7 @@
          #f
          ,(lambda (runtime-index)
             (let ((error-code-index (runtime-index '$error-code)))
-              `(func (result i32)
+              `(func (export "get-error-code") (result i32)
                      global.get ,error-code-index
                      i32.const ,error-no-error
                      global.set ,error-code-index))))
@@ -201,6 +201,13 @@
                    local.get $obj2
                    i32.eq
                    call ,(runtime-index '$i32->boolean))))
+        ($eqv?
+         eqv?
+         ,(lambda (runtime-index)
+            `(func (param $obj1 i32) (param $obj2 i32) (result i32)
+                   local.get $obj1
+                   local.get $obj2
+                   call ,(runtime-index '$eq?))))
         ($check-heap-obj-type
          #f
          ,(lambda (runtime-index)

@@ -6,7 +6,7 @@
           (lists)
           (scheme-syntax)
           (scheme-r7rs-syntax)
-          (scheme-libraries)
+          (scheme-runtime)
           (compilation-error)
           (lexical-env)
           (compiled-program)
@@ -32,7 +32,6 @@
       (let*
 	  ((imports
             (library-declarations 'import library))
-           (import-definitions (import-definitions imports))
            (exp-sequence
             (if (library-has-declaration? 'begin library)
 		(library-declarations 'begin library)
@@ -47,56 +46,52 @@
              (map definition-variable definitions))
            (exports
             (library-declarations 'export library))
-           (global-imports
-            (filter (lambda (import-def) (eq? (import-type import-def) 'global))
-                    import-definitions))
-           (global-import-bindings
-            (map import-binding global-imports))
-           (func-imports
-            (filter (lambda (import-def) (eq? (import-type import-def) 'func))
-                    import-definitions))
-           (func-import-bindings
-            (filter (lambda (b) b) (map import-binding func-imports)))
-           (import-bindings
-            (append global-import-bindings func-import-bindings))
-           (lexical-env
-            (make-global-lexical-env import-bindings definition-names exports))
+           ;; Compile runtime library functions to program
            (program
-            (compiled-program-with-definitions-and-value-code
+            (fold compile-runtime-library program imports))
+           ;; Extract runtime function bindings from program
+           (runtime-bindings
+            (fold
+             (lambda (library bindings)
+               (append
+                (runtime-exports program library)
+                bindings))
+             '()
+             imports))
+           ;; Add runtime function indices to function table
+           (program
+            (fold
+             (lambda (runtime-binding program)
+               (compiled-program-add-definition
+                program
+                `(elem ,(cdr runtime-binding))))
              program
-             (map import-definition import-definitions)
-             '()))
-           (bound-import-func-definitions
-            (let loop ((func-imports func-imports)
-                       (func-index 0)
-                       (definitions '()))
-              (let ((next
-                     (lambda (definitions)
-                       (loop (cdr func-imports) (+ func-index 1) definitions))))
-		(cond ((null? func-imports) (reverse definitions))
-                      ((import-binding (car func-imports))
-                       => (lambda (binding)
-                            (let ((definitions
-                                    (cons `(elem ,func-index) definitions))
-				  (next
-                                   (lambda (definitions)
-                                     (loop (cdr func-imports) (+ func-index 1) definitions))))
-                              (if (and (memq binding exports) (not (memq binding definition-names)))
-				  (next (cons `(export ,(symbol->string binding) (func ,func-index)) definitions))
-				  (next definitions)))))
-                      (else (next definitions))))))
+             runtime-bindings))
+           (runtime-global-definitions-count
+            (compiled-program-definitions-count program 'global))
+           ;; Add global function values for runtime functions
            (program
-            (compiled-program-with-definitions-and-value-code
-             program
-             bound-import-func-definitions
-             '()))
-           (program
-            (do ((bindings func-import-bindings (cdr bindings))
+            (do ((bindings runtime-bindings (cdr bindings))
                  (elem-index 0 (+ elem-index 1))
                  (program program (compiled-program-add-definition
                                    program
                                    `(global i32 (i32.const ,(funcidx->procedure-value elem-index))))))
                 ((null? bindings) program)))
+           ;; Add export definitions for exported runtime functions
+           (program
+            (fold
+             (lambda (runtime-binding program)
+               (if (and (memq (car runtime-binding) exports)
+                        (not (memq (car runtime-binding) definition-names)))
+                   (compiled-program-add-definition
+                    program
+                    `(export
+                      ,(symbol->string (car runtime-binding))
+                      (func ,(cdr runtime-binding))))
+                   program))
+             program
+             runtime-bindings))
+           ;; Add globals for top-level variables
            (program
             (compiled-program-with-definitions-and-value-code
              program
@@ -104,11 +99,18 @@
 			`(global (mut i32) (i32.const ,uninitialized-value)))
              '()))
            (definitions-init-assignments
-            (map (lambda (definition)
-                   `(set! ,(definition-variable definition) ,(definition-value definition)))
-		 definitions))
+             (map (lambda (definition)
+                    `(set! ,(definition-variable definition) ,(definition-value definition)))
+		  definitions))
            (non-definitions
             (append definitions-init-assignments non-definitions))
+           (lexical-env
+            (make-global-lexical-env
+             (append
+              (make-list runtime-global-definitions-count #f)
+              (map car runtime-bindings))
+             definition-names
+             exports))
            (program
             (if (null? non-definitions)
 		program
@@ -147,27 +149,12 @@
 		`((elem (i32.const 0) func ,@elem-func-indices))))
            (get-module-definitions
             (lambda (type)
-              (compiled-program-get-definitions program type)))
-           (not-import-definition?
-            (lambda (def) (not (wasm-import-definition? def))))
-           (imported-memories
-            (filter wasm-import-definition? (get-module-definitions 'memory)))
-           (imported-globals
-            (filter wasm-import-definition? (get-module-definitions 'global)))
-           (module-globals
-            (filter not-import-definition? (get-module-definitions 'global)))
-           (imported-funcs
-            (filter wasm-import-definition? (get-module-definitions 'func)))
-           (module-funcs
-            (filter not-import-definition? (get-module-definitions 'func))))
+              (compiled-program-get-definitions program type))))
         `(module
           ,@(get-module-definitions 'type)
-          ,@(get-module-definitions 'import)
-          ,@imported-memories
-          ,@imported-globals
-          ,@imported-funcs
-          ,@module-globals
-          ,@module-funcs
+          ,@(get-module-definitions 'memory)
+          ,@(get-module-definitions 'global)
+          ,@(get-module-definitions 'func)
           ,@(get-module-definitions 'table)
           ,@(get-module-definitions 'export)
           ,@(get-module-definitions 'start)

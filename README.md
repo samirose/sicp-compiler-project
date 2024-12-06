@@ -83,7 +83,6 @@ as my main machine.)
 of over- or underflow
 
 ## Backlog
-* Emit runtime library code into the compiled module to have the compiler produce self-sufficient Wasm modules that don't have to be linked together with a runtime module to be executable. This is in preparation for supporting programs and I/O. See also [DevNotes](DevNotes.md#compiler-output).
 * Implement support for programs (5.1 [[R7RS][r7rs]])
 * Implement basic output facility with WASI (6.13.3 [[R7RS][r7rs]])
 * Add run-time support for rudimentary heap-based values: vectors, pairs

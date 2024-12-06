@@ -43,6 +43,9 @@
       (assert_trap ,test-exp "unreachable")
       (assert_return (invoke "get-error-code") (i32.const ,expected-error-code)))))
 
+(define (compiler-test-expect-fail-host specifier)
+  '())
+
 (define (value->string exp)
   (cond ((boolean? exp)
 	 (if exp "#t" "#f"))

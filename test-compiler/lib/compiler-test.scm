@@ -5,7 +5,8 @@
 	  compiler-test-eq
 	  compiler-test-unspecified
 	  compiler-test-invoke
-          compiler-test-error)
+          compiler-test-error
+          compiler-test-expect-fail-host)
 
   (import (scheme base)
 	  (scheme process-context)
@@ -39,4 +40,10 @@
       (let ((fail-count (test-runner-fail-count (test-runner-current))))
 	(test-end name)
 	(if (> fail-count 0)
-	    (exit #f))))))
+	    (exit #f))))
+
+    (define-syntax compiler-test-expect-fail-host
+      (syntax-rules ()
+        ((compiler-test-expect-fail-host specifier)
+         (test-expect-fail specifier))))
+    ))

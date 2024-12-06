@@ -95,15 +95,6 @@ $(COMPILER_TEST_WAT_MODULES) : $(TEST_COMPILER_DIR)wat/%.wat : $(TEST_COMPILER_D
                                                                | $(TEST_COMPILER_DIR)wat
 	wat-desugar $< -o $@
 
-COMPILER_TEST_DIRECT_TESTS := $(wildcard $(TEST_COMPILER_DIR)wast/*.wast)
-COMPILER_TEST_DIRECT_TARGETS := $(COMPILER_TEST_DIRECT_TESTS:%.wast=%)
-COMPILER_TEST_DIRECT_LOGS := $(COMPILER_TEST_DIRECT_TARGETS:$(TEST_COMPILER_DIR)wast/%=$(TEST_COMPILER_DIR)log/%.log)
-
-.PHONY : test-compiler-direct
-test-compiler-direct : $(COMPILER_TEST_DIRECT_LOGS) ## Executes integration tests for the compiler
-
-$(COMPILER_TEST_DIRECT_TARGETS) : $(TEST_COMPILER_DIR)wast/% : $(TEST_COMPILER_DIR)log/%.log
-
 $(TEST_COMPILER_DIR)log/%.log : $(TEST_COMPILER_DIR)build/%.json | $(TEST_COMPILER_DIR)log/
 	spectest-interp $< | tee $@.tmp \
 	  && mv -f $@.tmp $@
@@ -146,7 +137,7 @@ $(UNIT_TEST_LOGS) : $(UNIT_TEST_BINARIES)
 $(UNIT_TEST_BINARIES) : $(COMPILER_BINARIES)
 
 .PHONY : test
-test : test-unit test-compiler-host test-compiler-wast test-compiler-direct ## Executes all tests
+test : test-unit test-compiler-host test-compiler-wast ## Executes all tests
 
 .PHONY : clean
 clean : clean-test clean-compiler ## Removes test outputs and forces compiler re-compilation

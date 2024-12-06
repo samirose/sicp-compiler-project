@@ -1,7 +1,7 @@
 (import (compiler-test)
-	(import))
+	(re-export))
 
-(compiler-test-begin "import")
+(compiler-test-begin "re-export")
 
 (compiler-test-expect-fail-host
  "Redefined number? is accessible and behaves like defined")
@@ -18,4 +18,4 @@
  "Re-exported zero? is accessible and behaves like the built-in"
  #f (zero? 1))
 
-(compiler-test-end "import")
+(compiler-test-end "re-export")

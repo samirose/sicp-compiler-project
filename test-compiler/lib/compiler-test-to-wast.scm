@@ -41,7 +41,10 @@
               (error "Unknown runtime error type" expected-error))))
     `(,(string-append ";; " name)
       (assert_trap ,test-exp "unreachable")
-      (assert_return (invoke $scheme-base "get-error-code") (i32.const ,expected-error-code)))))
+      (assert_return (invoke "get-error-code") (i32.const ,expected-error-code)))))
+
+(define (compiler-test-expect-fail-host specifier)
+  '())
 
 (define (value->string exp)
   (cond ((boolean? exp)

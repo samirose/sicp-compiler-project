@@ -3,8 +3,8 @@
  (lists)
  (assert)
  (lexical-env)
- (scheme-libraries)
  (compiled-program)
+ (scheme-runtime)
  (expression-compiler))
 
 (install-test-compilation-error-handler!)
@@ -13,10 +13,7 @@
   (add-new-lexical-frame (make-empty-lexical-env) '() '()))
 
 (define base-program
-  (compiled-program-with-definitions-and-value-code
-   (make-empty-compiled-program)
-   (map import-definition (import-definitions '((scheme base))))
-   '()))
+  (compile-runtime-library '(scheme base) (make-empty-compiled-program)))
 
 (define (assert-expression-raises-compilation-error exp expected-message expected-object description)
   (assert-raises-compilation-error

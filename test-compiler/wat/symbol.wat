@@ -2,36 +2,19 @@
   (type (;0;) (func (param i32) (result i32)))
   (type (;1;) (func (result i32)))
   (type (;2;) (func (param i32 i32) (result i32)))
-  (import "scheme base" "$heap" (memory (;0;) 1))
-  (import "scheme base" "get-error-code" (func (;0;) (result i32)))
-  (import "scheme base" "i32->fixnum" (func (;1;) (param i32) (result i32)))
-  (import "scheme base" "check-fixnum" (func (;2;) (param i32) (result i32)))
-  (import "scheme base" "fixnum->i32" (func (;3;) (param i32) (result i32)))
-  (import "scheme base" "number?" (func (;4;) (param i32) (result i32)))
-  (import "scheme base" "zero?" (func (;5;) (param i32) (result i32)))
-  (import "scheme base" "i32->boolean" (func (;6;) (param i32) (result i32)))
-  (import "scheme base" "boolean->i32" (func (;7;) (param i32) (result i32)))
-  (import "scheme base" "funcidx->procedure" (func (;8;) (param i32) (result i32)))
-  (import "scheme base" "procedure->funcidx" (func (;9;) (param i32) (result i32)))
-  (import "scheme base" "boolean?" (func (;10;) (param i32) (result i32)))
-  (import "scheme base" "procedure?" (func (;11;) (param i32) (result i32)))
-  (import "scheme base" "symbol?" (func (;12;) (param i32) (result i32)))
-  (import "scheme base" "string?" (func (;13;) (param i32) (result i32)))
-  (import "scheme base" "symbol=?" (func (;14;) (param i32 i32) (result i32)))
-  (import "scheme base" "string=?" (func (;15;) (param i32 i32) (result i32)))
-  (import "scheme base" "eq?" (func (;16;) (param i32 i32) (result i32)))
-  (import "scheme base" "eq?" (func (;17;) (param i32 i32) (result i32)))
-  (global (;0;) i32 (i32.const 2))
-  (global (;1;) i32 (i32.const 18))
-  (global (;2;) i32 (i32.const 34))
-  (global (;3;) i32 (i32.const 50))
-  (global (;4;) i32 (i32.const 66))
-  (global (;5;) i32 (i32.const 82))
-  (global (;6;) i32 (i32.const 98))
-  (global (;7;) i32 (i32.const 114))
-  (global (;8;) i32 (i32.const 130))
-  (global (;9;) i32 (i32.const 146))
-  (global (;10;) (mut i32) (i32.const 46))
+  (memory (;0;) 1)
+  (export "$heap" (memory 0))
+  (global (;0;) (mut i32) (i32.const 0))
+  (global (;1;) i32 (i32.const 2))
+  (global (;2;) i32 (i32.const 18))
+  (global (;3;) i32 (i32.const 34))
+  (global (;4;) i32 (i32.const 50))
+  (global (;5;) i32 (i32.const 66))
+  (global (;6;) i32 (i32.const 82))
+  (global (;7;) i32 (i32.const 98))
+  (global (;8;) i32 (i32.const 114))
+  (global (;9;) i32 (i32.const 130))
+  (global (;10;) i32 (i32.const 146))
   (global (;11;) (mut i32) (i32.const 46))
   (global (;12;) (mut i32) (i32.const 46))
   (global (;13;) (mut i32) (i32.const 46))
@@ -44,121 +27,368 @@
   (global (;20;) (mut i32) (i32.const 46))
   (global (;21;) (mut i32) (i32.const 46))
   (global (;22;) (mut i32) (i32.const 46))
-  (func (;18;) (type 1) (result i32)
+  (global (;23;) (mut i32) (i32.const 46))
+  (func (;0;) (result i32)
+    global.get 0
     i32.const 0
-    global.get 4
-    call 9
-    call_indirect (type 0))
-  (func (;19;) (type 1) (result i32)
-    (local i32)
-    block (result i32)  ;; label = @1
-      block  ;; label = @2
-        block  ;; label = @3
-          i32.const 0
-          i32.const 0
-          global.get 8
-          call 9
-          call_indirect (type 2)
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        block  ;; label = @3
-          global.get 11
-          i32.const 0
-          global.get 8
-          call 9
-          call_indirect (type 2)
-          local.tee 0
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        local.get 0
-        br 1 (;@1;)
-      end
+    global.set 0)
+  (export "get-error-code" (func 0))
+  (func (;1;) (param $value i32) (result i32)
+    local.get $value
+    i32.const 1
+    i32.shl
+    i32.const 1
+    i32.or)
+  (func (;2;) (param $obj i32) (result i32)
+    local.get $obj
+    local.get $obj
+    i32.const 1
+    i32.and
+    i32.const 1
+    i32.ne
+    if  ;; label = @1
+      i32.const 2
+      global.set 0
+      unreachable
+    end)
+  (func (;3;) (param $obj i32) (result i32)
+    local.get $obj
+    call 2
+    i32.const 1
+    i32.shr_s)
+  (func (;4;) (param $value i32) (result i32)
+    i32.const 22
+    i32.const 6
+    local.get $value
+    select)
+  (func (;5;) (param $obj i32) (result i32)
+    i32.const 0
+    i32.const 1
+    local.get $obj
+    i32.const 6
+    i32.eq
+    select)
+  (func (;6;) (param $funcidx i32) (result i32)
+    local.get $funcidx
+    i32.const 4
+    i32.shl
+    i32.const 2
+    i32.or)
+  (func (;7;) (param $obj i32) (result i32)
+    local.get $obj
+    local.get $obj
+    i32.const 15
+    i32.and
+    i32.const 2
+    i32.ne
+    if  ;; label = @1
+      i32.const 3
+      global.set 0
+      unreachable
+    end)
+  (func (;8;) (param $obj i32) (result i32)
+    local.get $obj
+    call 7
+    i32.const 4
+    i32.shr_u)
+  (func (;9;) (param $obj i32) (result i32)
+    local.get $obj
+    i32.const 1
+    i32.and
+    call 4)
+  (func (;10;) (param $obj i32) (result i32)
+    local.get $obj
+    call 3
+    i32.eqz
+    call 4)
+  (func (;11;) (param $obj i32) (result i32)
+    local.get $obj
+    i32.const 15
+    i32.and
+    i32.const 6
+    i32.eq
+    call 4)
+  (func (;12;) (param $obj i32) (result i32)
+    local.get $obj
+    i32.const 15
+    i32.and
+    i32.const 2
+    i32.eq
+    call 4)
+  (func (;13;) (param $obj i32) (result i32)
+    local.get $obj
+    i32.const 3
+    i32.and
+    i32.eqz
+    if (result i32)  ;; label = @1
+      local.get $obj
+      i32.load
+      i32.const 251658240
+      i32.and
+      i32.const 16777216
+      i32.eq
+      call 4
+    else
       i32.const 6
     end)
-  (func (;20;) (type 1) (result i32)
-    (local i32)
-    block (result i32)  ;; label = @1
-      block  ;; label = @2
-        block  ;; label = @3
-          i32.const 0
-          i32.const 0
-          global.get 6
-          call 9
-          call_indirect (type 2)
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        block  ;; label = @3
-          global.get 11
-          i32.const 0
-          global.get 6
-          call 9
-          call_indirect (type 2)
-          local.tee 0
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        local.get 0
-        br 1 (;@1;)
-      end
+  (func (;14;) (param $obj i32) (result i32)
+    local.get $obj
+    i32.const 3
+    i32.and
+    i32.eqz
+    if (result i32)  ;; label = @1
+      local.get $obj
+      i32.load
+      i32.const 251658240
+      i32.and
+      i32.const 33554432
+      i32.eq
+      call 4
+    else
       i32.const 6
     end)
-  (func (;21;) (type 1) (result i32)
-    (local i32)
-    block  ;; label = @1
-      block  ;; label = @2
-        i32.const 20
-        global.get 11
-        global.get 8
-        call 9
-        call_indirect (type 2)
-        local.tee 0
-        call 7
-        br_if 1 (;@1;)
-      end
-      global.get 11
-      global.get 12
-      global.get 8
-      call 9
-      call_indirect (type 2)
-      local.set 0
+  (func (;15;) (param $obj1 i32) (param $obj2 i32) (result i32)
+    local.get $obj1
+    local.get $obj2
+    i32.eq
+    call 4)
+  (func (;16;) (param $obj1 i32) (param $obj2 i32) (result i32)
+    local.get $obj1
+    local.get $obj2
+    call 15)
+  (func (;17;) (param $obj i32) (param $type i32) (param $error i32) (result i32)
+    block $error
+      local.get $obj
+      i32.const 3
+      i32.and
+      br_if $error
+      local.get $obj
+      i32.load
+      i32.const 251658240
+      i32.and
+      local.get $type
+      i32.ne
+      br_if $error
+      local.get $obj
+      return
     end
-    local.get 0)
-  (func (;22;) (type 1) (result i32)
-    (local i32)
-    block  ;; label = @1
-      block  ;; label = @2
-        i32.const 20
-        global.get 11
-        global.get 6
-        call 9
-        call_indirect (type 2)
-        local.tee 0
-        call 7
-        br_if 1 (;@1;)
-      end
-      global.get 11
-      global.get 12
-      global.get 6
-      call 9
-      call_indirect (type 2)
-      local.set 0
+    local.get $error
+    global.set 0
+    unreachable)
+  (func (;18;) (param $obj i32) (result i32)
+    local.get $obj
+    i32.const 16777216
+    i32.const 4
+    call 17)
+  (func (;19;) (param $s1 i32) (param $s2 i32) (result i32)
+    local.get $s1
+    call 18
+    local.get $s2
+    call 18
+    i32.eq
+    call 4)
+  (func (;20;) (param $obj i32) (param $type i32) (param $error i32) (result i32)
+    (local $heap-obj i32)
+    block $error
+      local.get $obj
+      i32.const 3
+      i32.and
+      br_if $error
+      local.get $obj
+      i32.load
+      local.tee $heap-obj
+      i32.const 251658240
+      i32.and
+      local.get $type
+      i32.ne
+      br_if $error
+      local.get $heap-obj
+      return
     end
-    local.get 0)
-  (func (;23;) (type 0) (param i32) (result i32)
-    local.get 0
-    global.get 4
-    call 9
-    call_indirect (type 0))
+    local.get $error
+    global.set 0
+    unreachable)
+  (func (;21;) (param $obj i32) (result i32)
+    local.get $obj
+    i32.const 33554432
+    i32.const 5
+    call 20)
+  (func (;22;) (param $addr1 i32) (param $addr2 i32) (param $n i32) (result i32)
+    block $equal_contents
+      block $compare_words
+        loop $loop
+          local.get $n
+          i32.eqz
+          br_if $compare_words
+          local.get $addr1
+          i32.load
+          local.get $addr1
+          i32.const 4
+          i32.add
+          local.set $addr1
+          local.get $addr2
+          i32.load
+          local.get $addr2
+          i32.const 4
+          i32.add
+          local.set $addr2
+          local.get $n
+          i32.const 1
+          i32.sub
+          local.set $n
+          i32.eq
+          br_if $loop
+          br $equal_contents
+        end
+      end
+      i32.const 1
+      return
+    end
+    i32.const 0)
+  (func (;23;) (param $s1 i32) (param $s2 i32) (result i32)
+    (local $len i32)
+    local.get $s1
+    call 21
+    i32.const 16777215
+    i32.and
+    local.tee $len
+    local.get $s2
+    call 21
+    i32.const 16777215
+    i32.and
+    i32.eq
+    if (result i32)  ;; label = @1
+      local.get $s1
+      i32.const 4
+      i32.add
+      local.get $s2
+      i32.const 4
+      i32.add
+      local.get $len
+      i32.const 3
+      i32.add
+      i32.const 2
+      i32.shr_u
+      call 22
+      call 4
+    else
+      i32.const 6
+    end)
   (func (;24;) (type 1) (result i32)
-    i32.const 28)
+    i32.const 0
+    global.get 5
+    call 8
+    call_indirect (type 0))
   (func (;25;) (type 1) (result i32)
+    (local i32)
+    block (result i32)  ;; label = @1
+      block  ;; label = @2
+        block  ;; label = @3
+          i32.const 0
+          i32.const 0
+          global.get 7
+          call 8
+          call_indirect (type 2)
+          call 5
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        block  ;; label = @3
+          global.get 12
+          i32.const 0
+          global.get 7
+          call 8
+          call_indirect (type 2)
+          local.tee 0
+          call 5
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        local.get 0
+        br 1 (;@1;)
+      end
+      i32.const 6
+    end)
+  (func (;26;) (type 1) (result i32)
+    (local i32)
+    block (result i32)  ;; label = @1
+      block  ;; label = @2
+        block  ;; label = @3
+          i32.const 0
+          i32.const 0
+          global.get 9
+          call 8
+          call_indirect (type 2)
+          call 5
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        block  ;; label = @3
+          global.get 12
+          i32.const 0
+          global.get 9
+          call 8
+          call_indirect (type 2)
+          local.tee 0
+          call 5
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        local.get 0
+        br 1 (;@1;)
+      end
+      i32.const 6
+    end)
+  (func (;27;) (type 1) (result i32)
+    (local i32)
+    block  ;; label = @1
+      block  ;; label = @2
+        i32.const 20
+        global.get 12
+        global.get 7
+        call 8
+        call_indirect (type 2)
+        local.tee 0
+        call 5
+        br_if 1 (;@1;)
+      end
+      global.get 12
+      global.get 13
+      global.get 7
+      call 8
+      call_indirect (type 2)
+      local.set 0
+    end
+    local.get 0)
+  (func (;28;) (type 1) (result i32)
+    (local i32)
+    block  ;; label = @1
+      block  ;; label = @2
+        i32.const 20
+        global.get 12
+        global.get 9
+        call 8
+        call_indirect (type 2)
+        local.tee 0
+        call 5
+        br_if 1 (;@1;)
+      end
+      global.get 12
+      global.get 13
+      global.get 9
+      call 8
+      call_indirect (type 2)
+      local.set 0
+    end
+    local.get 0)
+  (func (;29;) (type 0) (param i32) (result i32)
+    local.get 0
+    global.get 5
+    call 8
+    call_indirect (type 0))
+  (func (;30;) (type 1) (result i32)
+    i32.const 28)
+  (func (;31;) (type 1) (result i32)
     (local i32 i32)
     i32.const 44
     local.set 0
@@ -166,40 +396,40 @@
       block  ;; label = @2
         block  ;; label = @3
           i32.const 8
-          global.get 17
-          call 9
-          call_indirect (type 0)
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        block  ;; label = @3
-          global.get 12
-          global.get 17
-          call 9
-          call_indirect (type 0)
-          call 7
-          br_if 0 (;@3;)
-          br 1 (;@2;)
-        end
-        block  ;; label = @3
           global.get 18
-          call 9
-          call_indirect (type 1)
-          global.get 4
-          call 9
+          call 8
           call_indirect (type 0)
-          call 7
+          call 5
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        block  ;; label = @3
+          global.get 13
+          global.get 18
+          call 8
+          call_indirect (type 0)
+          call 5
+          br_if 0 (;@3;)
+          br 1 (;@2;)
+        end
+        block  ;; label = @3
+          global.get 19
+          call 8
+          call_indirect (type 1)
+          global.get 5
+          call 8
+          call_indirect (type 0)
+          call 5
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
         block  ;; label = @3
           local.get 0
-          global.get 4
-          call 9
+          global.get 5
+          call 8
           call_indirect (type 0)
           local.tee 1
-          call 7
+          call 5
           br_if 0 (;@3;)
           br 1 (;@2;)
         end
@@ -208,79 +438,79 @@
       end
       i32.const 6
     end)
-  (func (;26;) (type 1) (result i32)
+  (func (;32;) (type 1) (result i32)
     (local i32)
     i32.const 60
     local.set 0
     local.get 0
-    global.get 4
-    call 9
+    global.get 5
+    call 8
     call_indirect (type 0))
-  (func (;27;) (type 1) (result i32)
+  (func (;33;) (type 1) (result i32)
     i32.const 42
     call 1
-    global.get 11
-    global.get 6
-    call 9
+    global.get 12
+    global.get 9
+    call 8
     call_indirect (type 2))
-  (func (;28;) (type 1) (result i32)
+  (func (;34;) (type 1) (result i32)
     i32.const 88
     i32.const 96
-    global.get 6
-    call 9
+    global.get 9
+    call 8
     call_indirect (type 2))
-  (func (;29;)
+  (func (;35;)
     i32.const 10
-    call 8
-    global.set 10
-    i32.const 0
+    call 6
     global.set 11
-    i32.const 8
+    i32.const 0
     global.set 12
-    i32.const 11
-    call 8
+    i32.const 8
     global.set 13
-    i32.const 12
-    call 8
+    i32.const 11
+    call 6
     global.set 14
-    i32.const 13
-    call 8
+    i32.const 12
+    call 6
     global.set 15
-    i32.const 14
-    call 8
+    i32.const 13
+    call 6
     global.set 16
-    i32.const 15
-    call 8
+    i32.const 14
+    call 6
     global.set 17
-    i32.const 16
-    call 8
+    i32.const 15
+    call 6
     global.set 18
-    i32.const 17
-    call 8
+    i32.const 16
+    call 6
     global.set 19
-    i32.const 18
-    call 8
+    i32.const 17
+    call 6
     global.set 20
-    i32.const 19
-    call 8
+    i32.const 18
+    call 6
     global.set 21
-    i32.const 20
-    call 8
+    i32.const 19
+    call 6
     global.set 22
+    i32.const 20
+    call 6
+    global.set 23
     i32.const 30
     drop)
   (table (;0;) 21 funcref)
-  (export "literal-symbol-is-symbol" (func 18))
-  (export "literal-symbols-with-same-name-are-eq" (func 19))
-  (export "literal-symbols-with-same-name-are-symbol=?" (func 20))
-  (export "literal-symbols-with-different-name-are-not-eq" (func 21))
-  (export "literal-symbols-with-different-name-are-not-symbol=?" (func 22))
-  (export "literal-symbols-as-values-are-symbols" (func 25))
-  (export "symbol-may-contain-special-characters" (func 26))
-  (export "symbol=?-expects-symbol-first-argument" (func 27))
-  (export "symbol=?-expects-symbol-second-argument" (func 28))
-  (start 29)
-  (elem (;0;) (i32.const 0) func 4 5 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28)
+  (export "literal-symbol-is-symbol" (func 24))
+  (export "literal-symbols-with-same-name-are-eq" (func 25))
+  (export "literal-symbols-with-same-name-are-symbol=?" (func 26))
+  (export "literal-symbols-with-different-name-are-not-eq" (func 27))
+  (export "literal-symbols-with-different-name-are-not-symbol=?" (func 28))
+  (export "literal-symbols-as-values-are-symbols" (func 31))
+  (export "symbol-may-contain-special-characters" (func 32))
+  (export "symbol=?-expects-symbol-first-argument" (func 33))
+  (export "symbol=?-expects-symbol-second-argument" (func 34))
+  (start 35)
+  (elem (;0;) (i32.const 0) func 9 10 11 12 13 14 15 16 19 23 24 25 26 27 28 29 30 31 32 33 34)
   (data (;0;) (i32.const 0) "\03\00\00\01foo")
   (data (;1;) (i32.const 8) "\06\00\00\01foobar")
   (data (;2;) (i32.const 20) "\03\00\00\01baz")
@@ -289,4 +519,5 @@
   (data (;5;) (i32.const 60) "\17\00\00\01\22foo\22 \09\0a\0d\5c'bar'\f0\9f\98\80!@\7f\07")
   (data (;6;) (i32.const 88) "\04\00\00\01symb")
   (data (;7;) (i32.const 96) "\04\00\00\02symb")
-  (type (;3;) (func)))
+  (type (;3;) (func (param i32 i32 i32) (result i32)))
+  (type (;4;) (func)))

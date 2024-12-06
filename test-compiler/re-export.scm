@@ -1,4 +1,4 @@
-(define-library (import)
+(define-library (re-export)
 
   (import (scheme base))
 
@@ -9,7 +9,7 @@
   (export zero?)
 
   (begin
-    ;; re-define import
+    ;; re-define imported number?
     (define (number? x) 42)
 
     ))

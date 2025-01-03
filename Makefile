@@ -1,5 +1,5 @@
-SHELL = bash
-.SHELLFLAGS = -o pipefail -c
+SHELL := bash
+.SHELLFLAGS := -o pipefail -c
 
 .PHONY : help
 help : Makefile ## Display this help
@@ -7,11 +7,11 @@ help : Makefile ## Display this help
 
 HOST_SCHEME_FLAGS := --r7rs
 HOST_SCHEME_COMPILED_DIR := ./compiled/
-HOST_SCHEME_COMPILE_MODULE = guild compile $(HOST_SCHEME_FLAGS)
-HOST_SCHEME_RUN_PROGRAM = guile $(HOST_SCHEME_FLAGS) --no-auto-compile
-COMPILER_SOURCES = $(wildcard *.scm)
+HOST_SCHEME_COMPILE_MODULE := guild compile $(HOST_SCHEME_FLAGS)
+HOST_SCHEME_RUN_PROGRAM := guile $(HOST_SCHEME_FLAGS) --no-auto-compile
+COMPILER_SOURCES := $(wildcard *.scm)
 COMPILER_BINARIES := $(COMPILER_SOURCES:%.scm=$(HOST_SCHEME_COMPILED_DIR)%.go)
-RUN_COMPILER = $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) driver.scm
+RUN_COMPILER := $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) driver.scm
 
 .PHONY : compile
 compile : $(COMPILER_BINARIES) ## Compiles a scheme file from standard input and outputs WAT to standard output
@@ -23,7 +23,7 @@ compile-compiler : $(COMPILER_BINARIES) ## Compiles the compiler with host schem
 $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@
 
-COMPILER_DEPENDENCIES = $(HOST_SCHEME_COMPILED_DIR)module-dependencies.mk
+COMPILER_DEPENDENCIES := $(HOST_SCHEME_COMPILED_DIR)module-dependencies.mk
 $(COMPILER_DEPENDENCIES) : $(COMPILER_SOURCES) tools/scheme-dependencies.scm | $(HOST_SCHEME_COMPILED_DIR)
 	$(HOST_SCHEME_RUN_PROGRAM) tools/scheme-dependencies.scm $(COMPILER_SOURCES) \
 	  | sed -e 's|\([^[:space:]]*\)\.scm|$(HOST_SCHEME_COMPILED_DIR)\1\.go|g' \
@@ -38,7 +38,7 @@ TEST_COMPILER_DIR := test-compiler/
 COMPILER_TEST_PROGRAMS := $(wildcard $(TEST_COMPILER_DIR)test/*.scm)
 COMPILER_TEST_HOST_TARGETS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)%-host)
 COMPILER_TEST_HOST_LOGS := $(COMPILER_TEST_PROGRAMS:$(TEST_COMPILER_DIR)test/%.scm=$(TEST_COMPILER_DIR)host-log/%.log)
-RUN_COMPILER_TEST_HOST = $(HOST_SCHEME_RUN_PROGRAM) -L .. -L ../lib
+RUN_COMPILER_TEST_HOST := $(HOST_SCHEME_RUN_PROGRAM) -L .. -L ../lib
 
 $(TEST_COMPILER_DIR)build/ \
 $(TEST_COMPILER_DIR)log/ \

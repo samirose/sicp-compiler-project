@@ -24,8 +24,15 @@ $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@
 
 COMPILER_DEPENDENCIES := $(HOST_SCHEME_COMPILED_DIR)module-dependencies.mk
-$(COMPILER_DEPENDENCIES) : $(COMPILER_SOURCES) tools/scheme-dependencies.scm | $(HOST_SCHEME_COMPILED_DIR)
-	$(HOST_SCHEME_RUN_PROGRAM) tools/scheme-dependencies.scm $(COMPILER_SOURCES) \
+
+tools/compiled:
+	mkdir -p $@
+
+tools/compiled/%.go: tools/%.scm | tools/compiled
+	$(HOST_SCHEME_COMPILE_MODULE) -o $@ $<
+
+$(COMPILER_DEPENDENCIES) : $(COMPILER_SOURCES) tools/compiled/scheme-dependencies.go | $(HOST_SCHEME_COMPILED_DIR)
+	$(HOST_SCHEME_RUN_PROGRAM) -C tools/compiled tools/scheme-dependencies.scm $(COMPILER_SOURCES) \
 	  | sed -e 's|\([^[:space:]]*\)\.scm|$(HOST_SCHEME_COMPILED_DIR)\1\.go|g' \
 	  | tee $@.tmp && mv -f $@.tmp $@
 
@@ -140,7 +147,7 @@ $(UNIT_TEST_BINARIES) : $(COMPILER_BINARIES)
 test : test-unit test-compiler-host test-compiler-wast ## Executes all tests
 
 .PHONY : clean
-clean : clean-test clean-compiler ## Removes test outputs and forces compiler re-compilation
+clean : clean-test clean-compiler clean-tools ## Removes test outputs, compiled tools and forces compiler re-compilation
 
 .PHONY : clean-compiler
 clean-compiler : ## Forces compiler re-compilation
@@ -155,3 +162,7 @@ clean-test : ## Removes test build artefacts and results
 	  $(TEST_COMPILER_DIR)log \
 	  $(TEST_COMPILER_DIR)host-log \
 	  $(TEST_COMPILER_DIR)wast-log
+
+.PHONY : clean-tools
+clean-tools:  ## Removes tools build artefacts
+	-rm -rf tools/compiled

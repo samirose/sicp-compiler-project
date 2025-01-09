@@ -10,9 +10,10 @@ COMPILER_BINARIES := $(COMPILER_SOURCES:%.scm=$(HOST_SCHEME_COMPILED_DIR)%.go)
 RUN_COMPILER := $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) driver.scm
 
 TEST_COMPILER_DIR := test-compiler/
+TEST_UNIT_DIR := test-unit/
 
 .PHONY : help
-help : Makefile $(TEST_COMPILER_DIR)test-compiler.mk ## Display this help
+help : Makefile $(TEST_COMPILER_DIR)test-compiler.mk $(TEST_UNIT_DIR)/test-unit.mk ## Display this help
 	@sed -nE 's/^([[:alnum:]-]+)[[:space:]]*:[^#]*##[[:space:]]*(.*)$$/\1: \2/p' $^
 
 .PHONY : compile
@@ -45,30 +46,7 @@ $(COMPILER_BINARIES) : $(HOST_SCHEME_COMPILED_DIR)%.go : %.scm | $(HOST_SCHEME_C
 
 include $(TEST_COMPILER_DIR)test-compiler.mk
 
-TEST_UNIT_DIR := test-unit/
-UNIT_TEST_PROGRAMS := $(wildcard $(TEST_UNIT_DIR)*.scm)
-UNIT_TEST_BINARIES := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.scm=$(TEST_UNIT_DIR)compiled/%.go)
-UNIT_TEST_TARGETS := $(UNIT_TEST_PROGRAMS:.scm=)
-UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.scm=$(TEST_UNIT_DIR)log/%.log)
-RUN_UNIT_TEST := $(HOST_SCHEME_RUN_PROGRAM) -C $(TEST_UNIT_DIR)compiled -C $(HOST_SCHEME_COMPILED_DIR)
-
-.PHONY : test-unit $(UNIT_TEST_TARGETS)
-test-unit : $(UNIT_TEST_LOGS) ## Executes the unit tests for the compiler
-
-$(UNIT_TEST_TARGETS) : $(TEST_UNIT_DIR)% : $(TEST_UNIT_DIR)log/%.log
-
-$(TEST_UNIT_DIR)log $(TEST_UNIT_DIR)compiled :
-	mkdir -p $@
-
-$(UNIT_TEST_BINARIES) : $(TEST_UNIT_DIR)compiled/%.go : $(TEST_UNIT_DIR)%.scm | $(TEST_UNIT_DIR)compiled
-	$(HOST_SCHEME_COMPILE_MODULE) -L . -o $@ $<
-
-$(UNIT_TEST_LOGS) : $(TEST_UNIT_DIR)log/%.log : $(TEST_UNIT_DIR)%.scm | $(TEST_UNIT_DIR)log
-	$(RUN_UNIT_TEST) $< > $@.tmp \
-	  && mv -f $@.tmp $@
-
-$(UNIT_TEST_LOGS) : $(UNIT_TEST_BINARIES)
-$(UNIT_TEST_BINARIES) : $(COMPILER_BINARIES)
+include $(TEST_UNIT_DIR)/test-unit.mk
 
 .PHONY : test
 test : test-unit test-compiler ## Executes all tests
@@ -81,10 +59,7 @@ clean-compiler : ## Forces compiler re-compilation
 	-rm -rf $(HOST_SCHEME_COMPILED_DIR)
 
 .PHONY : clean-test
-clean-test : clean-test-compiler ## Removes all test build artefacts and results
-	-rm -rf \
-	  $(TEST_UNIT_DIR)log \
-	  $(TEST_UNIT_DIR)compiled
+clean-test : clean-test-unit clean-test-compiler ## Removes all test build artefacts and results
 
 .PHONY : clean-tools
 clean-tools:  ## Removes tools build artefacts

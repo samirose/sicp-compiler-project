@@ -13,7 +13,7 @@ TEST_COMPILER_DIR := test-compiler/
 TEST_UNIT_DIR := test-unit/
 
 .PHONY : help
-help : Makefile $(TEST_COMPILER_DIR)test-compiler.mk $(TEST_UNIT_DIR)/test-unit.mk ## Display this help
+help : Makefile $(TEST_COMPILER_DIR)test-compiler.mk $(TEST_UNIT_DIR)/test-unit.mk tools/tools.mk ## Display this help
 	@sed -nE 's/^([[:alnum:]-]+)[[:space:]]*:[^#]*##[[:space:]]*(.*)$$/\1: \2/p' $^
 
 .PHONY : compile
@@ -28,14 +28,9 @@ $(HOST_SCHEME_COMPILED_DIR) :
 
 COMPILER_DEPENDENCIES := $(HOST_SCHEME_COMPILED_DIR)module-dependencies.mk
 
-tools/compiled:
-	mkdir -p $@
-
-tools/compiled/%.go: tools/%.scm | tools/compiled
-	$(HOST_SCHEME_COMPILE_MODULE) -o $@ $<
-
-$(COMPILER_DEPENDENCIES) : $(COMPILER_SOURCES) tools/compiled/scheme-dependencies.go | $(HOST_SCHEME_COMPILED_DIR)
-	$(HOST_SCHEME_RUN_PROGRAM) -C tools/compiled tools/scheme-dependencies.scm $(COMPILER_SOURCES) \
+include tools/tools.mk
+$(COMPILER_DEPENDENCIES) : $(COMPILER_SOURCES) $(TOOL_SCHEME_DEPENDENCIES) | $(HOST_SCHEME_COMPILED_DIR)
+	$(RUN_TOOL_SCHEME_DEPENDENCIES) $(COMPILER_SOURCES) \
 	  | sed -e 's|\([^[:space:]]*\)\.scm|$(HOST_SCHEME_COMPILED_DIR)\1\.go|g' \
 	  | tee $@.tmp && mv -f $@.tmp $@
 
@@ -60,7 +55,3 @@ clean-compiler : ## Forces compiler re-compilation
 
 .PHONY : clean-test
 clean-test : clean-test-unit clean-test-compiler ## Removes all test build artefacts and results
-
-.PHONY : clean-tools
-clean-tools:  ## Removes tools build artefacts
-	-rm -rf tools/compiled

@@ -13,15 +13,20 @@ TEST_COMPILER_DIR := test-compiler/
 TEST_UNIT_DIR := test-unit/
 
 .PHONY : help
-help : Makefile $(TEST_COMPILER_DIR)test-compiler.mk $(TEST_UNIT_DIR)/test-unit.mk tools/tools.mk ## Display this help
-	@sed -nE 's/^([[:alnum:]-]+)[[:space:]]*:[^#]*##[[:space:]]*(.*)$$/\1: \2/p' $^
+help :  ## Display this help
+help : Makefile $(TEST_COMPILER_DIR)test-compiler.mk $(TEST_UNIT_DIR)/test-unit.mk tools/tools.mk
+	@echo "Targets:"
+	@sed -nE 's/^([[:alnum:]-]+)[[:space:]]*:[^#]*##[[:space:]]*(.*)$$/  \1:	\2/p' $^ \
+	  | column -t -s "	"
 
 .PHONY : compile
-compile : $(COMPILER_BINARIES) ## Compiles a scheme file from standard input and outputs WAT to standard output
+compile : ## Compiles a scheme file from standard input and outputs WAT to standard output
+compile : $(COMPILER_BINARIES)
 	$(RUN_COMPILER) $<
 
 .PHONY : compile-compiler
-compile-compiler : $(COMPILER_BINARIES) ## Compiles the compiler with host scheme
+compile-compiler : ## Compiles the compiler with host scheme
+compile-compiler : $(COMPILER_BINARIES)
 
 $(HOST_SCHEME_COMPILED_DIR) :
 	mkdir -p $@
@@ -44,14 +49,17 @@ include $(TEST_COMPILER_DIR)test-compiler.mk
 include $(TEST_UNIT_DIR)/test-unit.mk
 
 .PHONY : test
-test : test-unit test-compiler ## Executes all tests
+test : ## Executes all tests
+test : test-unit test-compiler
 
 .PHONY : clean
-clean : clean-test clean-compiler clean-tools ## Removes test outputs, compiled tools and forces compiler re-compilation
+clean : ## Removes test outputs, compiled tools and forces compiler re-compilation
+clean : clean-test clean-compiler clean-tools
 
 .PHONY : clean-compiler
 clean-compiler : ## Forces compiler re-compilation
 	-rm -rf $(HOST_SCHEME_COMPILED_DIR)
 
 .PHONY : clean-test
-clean-test : clean-test-unit clean-test-compiler ## Removes all test build artefacts and results
+clean-test : ## Removes all test build artefacts and results
+clean-test : clean-test-unit clean-test-compiler

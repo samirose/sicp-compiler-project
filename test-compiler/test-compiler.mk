@@ -11,10 +11,12 @@ $(TEST_COMPILER_DIR)wat :
 	mkdir -p $@
 
 .PHONY : test-compiler
-test-compiler: test-compiler-host test-compiler-wast
+test-compiler : ## Executes all compiler integration tests
+test-compiler : test-compiler-host test-compiler-wast
 
 .PHONY : test-compiler-host
-test-compiler-host : $(COMPILER_TEST_HOST_LOGS) ## Executes the compiler integration tests on the host scheme
+test-compiler-host : ## Executes the compiler integration tests on the host scheme
+test-compiler-host : $(COMPILER_TEST_HOST_LOGS)
 
 $(COMPILER_TEST_HOST_TARGETS) : $(TEST_COMPILER_DIR)%-host : $(TEST_COMPILER_DIR)host-log/%.log
 
@@ -36,7 +38,8 @@ COMPILER_TEST_SCM_MODULES := $(wildcard $(TEST_COMPILER_DIR)*.scm)
 COMPILER_TEST_WAT_MODULES := $(COMPILER_TEST_SCM_MODULES:$(TEST_COMPILER_DIR)%.scm=$(TEST_COMPILER_DIR)wat/%.wat)
 
 .PHONY : test-compiler-wast
-test-compiler-wast : $(COMPILER_TEST_WAST_LOGS) $(COMPILER_TEST_WAT_MODULES) ## Compiles the compiler tests to WAST scripts and executes them
+test-compiler-wast : ## Compiles the compiler tests to WAST scripts and executes them
+test-compiler-wast : $(COMPILER_TEST_WAST_LOGS) $(COMPILER_TEST_WAT_MODULES)
 
 $(COMPILER_TEST_WAST_TARGETS) : $(TEST_COMPILER_DIR)%-wast : $(TEST_COMPILER_DIR)wast-log/%.log
 

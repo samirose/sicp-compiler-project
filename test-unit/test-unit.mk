@@ -5,7 +5,8 @@ UNIT_TEST_LOGS := $(UNIT_TEST_PROGRAMS:$(TEST_UNIT_DIR)%.scm=$(TEST_UNIT_DIR)log
 RUN_UNIT_TEST := $(HOST_SCHEME_RUN_PROGRAM) -C $(TEST_UNIT_DIR)compiled -C $(HOST_SCHEME_COMPILED_DIR)
 
 .PHONY : test-unit
-test-unit : $(UNIT_TEST_LOGS) ## Executes the unit tests for the compiler
+test-unit : ## Executes the unit tests for the compiler
+test-unit : $(UNIT_TEST_LOGS)
 
 $(UNIT_TEST_TARGETS) : $(TEST_UNIT_DIR)% : $(TEST_UNIT_DIR)log/%.log
 

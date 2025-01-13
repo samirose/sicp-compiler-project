@@ -9,11 +9,9 @@ COMPILER_SOURCES := $(wildcard *.scm)
 COMPILER_BINARIES := $(COMPILER_SOURCES:%.scm=$(HOST_SCHEME_COMPILED_DIR)%.go)
 RUN_COMPILER := $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) driver.scm
 
-TEST_UNIT_DIR := test-unit/
-
 .PHONY : help
 help :  ## Display this help
-help : Makefile test-compiler/test-compiler.mk $(TEST_UNIT_DIR)/test-unit.mk tools/tools.mk
+help : Makefile test-compiler/test-compiler.mk test-unit/test-unit.mk tools/tools.mk
 	@echo "Targets:"
 	@sed -nE 's/^([[:alnum:]-]+)[[:space:]]*:[^#]*##[[:space:]]*(.*)$$/  \1:	\2/p' $^ \
 	  | column -t -s "	"
@@ -45,7 +43,7 @@ $(COMPILER_BINARIES) : $(HOST_SCHEME_COMPILED_DIR)%.go : %.scm | $(HOST_SCHEME_C
 
 include test-compiler/test-compiler.mk
 
-include $(TEST_UNIT_DIR)/test-unit.mk
+include test-unit/test-unit.mk
 
 .PHONY : test
 test : ## Executes all tests

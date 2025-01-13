@@ -9,12 +9,11 @@ COMPILER_SOURCES := $(wildcard *.scm)
 COMPILER_BINARIES := $(COMPILER_SOURCES:%.scm=$(HOST_SCHEME_COMPILED_DIR)%.go)
 RUN_COMPILER := $(HOST_SCHEME_RUN_PROGRAM) -L . -C $(HOST_SCHEME_COMPILED_DIR) driver.scm
 
-TEST_COMPILER_DIR := test-compiler/
 TEST_UNIT_DIR := test-unit/
 
 .PHONY : help
 help :  ## Display this help
-help : Makefile $(TEST_COMPILER_DIR)test-compiler.mk $(TEST_UNIT_DIR)/test-unit.mk tools/tools.mk
+help : Makefile test-compiler/test-compiler.mk $(TEST_UNIT_DIR)/test-unit.mk tools/tools.mk
 	@echo "Targets:"
 	@sed -nE 's/^([[:alnum:]-]+)[[:space:]]*:[^#]*##[[:space:]]*(.*)$$/  \1:	\2/p' $^ \
 	  | column -t -s "	"
@@ -44,7 +43,7 @@ include $(COMPILER_DEPENDENCIES)
 $(COMPILER_BINARIES) : $(HOST_SCHEME_COMPILED_DIR)%.go : %.scm | $(HOST_SCHEME_COMPILED_DIR)
 	GUILE_LOAD_COMPILED_PATH=$(HOST_SCHEME_COMPILED_DIR) $(HOST_SCHEME_COMPILE_MODULE) -o $@ $<
 
-include $(TEST_COMPILER_DIR)test-compiler.mk
+include test-compiler/test-compiler.mk
 
 include $(TEST_UNIT_DIR)/test-unit.mk
 

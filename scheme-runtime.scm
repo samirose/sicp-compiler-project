@@ -11,8 +11,7 @@
           (values)
           (definitions-table)
           (compiled-program)
-          (wasm-syntax)
-          (compilation-error))
+          (wasm-syntax))
 
   (begin
     (define (macro-raise-error runtime-index)

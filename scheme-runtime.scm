@@ -356,7 +356,7 @@
         ))
 
     (define runtime-libraries-table
-      (list (list '(scheme base) scheme-base-definitions scheme-base-code-table)))
+      `(((scheme base) ,scheme-base-definitions ,scheme-base-code-table)))
 
     (define (runtime-library-entry library)
       (assoc library runtime-libraries-table))

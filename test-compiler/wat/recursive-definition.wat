@@ -1,8 +1,8 @@
 (module
   (type (;0;) (func (param i32 i32 i32) (result i32)))
   (type (;1;) (func (param i32 i32) (result i32)))
-  (memory (;0;) 1)
-  (export "$heap" (memory 0))
+  (memory (;0;) 10)
+  (export "memory" (memory 0))
   (global (;0;) (mut i32) (i32.const 0))
   (global (;1;) i32 (i32.const 2))
   (global (;2;) i32 (i32.const 18))

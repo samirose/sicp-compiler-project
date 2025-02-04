@@ -12,11 +12,12 @@
           (compiled-program)
           (wasm-syntax))
 
-  (import (prefix (scheme-runtime-base) scheme-base-))
+  (import (prefix (scheme-runtime-base) scheme-base-)
+          (prefix (only (runtime-memory) definitions) memory-))
 
   (begin
     (define runtime-libraries-table
-      `(((scheme base) ,scheme-base-definitions ,scheme-base-code-table)))
+      `(((scheme base) (,@memory-definitions ,@scheme-base-definitions) ,scheme-base-code-table)))
 
     (define (runtime-library-entry library)
       (assoc library runtime-libraries-table))

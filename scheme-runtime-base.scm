@@ -24,8 +24,7 @@
         i32.const ,heap-obj-type
         i32.eq))
 
-    (define definitions
-      '((memory (export "$heap") 1)))
+    (define definitions '())
 
     (define code-table
       `(($error-code

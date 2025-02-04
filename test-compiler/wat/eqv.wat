@@ -2,8 +2,8 @@
   (type (;0;) (func (param i32 i32) (result i32)))
   (type (;1;) (func (param i32) (result i32)))
   (type (;2;) (func (result i32)))
-  (memory (;0;) 1)
-  (export "$heap" (memory 0))
+  (memory (;0;) 10)
+  (export "memory" (memory 0))
   (global (;0;) (mut i32) (i32.const 0))
   (global (;1;) i32 (i32.const 2))
   (global (;2;) i32 (i32.const 18))
@@ -453,8 +453,8 @@
     end
     local.get 1)
   (func (;41;) (type 2) (result i32)
-    i32.const 8
-    i32.const 8
+    i32.const 264
+    i32.const 264
     global.get 8
     call 8
     call_indirect (type 0))
@@ -464,7 +464,7 @@
       block  ;; label = @2
         block  ;; label = @3
           global.get 20
-          i32.const 0
+          i32.const 256
           global.get 8
           call 8
           call_indirect (type 0)
@@ -473,7 +473,7 @@
           br 1 (;@2;)
         end
         block  ;; label = @3
-          i32.const 0
+          i32.const 256
           global.get 20
           global.get 8
           call 8
@@ -498,7 +498,7 @@
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 0
+        i32.const 256
         local.get 0
         global.get 8
         call 8
@@ -519,7 +519,7 @@
       end
       block  ;; label = @2
         local.get 0
-        i32.const 0
+        i32.const 256
         global.get 8
         call 8
         call_indirect (type 0)
@@ -547,7 +547,7 @@
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 0
+        i32.const 256
         global.get 12
         global.get 8
         call 8
@@ -568,7 +568,7 @@
       end
       block  ;; label = @2
         global.get 12
-        i32.const 0
+        i32.const 256
         global.get 8
         call 8
         call_indirect (type 0)
@@ -587,7 +587,7 @@
         br_if 1 (;@1;)
       end
       block  ;; label = @2
-        i32.const 0
+        i32.const 256
         i32.const 31
         call 6
         global.get 8
@@ -611,7 +611,7 @@
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
-          i32.const 16
+          i32.const 272
           local.set 0
           local.get 0
           local.get 0
@@ -623,7 +623,7 @@
           br 1 (;@2;)
         end
         block  ;; label = @3
-          i32.const 20
+          i32.const 276
           local.set 1
           local.get 1
           local.get 1
@@ -645,8 +645,8 @@
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
-          i32.const 36
-          i32.const 40
+          i32.const 292
+          i32.const 296
           global.get 8
           call 8
           call_indirect (type 0)
@@ -658,8 +658,8 @@
           br 1 (;@2;)
         end
         block  ;; label = @3
-          i32.const 44
-          i32.const 60
+          i32.const 300
+          i32.const 316
           global.get 8
           call 8
           call_indirect (type 0)
@@ -671,8 +671,8 @@
           br 1 (;@2;)
         end
         block  ;; label = @3
-          i32.const 76
-          i32.const 84
+          i32.const 332
+          i32.const 340
           global.get 8
           call 8
           call_indirect (type 0)
@@ -693,7 +693,7 @@
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 92
+        i32.const 348
         local.get 0
         global.get 8
         call 8
@@ -703,7 +703,7 @@
         br_if 1 (;@1;)
       end
       local.get 0
-      i32.const 100
+      i32.const 356
       global.get 8
       call 8
       call_indirect (type 0)
@@ -722,7 +722,7 @@
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 104
+        i32.const 360
         global.get 12
         global.get 8
         call 8
@@ -733,7 +733,7 @@
       end
       block  ;; label = @2
         global.get 12
-        i32.const 112
+        i32.const 368
         global.get 8
         call 8
         call_indirect (type 0)
@@ -742,7 +742,7 @@
         br_if 1 (;@1;)
       end
       block  ;; label = @2
-        i32.const 116
+        i32.const 372
         i32.const 37
         call 6
         global.get 8
@@ -754,7 +754,7 @@
       end
       i32.const 38
       call 6
-      i32.const 128
+      i32.const 384
       global.get 8
       call 8
       call_indirect (type 0)
@@ -765,8 +765,8 @@
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 140
-        i32.const 0
+        i32.const 396
+        i32.const 256
         global.get 8
         call 8
         call_indirect (type 0)
@@ -775,8 +775,8 @@
         br_if 1 (;@1;)
       end
       block  ;; label = @2
-        i32.const 0
-        i32.const 148
+        i32.const 256
+        i32.const 404
         global.get 8
         call 8
         call_indirect (type 0)
@@ -785,7 +785,7 @@
         br_if 1 (;@1;)
       end
       block  ;; label = @2
-        i32.const 156
+        i32.const 412
         global.get 20
         global.get 8
         call 8
@@ -795,7 +795,7 @@
         br_if 1 (;@1;)
       end
       global.get 20
-      i32.const 160
+      i32.const 416
       global.get 8
       call 8
       call_indirect (type 0)
@@ -830,7 +830,7 @@
     i32.const 26
     call 6
     global.set 19
-    i32.const 0
+    i32.const 256
     global.set 20
     i32.const 27
     call 6
@@ -884,25 +884,25 @@
   (export "eqv-string-to-symbol" (func 54))
   (start 55)
   (elem (;0;) (i32.const 0) func 9 10 11 12 13 14 15 16 19 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54)
-  (data (;0;) (i32.const 0) "\04\00\00\01symb")
-  (data (;1;) (i32.const 8) "\03\00\00\01foo")
-  (data (;2;) (i32.const 16) "\00\00\00\02")
-  (data (;3;) (i32.const 20) "\0b\00\00\02foobarxyzzy")
-  (data (;4;) (i32.const 36) "\00\00\00\02")
-  (data (;5;) (i32.const 40) "\00\00\00\02")
-  (data (;6;) (i32.const 44) "\0a\00\00\02foobar1234")
-  (data (;7;) (i32.const 60) "\0a\00\00\02foobar1234")
-  (data (;8;) (i32.const 76) "\01\00\00\02x")
-  (data (;9;) (i32.const 84) "\01\00\00\02y")
-  (data (;10;) (i32.const 92) "\03\00\00\02foo")
-  (data (;11;) (i32.const 100) "\00\00\00\02")
-  (data (;12;) (i32.const 104) "\04\00\00\02proc")
-  (data (;13;) (i32.const 112) "\00\00\00\02")
-  (data (;14;) (i32.const 116) "\06\00\00\02lambda")
-  (data (;15;) (i32.const 128) "\06\00\00\02lambda")
-  (data (;16;) (i32.const 140) "\04\00\00\02symb")
-  (data (;17;) (i32.const 148) "\04\00\00\02symb")
-  (data (;18;) (i32.const 156) "\00\00\00\02")
-  (data (;19;) (i32.const 160) "\03\00\00\02foo")
+  (data (;0;) (i32.const 256) "\04\00\00\01symb")
+  (data (;1;) (i32.const 264) "\03\00\00\01foo")
+  (data (;2;) (i32.const 272) "\00\00\00\02")
+  (data (;3;) (i32.const 276) "\0b\00\00\02foobarxyzzy")
+  (data (;4;) (i32.const 292) "\00\00\00\02")
+  (data (;5;) (i32.const 296) "\00\00\00\02")
+  (data (;6;) (i32.const 300) "\0a\00\00\02foobar1234")
+  (data (;7;) (i32.const 316) "\0a\00\00\02foobar1234")
+  (data (;8;) (i32.const 332) "\01\00\00\02x")
+  (data (;9;) (i32.const 340) "\01\00\00\02y")
+  (data (;10;) (i32.const 348) "\03\00\00\02foo")
+  (data (;11;) (i32.const 356) "\00\00\00\02")
+  (data (;12;) (i32.const 360) "\04\00\00\02proc")
+  (data (;13;) (i32.const 368) "\00\00\00\02")
+  (data (;14;) (i32.const 372) "\06\00\00\02lambda")
+  (data (;15;) (i32.const 384) "\06\00\00\02lambda")
+  (data (;16;) (i32.const 396) "\04\00\00\02symb")
+  (data (;17;) (i32.const 404) "\04\00\00\02symb")
+  (data (;18;) (i32.const 412) "\00\00\00\02")
+  (data (;19;) (i32.const 416) "\03\00\00\02foo")
   (type (;3;) (func (param i32 i32 i32) (result i32)))
   (type (;4;) (func)))

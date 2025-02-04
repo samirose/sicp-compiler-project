@@ -12,11 +12,10 @@
    (lists)
    (values)
    (wasm-syntax)
-   (compiled-program))
+   (compiled-program)
+   (runtime-memory))
 
   (begin
-    (define literals-start-address 0)
-
     (define (align-address address alignment)
       (* (quotient (+ address (- alignment 1)) alignment)
          alignment))
@@ -29,7 +28,7 @@
               => (lambda (def)
                    (+ (literal-data-attribute-value 'address def)
                       (literal-data-attribute-value 'length def))))
-             (else literals-start-address))
+             (else user-memory-start-address))
        alignment))
 
     (define (compile-literal-symbol symbol program)

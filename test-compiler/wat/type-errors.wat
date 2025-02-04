@@ -2,8 +2,8 @@
   (type (;0;) (func (param i32) (result i32)))
   (type (;1;) (func (result i32)))
   (type (;2;) (func (param i32 i32) (result i32)))
-  (memory (;0;) 1)
-  (export "$heap" (memory 0))
+  (memory (;0;) 10)
+  (export "memory" (memory 0))
   (global (;0;) (mut i32) (i32.const 0))
   (global (;1;) i32 (i32.const 2))
   (global (;2;) i32 (i32.const 18))
@@ -354,23 +354,23 @@
     call 8
     call_indirect (type 0))
   (func (;33;) (type 1) (result i32)
-    i32.const 0
+    i32.const 256
     global.get 11
     call 8
     call_indirect (type 0))
   (func (;34;) (type 0) (param i32) (result i32)
     local.get 0
-    i32.const 8
+    i32.const 264
     call 8
     call_indirect (type 0))
   (func (;35;) (type 1) (result i32)
-    i32.const 16
+    i32.const 272
     global.get 11
     call 8
     call_indirect (type 0))
   (func (;36;) (type 0) (param i32) (result i32)
     local.get 0
-    i32.const 24
+    i32.const 280
     call 8
     call_indirect (type 0))
   (func (;37;)
@@ -423,9 +423,9 @@
   (export "string-as-operator" (func 36))
   (start 37)
   (elem (;0;) (i32.const 0) func 9 10 11 12 13 14 15 16 19 23 24 25 26 27 28 29 30 31 32 33 34 35 36)
-  (data (;0;) (i32.const 0) "\03\00\00\01foo")
-  (data (;1;) (i32.const 8) "\03\00\00\01bar")
-  (data (;2;) (i32.const 16) "\03\00\00\02foo")
-  (data (;3;) (i32.const 24) "\03\00\00\02bar")
+  (data (;0;) (i32.const 256) "\03\00\00\01foo")
+  (data (;1;) (i32.const 264) "\03\00\00\01bar")
+  (data (;2;) (i32.const 272) "\03\00\00\02foo")
+  (data (;3;) (i32.const 280) "\03\00\00\02bar")
   (type (;3;) (func (param i32 i32 i32) (result i32)))
   (type (;4;) (func)))

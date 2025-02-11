@@ -9,6 +9,7 @@
           compiled-program-add-definition
           compiled-program-last-definition
           compiled-program-lookup-definition
+          compiled-program-fold-definitions
           compiled-program-flatmap-definitions
           compiled-program-get-definitions
           compiled-program-contains-definition
@@ -69,6 +70,12 @@
       (lookup-definition
        (compiled-program-module-definitions cp)
        predicate))
+
+    (define (compiled-program-fold-definitions cp proc init)
+      (fold-definitions
+       (compiled-program-module-definitions cp)
+       proc
+       init))
 
     (define (compiled-program-flatmap-definitions cp proc)
       (flatmap-definitions

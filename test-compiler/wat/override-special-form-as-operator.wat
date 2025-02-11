@@ -441,5 +441,6 @@
   (export "override-special-symbols-let*" (func 41))
   (start 42)
   (elem (;0;) (i32.const 0) func 9 10 11 12 13 14 15 16 19 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41)
+  (data (;0;) (i32.const 0) "\00\01\00\00")
   (type (;3;) (func (param i32 i32 i32) (result i32)))
   (type (;4;) (func)))

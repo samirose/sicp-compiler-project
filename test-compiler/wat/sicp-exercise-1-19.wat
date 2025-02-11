@@ -500,6 +500,7 @@
   (export "fib" (func 28))
   (start 29)
   (elem (;0;) (i32.const 0) func 9 10 11 12 13 14 15 16 19 23 24 25 26 27 28)
+  (data (;0;) (i32.const 0) "\00\01\00\00")
   (type (;3;) (func (result i32)))
   (type (;4;) (func (param i32 i32 i32) (result i32)))
   (type (;5;) (func)))

@@ -348,6 +348,7 @@
   (export "not-false-expression-is-true" (func 30))
   (start 31)
   (elem (;0;) (i32.const 0) func 9 10 11 12 13 14 15 16 19 23 24 25 26 27 28 29 30)
+  (data (;0;) (i32.const 0) "\00\01\00\00")
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func (param i32 i32 i32) (result i32)))
   (type (;4;) (func)))

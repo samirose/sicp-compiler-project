@@ -13,11 +13,13 @@
           (compiled-program)
           (wasm-syntax))
 
-  (import (scheme-runtime-base))
+  (import (scheme-runtime-base)
+          (scheme-runtime-write))
 
   (begin
     (define runtime-libraries-table
-      (list scheme-base-table-entry))
+      (list scheme-base-table-entry
+            scheme-write-table-entry))
 
     (define (runtime-library-entry library)
       (assoc library runtime-libraries-table))

@@ -20,6 +20,7 @@
    error-expected-procedure
    error-expected-string
    error-expected-symbol
+   error-io-write
    symbol->error)
 
   (import
@@ -96,6 +97,7 @@
     (define error-expected-procedure 3)
     (define error-expected-symbol 4)
     (define error-expected-string 5)
+    (define error-io-write 10)
 
     (define symbol->error
       `((no-error . ,error-no-error)
@@ -103,6 +105,7 @@
         (expected-number . ,error-expected-number)
         (expected-procedure . ,error-expected-procedure)
         (expected-symbol . ,error-expected-symbol)
-        (expected-string . ,error-expected-string)))
+        (expected-string . ,error-expected-string)
+        (io-write . ,error-io-write)))
     )
   )

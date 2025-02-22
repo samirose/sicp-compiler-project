@@ -64,8 +64,17 @@
             (runtime-entry-name entry)
             (runtime-entry-exported-name entry)
             ((runtime-entry-definition-generator entry)
-             (lambda (name)
-               (lookup-runtime-index program library name)))))
+             (lambda (library/name)
+               (let ((library (if (pair? library/name)
+                                  (car library/name)
+                                  library))
+                     (name (if (pair? library/name)
+                               (cadr library/name)
+                               library/name)))
+                 (lookup-runtime-index
+                  program
+                  library
+                  name))))))
          program
          (runtime-library-table library-entry))))
 

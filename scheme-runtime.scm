@@ -1,6 +1,7 @@
 (define-library (scheme-runtime)
 
   (export is-runtime-library
+          compile-runtime-library-definitions
           compile-runtime-library
           runtime-exports
           lookup-runtime-index)
@@ -28,6 +29,12 @@
     (define (runtime-library-definitions library-entry)
       (cadr library-entry))
 
+    (define (runtime-library-definition-name definition-entry)
+      (car definition-entry))
+
+    (define (runtime-library-definition definition-entry)
+      (cadr definition-entry))
+
     (define (runtime-library-table library-entry)
       (caddr library-entry))
 
@@ -43,18 +50,28 @@
     (define (runtime-entry-definition-generator entry)
       (caddr entry))
 
+    (define (error-unknown-library library)
+      (error "Unknown runtime library" library))
+
+    (define (compile-runtime-library-definitions library program)
+      (let ((library-entry
+             (cond ((runtime-library-entry library))
+                   (else (error-unknown-library library)))))
+        (fold
+         (lambda (definition-entry program)
+           (add-runtime-definition
+            program
+            library
+            (runtime-library-definition-name definition-entry)
+            #f
+            (runtime-library-definition definition-entry)))
+         program
+         (runtime-library-definitions library-entry))))
+
     (define (compile-runtime-library library program)
-      (let* ((library-entry
-              (cond ((runtime-library-entry library))
-                    (else (error "Unknown runtime library" library))))
-             (program
-              (fold
-               (lambda (definition program)
-                 (compiled-program-add-definition
-                  program
-                  definition))
-               program
-               (runtime-library-definitions library-entry))))
+      (let ((library-entry
+             (cond ((runtime-library-entry library))
+                   (else (error-unknown-library library)))))
         (fold
          (lambda (entry program)
            (add-runtime-definition

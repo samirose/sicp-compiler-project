@@ -10,7 +10,7 @@
   (begin
     (define memory-definitions
       ;; WASI requires the export name "memory"
-      '((memory (export "memory") 10)))
+      '(($heap (memory (export "memory") 10))))
 
     ;; Reserve memory addresses 0x00000000-0x000000ff for runtime internal data.
     ;; Literal data will start from 0x00000100

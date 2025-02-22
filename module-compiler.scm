@@ -46,6 +46,9 @@
              (map definition-variable definitions))
            (exports
             (library-declarations 'export library))
+           ;; Compile runtime library definitions to program
+           (program
+            (fold compile-runtime-library-definitions program imports))
            ;; Compile runtime library functions to program
            (program
             (fold compile-runtime-library program imports))

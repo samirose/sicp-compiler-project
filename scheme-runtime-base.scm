@@ -1,8 +1,9 @@
 (define-library (scheme-runtime-base)
 
-  (export definitions code-table)
+  (export scheme-base-table-entry)
 
   (import (scheme base)
+          (runtime-memory)
           (values))
 
   (begin
@@ -23,8 +24,6 @@
         i32.and
         i32.const ,heap-obj-type
         i32.eq))
-
-    (define definitions '())
 
     (define code-table
       `(($error-code
@@ -344,4 +343,8 @@
                    else
                    i32.const ,false-value
                    end)))
-        ))))
+        ))
+
+    (define scheme-base-table-entry
+      `((scheme base) ,memory-definitions ,code-table))
+    ))

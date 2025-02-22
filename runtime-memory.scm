@@ -1,6 +1,6 @@
 (define-library (runtime-memory)
 
-  (export definitions
+  (export memory-definitions
           literal-memory-start-address
           heap-memory-start-vector)
 
@@ -8,7 +8,7 @@
           (values))
 
   (begin
-    (define definitions
+    (define memory-definitions
       ;; WASI requires the export name "memory"
       '((memory (export "memory") 10)))
 

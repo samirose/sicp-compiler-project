@@ -71,10 +71,15 @@
                      (name (if (pair? library/name)
                                (cadr library/name)
                                library/name)))
-                 (lookup-runtime-index
-                  program
-                  library
-                  name))))))
+                 (or
+                  (lookup-runtime-index
+                   program
+                   library
+                   name)
+                  (error "Unknown runtime symbol"
+                         (list library
+                               (runtime-entry-name entry)
+                               library/name))))))))
          program
          (runtime-library-table library-entry))))
 

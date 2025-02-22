@@ -149,13 +149,18 @@
 		`((elem (i32.const 0) func ,@elem-func-indices))))
            (get-module-definitions
             (lambda (type)
-              (compiled-program-get-definitions program type))))
+              (compiled-program-get-definitions program type)))
+           (not-wasm-import-definition?
+            (lambda (def)
+              (not (wasm-import-definition? def)))))
         `(module
           ,@(get-module-definitions 'type)
-          ,@(get-module-definitions 'memory)
-          ,@(get-module-definitions 'global)
-          ,@(get-module-definitions 'func)
+          ,@(filter wasm-import-definition? (get-module-definitions 'global))
+          ,@(filter wasm-import-definition? (get-module-definitions 'func))
+          ,@(filter not-wasm-import-definition? (get-module-definitions 'func))
           ,@(get-module-definitions 'table)
+          ,@(get-module-definitions 'memory)
+          ,@(filter not-wasm-import-definition? (get-module-definitions 'global))
           ,@(get-module-definitions 'export)
           ,@(get-module-definitions 'start)
           ,@elems-def

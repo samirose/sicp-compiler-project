@@ -138,17 +138,16 @@
 
     (define (compile-program-to-module program)
       (let*
-	  ((elem-defs
-            (compiled-program-get-definitions program 'elem))
-           (elem-func-indices
-            (map wasm-elem-definition-func-index elem-defs))
-           (elems-def
-            (if (null? elem-defs)
-		'()
-		`((elem (i32.const 0) func ,@elem-func-indices))))
-           (get-module-definitions
+          ((get-module-definitions
             (lambda (type)
-              (compiled-program-get-definitions program type))))
+              (compiled-program-get-definitions program type)))
+           (elem-definition
+            (let ((elem-func-indices
+                   (map wasm-elem-definition-func-index
+                        (get-module-definitions 'elem))))
+              (if (null? elem-func-indices)
+		  '()
+		  `((elem (i32.const 0) func ,@elem-func-indices))))))
         (let-values
             (((global-imports global-definitions)
               (partition wasm-import-definition?
@@ -166,7 +165,7 @@
             ,@global-definitions
             ,@(get-module-definitions 'export)
             ,@(get-module-definitions 'start)
-            ,@elems-def
+            ,@elem-definition
             ,@(literal-data-definitions program)))))
 
     (define (make-global-lexical-env imported-identifiers defined-variables exports)

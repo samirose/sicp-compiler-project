@@ -153,17 +153,24 @@
            (get-module-definitions
             (lambda (type)
               (compiled-program-get-definitions program type)))
-           (not-wasm-import-definition?
-            (lambda (def)
-              (not (wasm-import-definition? def)))))
+           (global-imports-and-definitions
+            (partition-list wasm-import-definition?
+                            (get-module-definitions 'global)))
+           (global-imports (car global-imports-and-definitions))
+           (global-definitions (cdr global-imports-and-definitions))
+           (func-imports-and-definitions
+            (partition-list wasm-import-definition?
+                            (get-module-definitions 'func)))
+           (func-imports (car func-imports-and-definitions))
+           (func-definitions (cdr func-imports-and-definitions)))
         `(module
           ,@(get-module-definitions 'type)
-          ,@(filter wasm-import-definition? (get-module-definitions 'global))
-          ,@(filter wasm-import-definition? (get-module-definitions 'func))
-          ,@(filter not-wasm-import-definition? (get-module-definitions 'func))
+          ,@global-imports
+          ,@func-imports
+          ,@func-definitions
           ,@(get-module-definitions 'table)
           ,@(get-module-definitions 'memory)
-          ,@(filter not-wasm-import-definition? (get-module-definitions 'global))
+          ,@global-definitions
           ,@(get-module-definitions 'export)
           ,@(get-module-definitions 'start)
           ,@elems-def

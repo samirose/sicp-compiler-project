@@ -36,9 +36,7 @@
 		           (library-declarations 'begin library)
 		           (raise-compilation-error "No begin declaration in library" library)))))
         (let*
-            ((definition-names
-               (map definition-variable definitions))
-             (imports
+            ((imports
               (library-declarations 'import library))
              (exports
               (library-declarations 'export library))
@@ -66,8 +64,17 @@
                   `(elem ,(cdr runtime-binding))))
                program
                runtime-bindings))
-             (runtime-global-definitions-count
-              (compiled-program-definitions-count program 'global))
+             (definition-names
+               (map definition-variable definitions))
+             ;; Create global lexical environment
+             (lexical-env
+              (make-global-lexical-env
+               (append
+                ;; Create unbound slots for globals from runtime imports
+                (make-list (compiled-program-definitions-count program 'global) #f)
+                (map car runtime-bindings))
+               definition-names
+               exports))
              ;; Add global function values for runtime functions
              (program
               (do ((bindings runtime-bindings (cdr bindings))
@@ -97,43 +104,39 @@
                (make-list (length definitions)
 			  `(global (mut i32) (i32.const ,uninitialized-value)))
                '()))
-             (definitions-init-assignments
-               (map (lambda (definition)
-                      `(set! ,(definition-variable definition) ,(definition-value definition)))
-		    definitions))
-             (non-definitions
-              (append definitions-init-assignments non-definitions))
-             (lexical-env
-              (make-global-lexical-env
-               (append
-                (make-list runtime-global-definitions-count #f)
-                (map car runtime-bindings))
-               definition-names
-               exports))
+             ;; Compile top-level code and globals initialisation
              (program
-              (if (null? non-definitions)
-		  program
-		  (let* ((program
-			  (compile-sequence non-definitions program lexical-env compile))
-                         (global-init-code
-			  (compiled-program-value-code program))
-                         (global-init-func-index
-			  (compiled-program-definitions-count program 'func)))
-		    (compiled-program-with-definitions-and-value-code
-                     program
-                     `((func
-                        ,@(wasm-local-definitions-to-top global-init-code)
-                        drop)
-                       (start ,global-init-func-index))
-                     '()))))
-             (elem-defs-count
-              (compiled-program-definitions-count program 'elem))
+              (let*
+                  ((definitions-init-assignments
+                     (map (lambda (definition)
+                            `(set! ,(definition-variable definition) ,(definition-value definition)))
+		          definitions))
+                   (non-definitions
+                    (append definitions-init-assignments non-definitions)))
+                (if (null? non-definitions)
+		    program
+		    (let* ((program
+			    (compile-sequence non-definitions program lexical-env compile))
+                           (global-init-code
+			    (compiled-program-value-code program))
+                           (global-init-func-index
+			    (compiled-program-definitions-count program 'func)))
+		      (compiled-program-with-definitions-and-value-code
+                       program
+                       `((func
+                          ,@(wasm-local-definitions-to-top global-init-code)
+                          drop)
+                         (start ,global-init-func-index))
+                       '())))))
+             ;; Add function table definition
              (program
-              (if (= elem-defs-count 0)
-		  program
-		  (compiled-program-add-definition
-		   program
-		   `(table ,elem-defs-count funcref)))))
+              (let ((elem-defs-count
+                     (compiled-program-definitions-count program 'elem)))
+                (if (= elem-defs-count 0)
+		    program
+		    (compiled-program-add-definition
+		     program
+		     `(table ,elem-defs-count funcref))))))
 	  program)))
 
     (define (compile-program-to-module program)

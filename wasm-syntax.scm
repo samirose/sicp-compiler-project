@@ -41,8 +41,9 @@
       (pattern-match? `(local ,?? ,??*) exp))
 
     (define (wasm-local-definitions-to-top seq)
-      (let ((split-code (partition-list wasm-locals-definition? seq)))
-	(append (car split-code) (cdr split-code))))
+      (let-values (((local-definitions statements)
+                   (partition wasm-locals-definition? seq)))
+	(append local-definitions statements)))
 
     (define (wasm-import-exp? exp)
       (pattern-match? `(import ,string? ,string?) exp))

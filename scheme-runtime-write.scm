@@ -3,6 +3,7 @@
   (export scheme-write-table-entry)
 
   (import (scheme base)
+          (scheme-runtime-base)
           (runtime-memory)
           (values))
 
@@ -11,10 +12,6 @@
       '(($fd_write
          (func (import "wasi_snapshot_preview1" "fd_write")
                (param i32 i32 i32 i32) (result i32)))))
-
-    (define (macro-raise-error runtime-index)
-      `(global.set ,(runtime-index '((scheme base) $error-code))
-        unreachable))
 
     (define code-table
       `(($write-string

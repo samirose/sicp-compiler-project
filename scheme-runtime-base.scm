@@ -1,6 +1,7 @@
 (define-library (scheme-runtime-base)
 
-  (export scheme-base-table-entry)
+  (export scheme-base-table-entry
+          macro-raise-error)
 
   (import (scheme base)
           (runtime-memory)
@@ -8,7 +9,7 @@
 
   (begin
     (define (macro-raise-error runtime-index)
-      `(global.set ,(runtime-index '$error-code)
+      `(global.set ,(runtime-index '((scheme base) $error-code))
         unreachable))
 
     (define macro-is-not-heap-obj

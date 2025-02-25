@@ -4,26 +4,6 @@
  (assert))
 
 (assert-equal
- (cons '() '())
- (partition-list even? '())
- "Partitioning an empty list returns a pair of empty lists")
-
-(assert-equal
- (cons '(2 4 6) '())
- (partition-list even? '(2 4 6))
- "Partitioning a list with all matching elements returns all elements in car")
-
-(assert-equal
- (cons '() '(1 3 5))
- (partition-list even? '(1 3 5))
- "Partitioning a list with all non-matching elements returns all elements in cdr")
-
-(assert-equal
- (cons '(4 2 6) '(3 1 1 5 9))
- (partition-list even? '(3 1 4 1 5 9 2 6))
- "Partitioning a list with collects matching elements to car and non-matching to cdr")
-
-(assert-equal
  #f
  (index-of-equal '() '())
  "index-of-equal from empty list results to #f")

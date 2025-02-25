@@ -6,6 +6,7 @@
           last-definition
           contains-definition
           lookup-definition
+          fold-definitions
           flatmap-definitions
           lookup-definition-index
           definition-index
@@ -13,6 +14,7 @@
 
   (import (scheme base)
           (counted-set)
+          (lists)
           (wasm-syntax))
 
   (begin
@@ -47,6 +49,9 @@
         (cond ((null? ds) #f)
               ((predicate (car ds)) (car ds))
               (else (loop (cdr ds))))))
+
+    (define (fold-definitions defs proc init)
+      (fold proc init (definitions defs)))
 
     (define (flatmap-definitions defs proc)
       (let loop ((ds (definitions defs))

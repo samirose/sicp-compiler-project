@@ -188,6 +188,14 @@
          "Definitions table with two funcs and one global added has the global as last global definition")
 
         (assert-equal
+         `($f $g $glob)
+         (fold-definitions
+          ds
+          (lambda (d r) (cons (cadr d) r))
+          '())
+         "fold-definitions can collect data from all definitions")
+
+        (assert-equal
          '((global (import "glob") (mut i32)) (global $glob (mut i32)))
          (flatmap-definitions
           ds

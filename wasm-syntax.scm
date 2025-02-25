@@ -41,14 +41,16 @@
       (pattern-match? `(local ,?? ,??*) exp))
 
     (define (wasm-local-definitions-to-top seq)
-      (let ((split-code (partition-list wasm-locals-definition? seq)))
-	(append (car split-code) (cdr split-code))))
+      (let-values (((local-definitions statements)
+                   (partition wasm-locals-definition? seq)))
+	(append local-definitions statements)))
+
+    (define (wasm-import-exp? exp)
+      (pattern-match? `(import ,string? ,string?) exp))
 
     (define (wasm-import-definition? exp)
-      (cond ((null? exp) #f)
-            ((pattern-match? `(import ,string? ,??*) exp))
-            ((pattern-match? `((import ,string? ,??*) ,??*) exp))
-            (else (wasm-import-definition? (cdr exp)))))
+      (or (pattern-match? `(global ,wasm-import-exp? ,?? ,??*) exp)
+          (pattern-match? `(func ,wasm-import-exp? ,?? ,??*) exp)))
 
     (define (i32-as-wasm-data n)
       (do ((bytes (make-bytevector 4))

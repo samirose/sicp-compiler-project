@@ -12,11 +12,10 @@
    (lists)
    (values)
    (wasm-syntax)
-   (compiled-program))
+   (compiled-program)
+   (runtime-memory))
 
   (begin
-    (define literals-start-address 0)
-
     (define (align-address address alignment)
       (* (quotient (+ address (- alignment 1)) alignment)
          alignment))
@@ -29,7 +28,7 @@
               => (lambda (def)
                    (+ (literal-data-attribute-value 'address def)
                       (literal-data-attribute-value 'length def))))
-             (else literals-start-address))
+             (else literal-memory-start-address))
        alignment))
 
     (define (compile-literal-symbol symbol program)
@@ -103,14 +102,33 @@
     (define (literal-data-definition attributes values)
       `(literal-data-definition ,attributes ,@values))
 
-    (define (literal-data-definitions program)
-      (compiled-program-flatmap-definitions
+    (define (last-literal-data-address program)
+      (compiled-program-fold-definitions
        program
-       (lambda (def)
+       (lambda (def max-address)
          (if (literal-data-definition? def)
-             `((data
-                (i32.const ,(literal-data-attribute-value 'address def))
-                ,@(literal-data-values def)))
-             '()))))
+             (let ((last-address
+                    (+ (literal-data-attribute-value 'address def)
+                       (literal-data-attribute-value 'length def))))
+               (if (> last-address max-address)
+                   last-address
+                   max-address))
+             max-address))
+       literal-memory-start-address))
+
+    (define (literal-data-definitions program)
+      (let ((first-heap-address
+             (align-address (last-literal-data-address program) 4)))
+        (cons
+         `(data (i32.const ,heap-memory-start-vector)
+                ,(car (i32-as-wasm-data first-heap-address)))
+         (compiled-program-flatmap-definitions
+          program
+          (lambda (def)
+            (if (literal-data-definition? def)
+                `((data
+                   (i32.const ,(literal-data-attribute-value 'address def))
+                   ,@(literal-data-values def)))
+                '()))))))
     )
   )

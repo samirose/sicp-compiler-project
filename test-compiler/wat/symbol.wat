@@ -2,32 +2,6 @@
   (type (;0;) (func (param i32) (result i32)))
   (type (;1;) (func (result i32)))
   (type (;2;) (func (param i32 i32) (result i32)))
-  (memory (;0;) 1)
-  (export "$heap" (memory 0))
-  (global (;0;) (mut i32) (i32.const 0))
-  (global (;1;) i32 (i32.const 2))
-  (global (;2;) i32 (i32.const 18))
-  (global (;3;) i32 (i32.const 34))
-  (global (;4;) i32 (i32.const 50))
-  (global (;5;) i32 (i32.const 66))
-  (global (;6;) i32 (i32.const 82))
-  (global (;7;) i32 (i32.const 98))
-  (global (;8;) i32 (i32.const 114))
-  (global (;9;) i32 (i32.const 130))
-  (global (;10;) i32 (i32.const 146))
-  (global (;11;) (mut i32) (i32.const 46))
-  (global (;12;) (mut i32) (i32.const 46))
-  (global (;13;) (mut i32) (i32.const 46))
-  (global (;14;) (mut i32) (i32.const 46))
-  (global (;15;) (mut i32) (i32.const 46))
-  (global (;16;) (mut i32) (i32.const 46))
-  (global (;17;) (mut i32) (i32.const 46))
-  (global (;18;) (mut i32) (i32.const 46))
-  (global (;19;) (mut i32) (i32.const 46))
-  (global (;20;) (mut i32) (i32.const 46))
-  (global (;21;) (mut i32) (i32.const 46))
-  (global (;22;) (mut i32) (i32.const 46))
-  (global (;23;) (mut i32) (i32.const 46))
   (func (;0;) (result i32)
     global.get 0
     i32.const 0
@@ -275,7 +249,7 @@
       i32.const 6
     end)
   (func (;24;) (type 1) (result i32)
-    i32.const 0
+    i32.const 256
     global.get 5
     call 8
     call_indirect (type 0))
@@ -284,8 +258,8 @@
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
-          i32.const 0
-          i32.const 0
+          i32.const 256
+          i32.const 256
           global.get 7
           call 8
           call_indirect (type 2)
@@ -295,7 +269,7 @@
         end
         block  ;; label = @3
           global.get 12
-          i32.const 0
+          i32.const 256
           global.get 7
           call 8
           call_indirect (type 2)
@@ -314,8 +288,8 @@
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
-          i32.const 0
-          i32.const 0
+          i32.const 256
+          i32.const 256
           global.get 9
           call 8
           call_indirect (type 2)
@@ -325,7 +299,7 @@
         end
         block  ;; label = @3
           global.get 12
-          i32.const 0
+          i32.const 256
           global.get 9
           call 8
           call_indirect (type 2)
@@ -343,7 +317,7 @@
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 20
+        i32.const 276
         global.get 12
         global.get 7
         call 8
@@ -364,7 +338,7 @@
     (local i32)
     block  ;; label = @1
       block  ;; label = @2
-        i32.const 20
+        i32.const 276
         global.get 12
         global.get 9
         call 8
@@ -387,15 +361,15 @@
     call 8
     call_indirect (type 0))
   (func (;30;) (type 1) (result i32)
-    i32.const 28)
+    i32.const 284)
   (func (;31;) (type 1) (result i32)
     (local i32 i32)
-    i32.const 44
+    i32.const 300
     local.set 0
     block (result i32)  ;; label = @1
       block  ;; label = @2
         block  ;; label = @3
-          i32.const 8
+          i32.const 264
           global.get 18
           call 8
           call_indirect (type 0)
@@ -440,7 +414,7 @@
     end)
   (func (;32;) (type 1) (result i32)
     (local i32)
-    i32.const 60
+    i32.const 316
     local.set 0
     local.get 0
     global.get 5
@@ -454,8 +428,8 @@
     call 8
     call_indirect (type 2))
   (func (;34;) (type 1) (result i32)
-    i32.const 88
-    i32.const 96
+    i32.const 344
+    i32.const 352
     global.get 9
     call 8
     call_indirect (type 2))
@@ -463,9 +437,9 @@
     i32.const 10
     call 6
     global.set 11
-    i32.const 0
+    i32.const 256
     global.set 12
-    i32.const 8
+    i32.const 264
     global.set 13
     i32.const 11
     call 6
@@ -500,6 +474,32 @@
     i32.const 30
     drop)
   (table (;0;) 21 funcref)
+  (memory (;0;) 10)
+  (export "memory" (memory 0))
+  (global (;0;) (mut i32) (i32.const 0))
+  (global (;1;) i32 (i32.const 2))
+  (global (;2;) i32 (i32.const 18))
+  (global (;3;) i32 (i32.const 34))
+  (global (;4;) i32 (i32.const 50))
+  (global (;5;) i32 (i32.const 66))
+  (global (;6;) i32 (i32.const 82))
+  (global (;7;) i32 (i32.const 98))
+  (global (;8;) i32 (i32.const 114))
+  (global (;9;) i32 (i32.const 130))
+  (global (;10;) i32 (i32.const 146))
+  (global (;11;) (mut i32) (i32.const 46))
+  (global (;12;) (mut i32) (i32.const 46))
+  (global (;13;) (mut i32) (i32.const 46))
+  (global (;14;) (mut i32) (i32.const 46))
+  (global (;15;) (mut i32) (i32.const 46))
+  (global (;16;) (mut i32) (i32.const 46))
+  (global (;17;) (mut i32) (i32.const 46))
+  (global (;18;) (mut i32) (i32.const 46))
+  (global (;19;) (mut i32) (i32.const 46))
+  (global (;20;) (mut i32) (i32.const 46))
+  (global (;21;) (mut i32) (i32.const 46))
+  (global (;22;) (mut i32) (i32.const 46))
+  (global (;23;) (mut i32) (i32.const 46))
   (export "literal-symbol-is-symbol" (func 24))
   (export "literal-symbols-with-same-name-are-eq" (func 25))
   (export "literal-symbols-with-same-name-are-symbol=?" (func 26))
@@ -511,13 +511,14 @@
   (export "symbol=?-expects-symbol-second-argument" (func 34))
   (start 35)
   (elem (;0;) (i32.const 0) func 9 10 11 12 13 14 15 16 19 23 24 25 26 27 28 29 30 31 32 33 34)
-  (data (;0;) (i32.const 0) "\03\00\00\01foo")
-  (data (;1;) (i32.const 8) "\06\00\00\01foobar")
-  (data (;2;) (i32.const 20) "\03\00\00\01baz")
-  (data (;3;) (i32.const 28) "\0a\00\00\01got-symbol")
-  (data (;4;) (i32.const 44) "\0c\00\00\01bound-symbol")
-  (data (;5;) (i32.const 60) "\17\00\00\01\22foo\22 \09\0a\0d\5c'bar'\f0\9f\98\80!@\7f\07")
-  (data (;6;) (i32.const 88) "\04\00\00\01symb")
-  (data (;7;) (i32.const 96) "\04\00\00\02symb")
+  (data (;0;) (i32.const 0) "h\01\00\00")
+  (data (;1;) (i32.const 256) "\03\00\00\01foo")
+  (data (;2;) (i32.const 264) "\06\00\00\01foobar")
+  (data (;3;) (i32.const 276) "\03\00\00\01baz")
+  (data (;4;) (i32.const 284) "\0a\00\00\01got-symbol")
+  (data (;5;) (i32.const 300) "\0c\00\00\01bound-symbol")
+  (data (;6;) (i32.const 316) "\17\00\00\01\22foo\22 \09\0a\0d\5c'bar'\f0\9f\98\80!@\7f\07")
+  (data (;7;) (i32.const 344) "\04\00\00\01symb")
+  (data (;8;) (i32.const 352) "\04\00\00\02symb")
   (type (;3;) (func (param i32 i32 i32) (result i32)))
   (type (;4;) (func)))

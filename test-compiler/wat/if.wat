@@ -1,35 +1,6 @@
 (module
   (type (;0;) (func (result i32)))
   (type (;1;) (func (param i32) (result i32)))
-  (memory (;0;) 1)
-  (export "$heap" (memory 0))
-  (global (;0;) (mut i32) (i32.const 0))
-  (global (;1;) i32 (i32.const 2))
-  (global (;2;) i32 (i32.const 18))
-  (global (;3;) i32 (i32.const 34))
-  (global (;4;) i32 (i32.const 50))
-  (global (;5;) i32 (i32.const 66))
-  (global (;6;) i32 (i32.const 82))
-  (global (;7;) i32 (i32.const 98))
-  (global (;8;) i32 (i32.const 114))
-  (global (;9;) i32 (i32.const 130))
-  (global (;10;) i32 (i32.const 146))
-  (global (;11;) (mut i32) (i32.const 46))
-  (global (;12;) (mut i32) (i32.const 46))
-  (global (;13;) (mut i32) (i32.const 46))
-  (global (;14;) (mut i32) (i32.const 46))
-  (global (;15;) (mut i32) (i32.const 46))
-  (global (;16;) (mut i32) (i32.const 46))
-  (global (;17;) (mut i32) (i32.const 46))
-  (global (;18;) (mut i32) (i32.const 46))
-  (global (;19;) (mut i32) (i32.const 46))
-  (global (;20;) (mut i32) (i32.const 46))
-  (global (;21;) (mut i32) (i32.const 46))
-  (global (;22;) (mut i32) (i32.const 46))
-  (global (;23;) (mut i32) (i32.const 46))
-  (global (;24;) (mut i32) (i32.const 46))
-  (global (;25;) (mut i32) (i32.const 46))
-  (global (;26;) (mut i32) (i32.const 46))
   (func (;0;) (result i32)
     global.get 0
     i32.const 0
@@ -308,7 +279,7 @@
       call 1
     end)
   (func (;27;) (type 0) (result i32)
-    i32.const 0
+    i32.const 256
     call 5
     if (result i32)  ;; label = @1
       i32.const 1
@@ -318,7 +289,7 @@
       call 1
     end)
   (func (;28;) (type 0) (result i32)
-    i32.const 8
+    i32.const 264
     call 5
     if (result i32)  ;; label = @1
       i32.const 1
@@ -609,6 +580,35 @@
     i32.const 30
     drop)
   (table (;0;) 31 funcref)
+  (memory (;0;) 10)
+  (export "memory" (memory 0))
+  (global (;0;) (mut i32) (i32.const 0))
+  (global (;1;) i32 (i32.const 2))
+  (global (;2;) i32 (i32.const 18))
+  (global (;3;) i32 (i32.const 34))
+  (global (;4;) i32 (i32.const 50))
+  (global (;5;) i32 (i32.const 66))
+  (global (;6;) i32 (i32.const 82))
+  (global (;7;) i32 (i32.const 98))
+  (global (;8;) i32 (i32.const 114))
+  (global (;9;) i32 (i32.const 130))
+  (global (;10;) i32 (i32.const 146))
+  (global (;11;) (mut i32) (i32.const 46))
+  (global (;12;) (mut i32) (i32.const 46))
+  (global (;13;) (mut i32) (i32.const 46))
+  (global (;14;) (mut i32) (i32.const 46))
+  (global (;15;) (mut i32) (i32.const 46))
+  (global (;16;) (mut i32) (i32.const 46))
+  (global (;17;) (mut i32) (i32.const 46))
+  (global (;18;) (mut i32) (i32.const 46))
+  (global (;19;) (mut i32) (i32.const 46))
+  (global (;20;) (mut i32) (i32.const 46))
+  (global (;21;) (mut i32) (i32.const 46))
+  (global (;22;) (mut i32) (i32.const 46))
+  (global (;23;) (mut i32) (i32.const 46))
+  (global (;24;) (mut i32) (i32.const 46))
+  (global (;25;) (mut i32) (i32.const 46))
+  (global (;26;) (mut i32) (i32.const 46))
   (export "if-true" (func 24))
   (export "if-number" (func 25))
   (export "if-procedure" (func 26))
@@ -626,8 +626,9 @@
   (export "if-lambda-alternative" (func 44))
   (start 45)
   (elem (;0;) (i32.const 0) func 9 10 11 12 13 14 15 16 19 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44)
-  (data (;0;) (i32.const 0) "\04\00\00\01symb")
-  (data (;1;) (i32.const 8) "\03\00\00\02str")
+  (data (;0;) (i32.const 0) "\10\01\00\00")
+  (data (;1;) (i32.const 256) "\04\00\00\01symb")
+  (data (;2;) (i32.const 264) "\03\00\00\02str")
   (type (;2;) (func (param i32 i32) (result i32)))
   (type (;3;) (func (param i32 i32 i32) (result i32)))
   (type (;4;) (func)))

@@ -45,46 +45,35 @@
                    program
                    `(i32.const ,address))))
             (else
-             (let* ((address (next-literal-address program 4))
-                    (symbol-string (symbol->string symbol))
-                    (symbol-data-value (string-as-wasm-data symbol-string))
-                    (symbol-length (cdr symbol-data-value))
-                    (symbol-header-value
-                     (i32-as-wasm-data (symbol-literal-header symbol-length)))
-                    (symbol-header-length (cdr symbol-header-value))
-                    (symbol-data-length (+ symbol-header-length symbol-length))
-                    (symbol-data-values
-                     (list (car symbol-header-value) (car symbol-data-value)))
-                    (symbol-data-definition
-                     (literal-data-definition
-                      `((symbol . ,symbol)
-                        (address . ,address)
-                        (length . ,symbol-data-length))
-                      symbol-data-values)))
-               (compiled-program-with-definition-and-value-code
-                program
-                symbol-data-definition
-                `(i32.const ,address))))))
+             (let*-values
+                 (((symbol-data symbol-data-length)
+                   (string-as-wasm-data (symbol->string symbol)))
+                  ((symbol-header-data symbol-header-length)
+                   (i32-as-wasm-data (symbol-literal-header symbol-data-length))))
+               (let ((address (next-literal-address program 4)))
+                 (compiled-program-with-definition-and-value-code
+                  program
+                  (literal-data-definition
+                   `((symbol . ,symbol)
+                     (address . ,address)
+                     (length . ,(+ symbol-header-length symbol-data-length)))
+                   (list symbol-header-data symbol-data))
+                  `(i32.const ,address)))))))
 
     (define (compile-literal-string string program)
-      (let* ((address (next-literal-address program 4))
-             (string-data-value (string-as-wasm-data string))
-             (string-length (cdr string-data-value))
-             (string-header-value
-              (i32-as-wasm-data (string-literal-header string-length)))
-             (string-header-length (cdr string-header-value))
-             (string-data-length (+ string-header-length string-length))
-             (string-data-values
-              (list (car string-header-value) (car string-data-value)))
-             (string-data-definition
-              (literal-data-definition
-               `((address . ,address)
-                 (length . ,string-data-length))
-               string-data-values)))
-        (compiled-program-with-definition-and-value-code
-         program
-         string-data-definition
-         `(i32.const ,address))))
+      (let*-values
+          (((string-data string-data-length)
+            (string-as-wasm-data string))
+           ((string-header-data string-header-length)
+            (i32-as-wasm-data (string-literal-header string-data-length))))
+        (let ((address (next-literal-address program 4)))
+          (compiled-program-with-definition-and-value-code
+           program
+           (literal-data-definition
+            `((address . ,address)
+              (length . ,(+ string-header-length string-data-length)))
+            (list string-header-data string-data))
+           `(i32.const ,address)))))
 
     (define (literal-data-definition? exp)
       (eq? (car exp) 'literal-data-definition))
@@ -117,11 +106,11 @@
        literal-memory-start-address))
 
     (define (literal-data-definitions program)
-      (let ((first-heap-address
-             (align-address (last-literal-data-address program) 4)))
+      (let-values
+          (((first-heap-address-data _)
+            (i32-as-wasm-data (align-address (last-literal-data-address program) 4))))
         (cons
-         `(data (i32.const ,heap-memory-start-vector)
-                ,(car (i32-as-wasm-data first-heap-address)))
+         `(data (i32.const ,heap-memory-start-vector) ,first-heap-address-data)
          (compiled-program-flatmap-definitions
           program
           (lambda (def)

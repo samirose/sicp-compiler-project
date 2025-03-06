@@ -42,7 +42,7 @@
 
     (define (wasm-local-definitions-to-top seq)
       (let-values (((local-definitions statements)
-                   (partition wasm-locals-definition? seq)))
+                    (partition wasm-locals-definition? seq)))
 	(append local-definitions statements)))
 
     (define (wasm-import-exp? exp)
@@ -55,7 +55,7 @@
     (define (i32-as-wasm-data n)
       (do ((bytes (make-bytevector 4))
            (i 0 (+ i 1)))
-          ((= i 4) (cons bytes 4))
+          ((= i 4) (values bytes 4))
         (bytevector-u8-set!
          bytes
          i
@@ -64,7 +64,7 @@
           #xff))))
 
     (define (string-as-wasm-data s)
-      (cons s (bytevector-length (string->utf8 s))))
+      (values s (bytevector-length (string->utf8 s))))
 
     (define (emit-wat-string-char c port)
       ;; W3C / WebAssembly Core Specification / 6.3.3. Strings

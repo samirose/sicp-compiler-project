@@ -2,17 +2,20 @@
         (wasm-syntax)
         (assert))
 
-(assert-equal
- '("" . 0)
- (string-as-wasm-data "")
- "empty string produces data with empty string and zero length")
+(let-values
+    (((data length) (string-as-wasm-data "")))
+  (assert-equal "" data "data of empty string is the empty string")
+  (assert-equal 0 length "data length of empty string is zero"))
 
-(assert-equal
- '("str" . 3)
- (string-as-wasm-data "str")
- "single string produces the string as wasm data with the length of the string in bytes")
+(let-values
+    (((data length) (string-as-wasm-data "str")))
+  (assert-equal "str" data "data of string is the string")
+  (assert-equal 3 length "data length of a string is the string length in bytes"))
 
-(assert-equal
- '(#u8(#x12 #x34 #xab #xcd) . 4)
- (i32-as-wasm-data #xcdab3412)
- "word value produces bytevector in little-endian order with length of 4")
+(let-values
+    (((data length) (i32-as-wasm-data #xcdab3412)))
+  (assert-equal
+   #u8(#x12 #x34 #xab #xcd)
+   data
+   "data of number as i32 is a bytevector of the value in little-endian order")
+  (assert-equal 4 length "data length of a number as i32 is 4"))
